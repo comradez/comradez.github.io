@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://example.com/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130102950882.png">
 <meta property="og:image" content="http://example.com/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130103012084.png">
 <meta property="article:published_time" content="2021-01-30T02:40:11.000Z">
-<meta property="article:modified_time" content="2021-01-30T03:20:35.091Z">
+<meta property="article:modified_time" content="2021-01-30T03:22:33.658Z">
 <meta property="article:author" content="茨月">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210128224251578.png">
@@ -196,7 +196,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-30 10:40:11 / 修改时间：11:20:35" itemprop="dateCreated datePublished" datetime="2021-01-30T10:40:11+08:00">2021-01-30</time>
+              <time title="创建时间：2021-01-30 10:40:11 / 修改时间：11:22:33" itemprop="dateCreated datePublished" datetime="2021-01-30T10:40:11+08:00">2021-01-30</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -245,12 +245,12 @@
 <h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>概念简介：</p>
 <p>一个<code>atom</code>包含一个谓词和若干个项，因为我们考虑的是无函数的一阶逻辑，每个项只能是常量或者变量。例如，$[grandfatherOf, \textbf{Q}, BART]$是一个包含了谓词<code>grandfatherOf</code>和两个项（变量<code>Q</code>和常量<code>BART</code>）的<code>atom</code></p>
 <p>一个<code>rule</code>形如$H\text{:-}B$，其中H是一个<code>atom</code>，B是一系列<code>atom</code>的合取（可能为空），（代表B推出H）</p>
-<p>一个不含变量的<code>rule</code>叫做<code>ground </code>rule``，一个B为空的<code>rule</code>叫做<code>fact</code></p>
+<p>一个不含变量的<code>rule</code>叫做<code>ground rule</code>，一个B为空的<code>rule</code>叫做<code>fact</code></p>
 <p>一个<code>substitution set</code>形如$\psi={X_1/t_1, X_2/t_2,…,X_N/t_N}$，其中$X_i$是变量，而$t_i$是用于替换变量的值。将一个<code>substitution set</code>应用于一个<code>atom</code>即为将这个<code>atom</code>中的所有变量替换为<code>substitution set</code>中对应的替换值。</p>
 <p>给定一个query（也称作goal），以$[grandfatherOf, \textbf{Q}, BART]$为例，我们可以用Prolog’s backward chaining algorithm来找到Q适合的替换值。</p>
 <p>总地来说，这个算法基于两个函数，OR和AND。</p>
 <p>首先，OR遍历所有的<code>rule</code>（包括<code>fact</code>），将每个<code>rule</code>的H和goal进行合并（谓词相同才可以合并，用goal里的对象对应地替换<code>rule</code>里的对象），同时更新<code>substitution set</code>。因为只要有一条<code>rule</code>能够成功合并就足够了，所以这个操作称作OR。</p>
-<p>当合并成功后，OR会调用AND来证明<code>rule</code>的body中的所有<code>rule</code>（也叫作subgoal）。AND首先将<code>substitution set</code>应用于第一个<code>atom</code>，然后继续调用OR来证明他；随后对每一个body中的atom都做相同的事情。只有所有的atom都被证明才可以说明goal被证明，所以这个操作叫做AND。</p>
+<p>当合并成功后，OR会调用AND来证明<code>rule</code>的body中的所有<code>rule</code>（也叫作subgoal）。AND首先将<code>substitution set</code>应用于第一个<code>atom</code>，然后继续调用OR来证明他；随后对每一个body中的<code>atom</code>都做相同的事情。只有所有的<code>atom</code>都被证明才可以说明goal被证明，所以这个操作叫做AND。</p>
 <p>举一个例子：</p>
 <p>goal是$[grandfatherOf, \textbf{Q}, BART]$。</p>
 <p>有一条<code>rule</code>是$[grandfatherOf, \textbf{X}, \textbf{Y}]\text{:-}[[fatherOf, \textbf{X}, \textbf{Z}],[parentOf, \textbf{Z}, \textbf{Y}]]$</p>
@@ -261,32 +261,32 @@
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210128224319624.png" class>
 
 <h3 id="Differentiable-Prover"><a href="#Differentiable-Prover" class="headerlink" title="Differentiable Prover"></a>Differentiable Prover</h3><p>我们将NTP的构建表述为一系列<code>module</code>的构建。每个<code>module</code>输入一些离散的对象（如<code>atom</code>和<code>rule</code>）和一个<code>proof state</code>，同时输出若干新的<code>proof state</code>。</p>
-<p>一个<code>proof state</code>$S = (\psi, \rho)$由<code>substitution set</code> $\psi$和神经网络$\rho$构成。其中$\psi$是截至目前的<code>substitution set</code>，$\rho$会输出一个（部分）证明的success score（是实数）。尽管离散的对象和<code>substitution set</code>都只在建立网络的过程中用到，一旦网络建立完成，在训练和测试的时候对于不同的proof我们就可以计算连续的proof success score。</p>
-<p><code>module</code>由离散的对象和<code>substitution set</code>实例化。他们构成了一个表示（部分）证明的success score的神经网络，同时递归地实例化子<code>module</code>来继续证明。</p>
+<p>一个<code>proof state</code>$S = (\psi, \rho)$由<code>substitution set</code> $\psi$和神经网络$\rho$构成。其中$\psi$是截至目前的<code>substitution set</code>，$\rho$会输出一个（部分）证明的<code>success score</code>（是实数）。尽管离散的对象和<code>substitution set</code>都只在建立网络的过程中用到，一旦网络建立完成，在训练和测试的时候对于不同的proof我们就可以计算连续的proof <code>success score</code>。</p>
+<p><code>module</code>由离散的对象和<code>substitution set</code>实例化。他们构成了一个表示（部分）证明的<code>success score</code>的神经网络，同时递归地实例化子<code>module</code>来继续证明。</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210128234749898.png" class>
 
 <p>所有<code>module</code>都共享以下声明：$D\times S\to S^N$，其中D是控制网络构建的域，S是<code>proof state</code>的域，N是输出<code>proof state</code>的数目。进一步地，我们记$S_\psi$为<code>proof state</code> S对应的<code>substitution set</code>，$S_p$为它对应的神经网络</p>
-<h4 id="合并模块"><a href="#合并模块" class="headerlink" title="合并模块"></a>合并模块</h4><p>在backward chaining中，两个atom的合并是核心（例如，一个是我们要证明的goal，另一个是一条<code>rule</code>的<code>rule head</code>）。在朴素的backward chaining中，两个非变量的符号要检查是否一致——一致才可以合并，否则直接退出。然而，我们希望的是让它对于不完全一致而含义类似（e.g. <code>grandfatherOf</code>和<code>grandpaOf</code>）的也进行合并，因此我们通过神经网络来衡量两个符号在向量空间中的相似性。</p>
-<p>unify模块就用来更新<code>substitution set</code>并创建一个可以比较非变量符号的向量表示的相似性的神经网络。它的签名形如$L\times L\times S\to S$，其中L是由所有项的列表构成的集合（L中的元素都是包含若干项的列表），S是<code>proof state</code>的定义域。unify模块接受两个atom（表示为项的集合形式）和一个上游<code>proof state</code>，返回一个下游<code>proof state</code>。</p>
-<p>unify模块首先遍历两个atom并且比较这些符号，如果一个符号是变量那么更新<code>substitution set</code>；否则将他们通过一个径向基函数(<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Radial_basis_function">radial basis function</a>)核，作者选取的超参数$\mu=\frac{1}{\sqrt{2}}$</p>
+<h4 id="合并模块"><a href="#合并模块" class="headerlink" title="合并模块"></a>合并模块</h4><p>在backward chaining中，两个<code>atom</code>的合并是核心（例如，一个是我们要证明的goal，另一个是一条<code>rule</code>的<code>rule head</code>）。在朴素的backward chaining中，两个非变量的符号要检查是否一致——一致才可以合并，否则直接退出。然而，我们希望的是让它对于不完全一致而含义类似（e.g. <code>grandfatherOf</code>和<code>grandpaOf</code>）的也进行合并，因此我们通过神经网络来衡量两个符号在向量空间中的相似性。</p>
+<p>unify模块就用来更新<code>substitution set</code>并创建一个可以比较非变量符号的向量表示的相似性的神经网络。它的签名形如$L\times L\times S\to S$，其中L是由所有项的列表构成的集合（L中的元素都是包含若干项的列表），S是<code>proof state</code>的定义域。unify模块接受两个<code>atom</code>（表示为项的集合形式）和一个上游<code>proof state</code>，返回一个下游<code>proof state</code>。</p>
+<p>unify模块首先遍历两个<code>atom</code>并且比较这些符号，如果一个符号是变量那么更新<code>substitution set</code>；否则将他们通过一个径向基函数(<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Radial_basis_function">radial basis function</a>)核，作者选取的超参数$\mu=\frac{1}{\sqrt{2}}$</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130092554431.png" class>
 
-<p>具体的unify规则如上所示，如果两个atom都空，那么输入<code>proof state</code>不变；如果只有一个为空，那么unify失败；如果两个都不为空，那么按照下面的两个公式逐元素进行unify。</p>
+<p>具体的unify规则如上所示，如果两个<code>atom</code>都空，那么输入<code>proof state</code>不变；如果只有一个为空，那么unify失败；如果两个都不为空，那么按照下面的两个公式逐元素进行unify。</p>
 <p>其中$S’$是新<code>proof state</code>，$\nu$是变量符号的集合，$h/g$表示用值g替换变量h（也就是更新<code>substitution set</code>的过程）。这里的$S_\rho’$实际上是一个神经网络，min里面的值是【如果将这组输入喂给神经网络那么神经网络会输出的结果】。</p>
 <p>注意到$S_\rho$的值一定落在$(0,1]$上。</p>
-<h4 id="OR模块"><a href="#OR模块" class="headerlink" title="OR模块"></a>OR模块</h4><p>or模块的签名为$L\times \mathbb{N}\times S\to S^N$，其中L是所有goal atom的集合，$\mathbb{N}$是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。</p>
+<h4 id="OR模块"><a href="#OR模块" class="headerlink" title="OR模块"></a>OR模块</h4><p>or模块的签名为$L\times \mathbb{N}\times S\to S^N$，其中L是所有goal <code>atom</code>的集合，$\mathbb{N}$是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。</p>
 <p>基于unify模块，or模块的定义是</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130100730881.png" class>
 
 <p>类似backward chaining中的做法，对每个<code>rule</code>取出head去unify，然后对unify得到的东西去做and操作。</p>
-<h4 id="and模块"><a href="#and模块" class="headerlink" title="and模块"></a>and模块</h4><p>首先定义一个辅助函数substitute，只要可能就会在atom中将变量替换（能换的尽量换）</p>
+<h4 id="and模块"><a href="#and模块" class="headerlink" title="and模块"></a>and模块</h4><p>首先定义一个辅助函数substitute，只要可能就会在<code>atom</code>中将变量替换（能换的尽量换）</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130101058127.png" class>
 
-<p>and模块的签名签名为$L\times \mathbb{N}\times S\to S^N$，其中L是所有goal atom的集合，$\mathbb{N}$是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。（和or一样）</p>
+<p>and模块的签名签名为$L\times \mathbb{N}\times S\to S^N$，其中L是所有<code>goal atom</code>的集合，$\mathbb{N}$是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。（和or一样）</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130101519851.png" class>
 
-<p>如果S是FAIL，或者剩余的步数是0，那么and操作都会失败。如果atom集合为空，那么直接将输入<code>proof state</code>输出。否则将atom集合中的每个元素拿出来，经过substitute替换后用or去递归建立神经网络。</p>
-<h4 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h4><p>最终通过以下公式计算success score</p>
+<p>如果S是FAIL，或者剩余的步数是0，那么and操作都会失败。如果<code>atom</code>集合为空，那么直接将输入<code>proof state</code>输出。否则将<code>atom</code>集合中的每个元素拿出来，经过substitute替换后用or去递归建立神经网络。</p>
+<h4 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h4><p>最终通过以下公式计算<code>success score</code></p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130102203392.png" class>
 
 <h3 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h3><p>NTP loss用负对数定义</p>
