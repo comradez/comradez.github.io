@@ -28,8 +28,11 @@
 <meta property="og:description" content="LEARNING A SAT SOLVER FROM SINGLE-BIT SUPERVISION 阅读笔记论文地址 引入作者希望用神经网络来解决SAT问题，提出了NeuroSAT模型。 NeuroSAT在训练过程中对每个问题的监督只有“可满足”和“不可满足”两种状态。测试时，每次给一个SAT问题P，NeuroSAT就会给出这个问题是否可满足，而且如果一个问题被判定为可满足，我们几乎总是可以从激活">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130133955785.png">
+<meta property="og:image" content="http://example.com/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131101904684.png">
+<meta property="og:image" content="http://example.com/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131111537138.png">
+<meta property="og:image" content="c:/Users/张楚炎/AppData/Roaming/Typora/typora-user-images/image-20210131113320182.png">
 <meta property="article:published_time" content="2021-01-30T05:44:22.000Z">
-<meta property="article:modified_time" content="2021-01-30T05:45:15.300Z">
+<meta property="article:modified_time" content="2021-01-31T04:05:58.540Z">
 <meta property="article:author" content="茨月">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130133955785.png">
@@ -185,10 +188,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-01-30 13:44:22 / 修改时间：13:45:15" itemprop="dateCreated datePublished" datetime="2021-01-30T13:44:22+08:00">2021-01-30</time>
+              <time title="创建时间：2021-01-30 13:44:22" itemprop="dateCreated datePublished" datetime="2021-01-30T13:44:22+08:00">2021-01-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-31 12:05:58" itemprop="dateModified" datetime="2021-01-31T12:05:58+08:00">2021-01-31</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -234,6 +243,43 @@
 <img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130133955785.png" class>
 
 <p>左半部分是迭代的第一步，右半部分是第二步。</p>
+<p>具体地来讲，模型用两个向量$L_{init}, C_{init}$（都是$\mathbb{R}^d$）初始化，包含三个多层感知机$L_{msg}, C_{msg}, L_{vote}$和两个有Layer-Norm的LSTM $L_u, C_u$。</p>
+<p>在每个时间点$t$，我们都用一个矩阵$L^{(t)}\in \mathbb{R}^{2n\times d}$来表示字面量的embedding（一共n个字面量，加上补就有2n个，每个的embedding维度都是d），一个矩阵$C^{(t)}\in \mathbb{R}^{m\times d}$来表示子句的embedding（一共m个子句，每个的embedding维度都是d）。他们分别用$L_{init}$和$C_{init}$堆起来进行初始化。同时，还有LSTM使用的隐状态$L^{(t)}_h$和$C_h^{(t)}$（尺寸和上面的对应），初始化为零矩阵。</p>
+<p>定义矩阵$M$为图的关联矩阵（原文叫邻接矩阵，但我记得离散2里把点和边的连通性矩阵叫关联矩阵，anyway），即$M_{ij}=1$当且仅当第$i$个字面量$l_i$出现在子句$c_j$中。</p>
+<p>定义<code>Flip</code>操作，每次接受一个矩阵L，将L中每个字面量对应的行替换为它的否定对应的行（即如果矩阵L的四行分别对应$P, Q, \neg P, \neg Q$，那么<code>Flip</code>后的矩阵四行分别对应$\neg P, \neg Q, P, Q$）然后输出。</p>
+<p>一次迭代过程表示如下（注意和上面文字描述的版本相对应）：</p>
+<img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131101904684.png" class>
+
+<p>第一行是更新子句矩阵，用关联矩阵去乘$L_{msg}$作用下的$L^{(t)}$，每个子句就只受到它相关的字面量的影响。</p>
+<p>第二行是更新字面量矩阵，除了隐状态$L_h^{(t)}$和$M\text{C}_{msg}(C^{t+1})$以外，他还引入了<code>Flip(</code>$L(t)$<code>)</code>来引入否定不变性。</p>
+<p>在$T$次迭代后（一开始设置的最长迭代步数），用最后的一个全连接$L_{vote}(L^{(T)})$来得到结果向量$L_<em>^{(T)}\in\mathbb{R^{2n}}$，每个字面量得到一个标量值；再将这个向量取平均得到$y^{(t)}=\text{mean}(L_</em>^{(T)})\in \mathbb{R}$，通过训练使得$y^{(T)}$和真实标签$\phi(P)$之间的sigmoid cross-entropy loss最小。</p>
+<p>这个模型的好处：</p>
+<ul>
+<li>在架构设计上引入了排列不变形和否定不变性</li>
+<li>与问题规模无关，可以处理各种规模的问题</li>
+</ul>
+<h2 id="训练数据"><a href="#训练数据" class="headerlink" title="训练数据"></a>训练数据</h2><p>作者希望让模型有比较好的泛化能力，而不只是从某些领域内学得很好而其他地方很烂。</p>
+<p>因此作者创建了一个问题集$\mathbf{SR}(n)$，由包含$n$个变量的SAT问题对组成，每对中一个是可满足的，一个是不可满足的，而且他们只在一个子句中对一个字面量取否定就可以相互转换（换言之，加上/去掉一个$\neg$，这两个问题就一模一样）。</p>
+<p>怎么取的我就不关心了。</p>
+<h2 id="预测可满足性"><a href="#预测可满足性" class="headerlink" title="预测可满足性"></a>预测可满足性</h2><p>首先在$\mathbf{SR}(40)$上做（虽然这种东西对于现代SAT求解器来说很容易，但在ML方面来看仍然是困难的）。</p>
+<p>朴素LSTM直接歇逼，准确率不足50%（即不如瞎蒙）；MiniSAT求解器平均需要backjump 10次（这意味着拆十次存在量词/全称量词），做超过100次基本逻辑推理。</p>
+<p>NeuroSAT用<code>d=128</code>，每个多层感知机都有3个隐层（也即一共5层？），Layer-Norm的参数选$10^{-10}$，跑26次迭代，用ADAM优化器，学习率$2\times 10^{-5}$，clip rate取0.65来全局地剪切梯度（这是不是那个dropout？）。为了方便训练，他们训的是$\mathbf{SR}(\mathbf{U}(10, 40))$，但在$\mathbf{SR}(40)$上测试，得到了85%的准确度。接下来作者试图了解如何从被认为是可满足的问题中decode出一组解。</p>
+<h2 id="解码满足条件"><a href="#解码满足条件" class="headerlink" title="解码满足条件"></a>解码满足条件</h2><img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131111537138.png" class>
+
+<p>上图中，白色代表中立，蓝色表示倾向于不可满足，红色表示倾向于可满足，颜色深浅表示置信度高低。</p>
+<p>因此我们可以看出，一开始网络整体以较低的置信度倾向于不可满足，但从一个转折点开始，有的字面量开始以较高的置信度倾向于可满足，而且很快所有字面量都开始以高置信倾向于可满足，随后网络收敛。</p>
+<p>在正确地被判定为可满足的问题里，NeuroSAT的表现都差不太多。在NeuroSAT判定为不可满足的问题里，自始至终都是低置信的不可满足——它从来不会判定一个问题是高置信地不可满足。这意味着NeuroSAT会搜寻一个可满足性的【凭证】，只要找到就会开始判定可满足。</p>
+<p>作者认为虽然引入了n个字面量的否定，但是从结果来看NeuroSAT对每个字面量还是只用了一个bit来encode。</p>
+<p>如果把高维的字面量Embedding用PCA（主成分分析）降维投影到二维，那么可以发现，上文对应的转折点前红点（支持可满足）和蓝点（支持不可满足）是无法用一条线进行划分的，而转折点后则是可以轻易划分的。</p>
+<p><img data-src="C:\Users\张楚炎\AppData\Roaming\Typora\typora-user-images\image-20210131113320182.png" alt="image-20210131113320182"></p>
+<p>因此作者认为，在转折点后挑一个时间点做PCA，然后红蓝点就分别对应了字面量取值的1和0，由此就找到了一组可行解。</p>
+<h2 id="向其他问题集泛化"><a href="#向其他问题集泛化" class="headerlink" title="向其他问题集泛化"></a>向其他问题集泛化</h2><h3 id="规模更大的问题"><a href="#规模更大的问题" class="headerlink" title="规模更大的问题"></a>规模更大的问题</h3><p>在小规模问题上训练，在大规模问题上推理，如果增加迭代次数，那么效果会提升（内心OS：MiniSAT也要backjump更多次啊 你这不是废话吗）。</p>
+<p>在$\mathbf{SR}(\mathbf{U}(10,40))$上训练的网络，在$\mathbf{SR}(200)$上也可以做，只是最好最好就是25%了……</p>
+<h3 id="不同类型的问题"><a href="#不同类型的问题" class="headerlink" title="不同类型的问题"></a>不同类型的问题</h3><p>用不同的生成随机图的方法整了一堆10个点、17条边的图，出了好多不同类型的问题比如图染色、domaining-set problem（我没查到这是啥??）、完全图搜索、点覆盖等等，最后保留了4888个问题。</p>
+<p>跑了512次迭代的NeuroSAT达到了85%的准确度。</p>
+<h2 id="寻找UNSAT-core"><a href="#寻找UNSAT-core" class="headerlink" title="寻找UNSAT core"></a>寻找UNSAT core</h2><p>在$\mathbf{SR}(\mathbf{U}(10,40))$上训练的NeuroSAT找可行解比较好，但不会给出不可行的证明，它没有暴力遍历可能性，而是随机地去撞大运。</p>
+<p>但是作者又构造了一种新的数据集叫$\mathbf{SRC}(n,u)$，和$\mathbf{SR}(n)$类似，但是每个不可实现的问题都有一个已经不可满足的子句$u$（叫unsat core）（这里unsat core是只要把一个$\neg$加上或去掉就会变回可满足的子句）</p>
+<p>在这种集合上训练的NeuroSAT（叫做NeuroUNSAT）会一上来就高置信地支持不可满足，然后在一个转折点开始低置信地支持可满足（如果判定可满足）或者在某个/某些字面量上以极其高的置信支持不可满足（如果判定不可满足）。</p>
 
     </div>
 
@@ -318,7 +364,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">LEARNING A SAT SOLVER FROM SINGLE-BIT SUPERVISION 阅读笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%BB%BA%E7%AB%8B"><span class="nav-number">1.2.</span> <span class="nav-text">问题建立</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">模型</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">LEARNING A SAT SOLVER FROM SINGLE-BIT SUPERVISION 阅读笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%BB%BA%E7%AB%8B"><span class="nav-number">1.2.</span> <span class="nav-text">问题建立</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE"><span class="nav-number">1.4.</span> <span class="nav-text">训练数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E5%8F%AF%E6%BB%A1%E8%B6%B3%E6%80%A7"><span class="nav-number">1.5.</span> <span class="nav-text">预测可满足性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E7%A0%81%E6%BB%A1%E8%B6%B3%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.6.</span> <span class="nav-text">解码满足条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E5%85%B6%E4%BB%96%E9%97%AE%E9%A2%98%E9%9B%86%E6%B3%9B%E5%8C%96"><span class="nav-number">1.7.</span> <span class="nav-text">向其他问题集泛化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%84%E6%A8%A1%E6%9B%B4%E5%A4%A7%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.7.1.</span> <span class="nav-text">规模更大的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.7.2.</span> <span class="nav-text">不同类型的问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BB%E6%89%BEUNSAT-core"><span class="nav-number">1.8.</span> <span class="nav-text">寻找UNSAT core</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
