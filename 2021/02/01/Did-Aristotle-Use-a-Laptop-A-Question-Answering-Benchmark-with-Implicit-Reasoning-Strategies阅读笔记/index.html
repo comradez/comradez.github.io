@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="论文链接 摘要 目前的多条推理数据集的一个重大缺陷是它们所要求的推理步骤都【显式地】表达在问题中。本文介绍StrategyQA，一个推理步骤【隐式地】包含在问题中，需要用策略来推导的QA基准测试。 StrategyQA一共包含2780个条目，每个条目包括：  一个策略问题（推理步骤隐含） 若干子问题，是策略问题的分解（每个推理步骤一个子问题） 包含了每个子问题答案的维基百科文段  回答是yes&#x2F;n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Did Aristotle Use a Laptop? A Question Answering Benchmark with Implicit Reasoning Strategies阅读笔记">
+<meta property="og:url" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="cy&#39;s blog">
+<meta property="og:description" content="论文链接 摘要 目前的多条推理数据集的一个重大缺陷是它们所要求的推理步骤都【显式地】表达在问题中。本文介绍StrategyQA，一个推理步骤【隐式地】包含在问题中，需要用策略来推导的QA基准测试。 StrategyQA一共包含2780个条目，每个条目包括：  一个策略问题（推理步骤隐含） 若干子问题，是策略问题的分解（每个推理步骤一个子问题） 包含了每个子问题答案的维基百科文段  回答是yes&#x2F;n">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201131940802.png">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201144658579.png">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201145953846.png">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201150132404.png">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201151737358.png">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201153837758.png">
+<meta property="og:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201153909299.png">
+<meta property="article:published_time" content="2021-02-01T08:02:58.000Z">
+<meta property="article:modified_time" content="2021-02-01T08:23:36.559Z">
+<meta property="article:author" content="茨月">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201131940802.png">
+
+<link rel="canonical" href="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Did Aristotle Use a Laptop? A Question Answering Benchmark with Implicit Reasoning Strategies阅读笔记 | cy's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">cy's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">猫猫窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Did Aristotle Use a Laptop? A Question Answering Benchmark with Implicit Reasoning Strategies阅读笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-01 16:02:58 / 修改时间：16:23:36" itemprop="dateCreated datePublished" datetime="2021-02-01T16:02:58+08:00">2021-02-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies阅读笔记/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2101.02235.pdf">论文链接</a></p>
+<h1 id="摘要">摘要</h1>
+<p>目前的多条推理数据集的一个重大缺陷是它们所要求的推理步骤都【显式地】表达在问题中。本文介绍StrategyQA，一个推理步骤【隐式地】包含在问题中，需要用策略来推导的QA基准测试。</p>
+<p>StrategyQA一共包含2780个条目，每个条目包括：</p>
+<ul>
+<li>一个策略问题（推理步骤隐含）</li>
+<li>若干子问题，是策略问题的分解（每个推理步骤一个子问题）</li>
+<li>包含了每个子问题答案的维基百科文段</li>
+</ul>
+<p>回答是yes/no。</p>
+<p>这些问题都很短而且覆盖了很大的范围，人类表现约为87%，而baseline则是66%。</p>
+<h1 id="引入">引入</h1>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201131940802.png" class>
+<p>现有的问题集一般把推理步骤显式展现在问题里，比如Q2"Was Aristotle alive when the laptop was invented?"，但在日常生活中，推理的步骤要更隐式，比如Q1"Did Aristotle use a laptop?"。事实上，后一个问题可以与前一个问题用完全相同的步骤来进行解答（如上图所示），但是它需要模型推理出“我需要对这两个时间进行比较”这样一个策略。</p>
+<p>回答隐式的问题比起回答显式的问题要更困难。首先，问题和语境的重合程度比较低，获取语境本身就比较难；其次，问题比较短，使得模型利用问题文本取捷径更加困难。因此，作者提出了StrategyQA，要求模型利用策略来回答推理步骤隐含的问题，而且覆盖了相当多的人类在回答问题时使用的策略。</p>
+<p>作者希望问题能尽可能地广泛，但是众包工人的<em>创造力</em>往往不尽人意，因此作者采取了一些方法来提升问题质量，比如给工人随机的维基百科条目、增加工人数量来减少单个人的工作量，以及在数据采集时就训练对抗模型并缓慢地提升难度。（考虑到我们的关注点是数据集本身，数据集采集方面的论述我不再记录）</p>
+<h1 id="策略问题">策略问题</h1>
+<h2 id="策略问题的要求">策略问题的要求</h2>
+<p>本文中以维基百科作为训练语料。</p>
+<p>策略问题需要具有以下特征：</p>
+<ul>
+<li>需要多步推理</li>
+<li>可行性（从语料中可以找到答案，如“独眼莲适不适合用单片镜？”可以从维基百科中找到信息“单片镜是用来戴在一只眼睛上的”、“独眼莲只有一只眼”，而“Justin Bieber有没有一台Zune？”则不行）</li>
+<li>隐式的</li>
+<li>确定的（“汉堡是三明治的一种吗？”不行，“巧克力奶昔比香草味更好喝吗？”不行）</li>
+</ul>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201144658579.png" class>
+<h2 id="策略问题的分解">策略问题的分解</h2>
+<p>每个策略问题可以分解为若干个步骤问题，每个问题对应一个基本的步骤。步骤问题中可能存在占位符，表示前面问题的结果。</p>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201145953846.png" class>
+<p>没有截全，但是这两个例子足以解释。</p>
+<p>斜体是输入中显式给出的信息，而粗体是输入中隐含的信息。</p>
+<h1 id="数据采集过程">数据采集过程</h1>
+<p>略过</p>
+<h1 id="strategyqa-数据集">StrategyQA 数据集</h1>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201150132404.png" class>
+<div data-align="center">
+基本统计信息
+</div>
+<ul>
+<li><p>Yes/No回答数目基本一致</p></li>
+<li><p>问题比较短（相比HotpotQA和WebQuestions而言），而且重复度比较低</p></li>
+<li><p>既要求多跳，又隐式包含推理信息</p></li>
+<li><p>包含许多分类</p></li>
+</ul>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201151737358.png" class>
+<div data-align="center">
+分类信息（最后一个好损）
+</div>
+<h1 id="实验和evaluation">实验和Evaluation</h1>
+<h2 id="基线模型">基线模型</h2>
+<p>回答StrategyQA的问题需要很多外部知识，仅仅用这两千个问题训练是远远不够的。</p>
+<p>因此基线模型基于预训练的语言模型，在辅助数据集上finetune得到。具体地讲，是RoBERTa，在以下数据集上finetune：</p>
+<ul>
+<li>BoolQ</li>
+<li>MNLI</li>
+<li>Twenty Questions</li>
+<li>DROP</li>
+</ul>
+<p>模型有两种配置：</p>
+<ul>
+<li><p>无语境：</p>
+<p>只喂问题，输出0/1，用特殊的CLS token（？）</p></li>
+<li><p>有语境：</p>
+<p>用BM25从语料中抽取语境，把问题和抽取出的语境concat到一起，把512个token后面trunc调，然后输出0/1预测。</p></li>
+</ul>
+<h3 id="预测问题的分解">预测问题的分解</h3>
+<p>在StrategyQA上finetune了一个BART（称为<span class="math inline">\(\text{BART}_{\text{DECOMP}}\)</span>），来输入问题，输出它的分解（也就是若干子问题）。</p>
+<h3 id="基线模型-1">基线模型</h3>
+<p>作者用<span class="math inline">\(\text{RoBERTa}\)</span>，一次在DROP、20Q和BoolQ上finetune。在DROP上训练时，首先用多输出头，然后再替换为单个布尔值输出。这个finetune过的模型被称作<span class="math inline">\(\text{RoBERTa}^{*}\)</span>。</p>
+<p>作者用了以下模型作为基线：</p>
+<ul>
+<li><p><span class="math inline">\(\text{RoBERTa}^{*}\_{\phi}\)</span>，无语境finetune的<span class="math inline">\(\text{RoBERTa}^{*}\)</span></p></li>
+<li><p><span class="math inline">\(\text{RoBERTa}^{*}_{\text{IR-Q}}\)</span>和<span class="math inline">\(\text{RoBERTa}_{\text{IR-Q}}\)</span>，分别是使用了对问题整体抽取语境的<span class="math inline">\(\text{RoBERTa}^{*}\)</span>和<span class="math inline">\(\text{RoBERTa}\)</span></p></li>
+<li><p><span class="math inline">\(\text{RoBERTa}^{*}_{\text{IR-D}}\)</span>，对问题首先做了一次分解（上文的<span class="math inline">\(\text{BART}_{\text{DECOMP}}\)</span>），然后再抽取语境的<span class="math inline">\(\text{RoBERTa}^*\)</span></p></li>
+</ul>
+<p>后面几个oracle模型，又什么gold paragraph又什么gold decomposition的，没明白。图片放在这了。</p>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201153837758.png" class>
+<p>结果如下：</p>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201153909299.png" class>
+<h2 id="结果分析">结果分析</h2>
+<p><span class="math inline">\(\text{RoBERTa}^{*}_{\text{IR-Q}}\)</span>暴打<span class="math inline">\(\text{RoBERTa}_{\text{IR-Q}}\)</span>，说明在辅助数据集上finetune是很有用的，所以我们下文就只关心<span class="math inline">\(\text{RoBERTa}^{*}\)</span>了。</p>
+<p>不用语境训练使得acc从53.9上升到了63.6，说明大型语言模型在相关数据集上嗯训也能训出东西来。</p>
+<p>不过在<em>gold</em> paragraph（这到底是啥啊）上训练就能提升到70.7，说明高质量的预警抽取可以让模型跑得更有效。</p>
+<p>而且加入decomposition之后进一步提升到72.0，说明分解有用（内心OS：但用处不大）</p>
+<p>不在辅助数据集上finetune的话，即使用语境也不如在辅助数据集上finetune过但没有语境的模型。所以说没有辅助数据集，表现会很垃圾。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" rel="prev" title="NLProlog: Reasoning with Weak Unification for Question Answering in Natural Language阅读笔记">
+      <i class="fa fa-chevron-left"></i> NLProlog: Reasoning with Weak Unification for Question Answering in Natural Language阅读笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/" rel="next" title="更换hexo的渲染引擎">
+      更换hexo的渲染引擎 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">2.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">策略问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E9%97%AE%E9%A2%98%E7%9A%84%E8%A6%81%E6%B1%82"><span class="nav-number">3.1.</span> <span class="nav-text">策略问题的要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E9%97%AE%E9%A2%98%E7%9A%84%E5%88%86%E8%A7%A3"><span class="nav-number">3.2.</span> <span class="nav-text">策略问题的分解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">数据采集过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#strategyqa-%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">5.</span> <span class="nav-text">StrategyQA 数据集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%92%8Cevaluation"><span class="nav-number">6.</span> <span class="nav-text">实验和Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%BA%BF%E6%A8%A1%E5%9E%8B"><span class="nav-number">6.1.</span> <span class="nav-text">基线模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E9%97%AE%E9%A2%98%E7%9A%84%E5%88%86%E8%A7%A3"><span class="nav-number">6.1.1.</span> <span class="nav-text">预测问题的分解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%BA%BF%E6%A8%A1%E5%9E%8B-1"><span class="nav-number">6.1.2.</span> <span class="nav-text">基线模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90"><span class="nav-number">6.2.</span> <span class="nav-text">结果分析</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="茨月"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">茨月</p>
+  <div class="site-description" itemprop="description">计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/comradez" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;comradez" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.tapechat.net/u/ma8muL/ZHBR0I2H" title="Tape → https:&#x2F;&#x2F;www.tapechat.net&#x2F;u&#x2F;ma8muL&#x2F;ZHBR0I2H" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>Tape</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" title="Ayayayayayaya → https:&#x2F;&#x2F;thwiki.cc&#x2F;%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" rel="noopener" target="_blank"><i class="fab fa-canadian-maple-leaf fa-fw"></i>Ayayayayayaya</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">茨月</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zcyblog.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/";
+    this.page.identifier = "2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies阅读笔记/";
+    this.page.title = "Did Aristotle Use a Laptop? A Question Answering Benchmark with Implicit Reasoning Strategies阅读笔记";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zcyblog.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

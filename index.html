@@ -158,6 +158,257 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/" class="post-title-link" itemprop="url">更换hexo的渲染引擎</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-01 16:25:41 / 修改时间：16:35:20" itemprop="dateCreated datePublished" datetime="2021-02-01T16:25:41+08:00">2021-02-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%9A%E5%AE%A2/" itemprop="url" rel="index"><span itemprop="name">博客</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/01/更换hexo的渲染引擎/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>今天写论文笔记的时候，发现hexo对mathjax渲染的时候Markdown和<span class="math inline">\(\LaTeX\)</span>会产生冲突，主要是<code>_</code>和<code>*</code>这两个字符。之前因为问题加个<code>\</code>就解决了，所以也没有在意。但是今天这个冲突比较厉害，一时间改不过来，去查找解决方案的时候发现可以把hexo的渲染引擎改为pandoc。 首先检查有没有安装pandoc <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install pandoc</span><br></pre></td></tr></table></figure> 发现pandoc已经安装 然后卸载默认渲染器，安装pandoc渲染插件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm uninstall hexo-renderer-marked --save</span><br><span class="line">npm install hexo-renderer-pandoc --save</span><br></pre></td></tr></table></figure>
+<p>当我满心欢喜地<code>hexo g</code>的时候，却发现报了错误"pandoc: Unknown extension: smart" 查过之后发现问题在于pandoc版本太低，需要改为2以上。 可是apt明明告诉我版本是最新的啊？ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pandoc --version</span><br></pre></td></tr></table></figure> 发现不但是1.19.2.4，而且还是i386…… 于是到官网上去下载，官网上也有现成的针对各大distro的安装包 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;github.com&#x2F;jgm&#x2F;pandoc&#x2F;releases&#x2F;download&#x2F;2.11.4&#x2F;pandoc-2.11.4-1-amd64.deb</span><br><span class="line">sudo dpkg -i pandoc-2.11.4-1-amd64.deb</span><br></pre></td></tr></table></figure> 然后再<code>hexo g</code>就可以啦！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Did Aristotle Use a Laptop? A Question Answering Benchmark with Implicit Reasoning Strategies阅读笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-01 16:02:58 / 修改时间：16:23:36" itemprop="dateCreated datePublished" datetime="2021-02-01T16:02:58+08:00">2021-02-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies阅读笔记/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2101.02235.pdf">论文链接</a></p>
+<h1 id="摘要">摘要</h1>
+<p>目前的多条推理数据集的一个重大缺陷是它们所要求的推理步骤都【显式地】表达在问题中。本文介绍StrategyQA，一个推理步骤【隐式地】包含在问题中，需要用策略来推导的QA基准测试。</p>
+<p>StrategyQA一共包含2780个条目，每个条目包括：</p>
+<ul>
+<li>一个策略问题（推理步骤隐含）</li>
+<li>若干子问题，是策略问题的分解（每个推理步骤一个子问题）</li>
+<li>包含了每个子问题答案的维基百科文段</li>
+</ul>
+<p>回答是yes/no。</p>
+<p>这些问题都很短而且覆盖了很大的范围，人类表现约为87%，而baseline则是66%。</p>
+<h1 id="引入">引入</h1>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201131940802.png" class>
+<p>现有的问题集一般把推理步骤显式展现在问题里，比如Q2"Was Aristotle alive when the laptop was invented?"，但在日常生活中，推理的步骤要更隐式，比如Q1"Did Aristotle use a laptop?"。事实上，后一个问题可以与前一个问题用完全相同的步骤来进行解答（如上图所示），但是它需要模型推理出“我需要对这两个时间进行比较”这样一个策略。</p>
+<p>回答隐式的问题比起回答显式的问题要更困难。首先，问题和语境的重合程度比较低，获取语境本身就比较难；其次，问题比较短，使得模型利用问题文本取捷径更加困难。因此，作者提出了StrategyQA，要求模型利用策略来回答推理步骤隐含的问题，而且覆盖了相当多的人类在回答问题时使用的策略。</p>
+<p>作者希望问题能尽可能地广泛，但是众包工人的<em>创造力</em>往往不尽人意，因此作者采取了一些方法来提升问题质量，比如给工人随机的维基百科条目、增加工人数量来减少单个人的工作量，以及在数据采集时就训练对抗模型并缓慢地提升难度。（考虑到我们的关注点是数据集本身，数据集采集方面的论述我不再记录）</p>
+<h1 id="策略问题">策略问题</h1>
+<h2 id="策略问题的要求">策略问题的要求</h2>
+<p>本文中以维基百科作为训练语料。</p>
+<p>策略问题需要具有以下特征：</p>
+<ul>
+<li>需要多步推理</li>
+<li>可行性（从语料中可以找到答案，如“独眼莲适不适合用单片镜？”可以从维基百科中找到信息“单片镜是用来戴在一只眼睛上的”、“独眼莲只有一只眼”，而“Justin Bieber有没有一台Zune？”则不行）</li>
+<li>隐式的</li>
+<li>确定的（“汉堡是三明治的一种吗？”不行，“巧克力奶昔比香草味更好喝吗？”不行）</li>
+</ul>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201144658579.png" class>
+<h2 id="策略问题的分解">策略问题的分解</h2>
+<p>每个策略问题可以分解为若干个步骤问题，每个问题对应一个基本的步骤。步骤问题中可能存在占位符，表示前面问题的结果。</p>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201145953846.png" class>
+<p>没有截全，但是这两个例子足以解释。</p>
+<p>斜体是输入中显式给出的信息，而粗体是输入中隐含的信息。</p>
+<h1 id="数据采集过程">数据采集过程</h1>
+<p>略过</p>
+<h1 id="strategyqa-数据集">StrategyQA 数据集</h1>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201150132404.png" class>
+<div data-align="center">
+基本统计信息
+</div>
+<ul>
+<li><p>Yes/No回答数目基本一致</p></li>
+<li><p>问题比较短（相比HotpotQA和WebQuestions而言），而且重复度比较低</p></li>
+<li><p>既要求多跳，又隐式包含推理信息</p></li>
+<li><p>包含许多分类</p></li>
+</ul>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201151737358.png" class>
+<div data-align="center">
+分类信息（最后一个好损）
+</div>
+<h1 id="实验和evaluation">实验和Evaluation</h1>
+<h2 id="基线模型">基线模型</h2>
+<p>回答StrategyQA的问题需要很多外部知识，仅仅用这两千个问题训练是远远不够的。</p>
+<p>因此基线模型基于预训练的语言模型，在辅助数据集上finetune得到。具体地讲，是RoBERTa，在以下数据集上finetune：</p>
+<ul>
+<li>BoolQ</li>
+<li>MNLI</li>
+<li>Twenty Questions</li>
+<li>DROP</li>
+</ul>
+<p>模型有两种配置：</p>
+<ul>
+<li><p>无语境：</p>
+<p>只喂问题，输出0/1，用特殊的CLS token（？）</p></li>
+<li><p>有语境：</p>
+<p>用BM25从语料中抽取语境，把问题和抽取出的语境concat到一起，把512个token后面trunc调，然后输出0/1预测。</p></li>
+</ul>
+<h3 id="预测问题的分解">预测问题的分解</h3>
+<p>在StrategyQA上finetune了一个BART（称为<span class="math inline">\(\text{BART}_{\text{DECOMP}}\)</span>），来输入问题，输出它的分解（也就是若干子问题）。</p>
+<h3 id="基线模型-1">基线模型</h3>
+<p>作者用<span class="math inline">\(\text{RoBERTa}\)</span>，一次在DROP、20Q和BoolQ上finetune。在DROP上训练时，首先用多输出头，然后再替换为单个布尔值输出。这个finetune过的模型被称作<span class="math inline">\(\text{RoBERTa}^{*}\)</span>。</p>
+<p>作者用了以下模型作为基线：</p>
+<ul>
+<li><p><span class="math inline">\(\text{RoBERTa}^{*}\_{\phi}\)</span>，无语境finetune的<span class="math inline">\(\text{RoBERTa}^{*}\)</span></p></li>
+<li><p><span class="math inline">\(\text{RoBERTa}^{*}_{\text{IR-Q}}\)</span>和<span class="math inline">\(\text{RoBERTa}_{\text{IR-Q}}\)</span>，分别是使用了对问题整体抽取语境的<span class="math inline">\(\text{RoBERTa}^{*}\)</span>和<span class="math inline">\(\text{RoBERTa}\)</span></p></li>
+<li><p><span class="math inline">\(\text{RoBERTa}^{*}_{\text{IR-D}}\)</span>，对问题首先做了一次分解（上文的<span class="math inline">\(\text{BART}_{\text{DECOMP}}\)</span>），然后再抽取语境的<span class="math inline">\(\text{RoBERTa}^*\)</span></p></li>
+</ul>
+<p>后面几个oracle模型，又什么gold paragraph又什么gold decomposition的，没明白。图片放在这了。</p>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201153837758.png" class>
+<p>结果如下：</p>
+<img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201153909299.png" class>
+<h2 id="结果分析">结果分析</h2>
+<p><span class="math inline">\(\text{RoBERTa}^{*}_{\text{IR-Q}}\)</span>暴打<span class="math inline">\(\text{RoBERTa}_{\text{IR-Q}}\)</span>，说明在辅助数据集上finetune是很有用的，所以我们下文就只关心<span class="math inline">\(\text{RoBERTa}^{*}\)</span>了。</p>
+<p>不用语境训练使得acc从53.9上升到了63.6，说明大型语言模型在相关数据集上嗯训也能训出东西来。</p>
+<p>不过在<em>gold</em> paragraph（这到底是啥啊）上训练就能提升到70.7，说明高质量的预警抽取可以让模型跑得更有效。</p>
+<p>而且加入decomposition之后进一步提升到72.0，说明分解有用（内心OS：但用处不大）</p>
+<p>不在辅助数据集上finetune的话，即使用语境也不如在辅助数据集上finetune过但没有语境的模型。所以说没有辅助数据集，表现会很垃圾。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -280,7 +531,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-31 14:27:11" itemprop="dateModified" datetime="2021-01-31T14:27:11+08:00">2021-01-31</time>
+                <time title="修改时间：2021-02-01 16:25:00" itemprop="dateModified" datetime="2021-02-01T16:25:00+08:00">2021-02-01</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -318,52 +569,58 @@
 
       
           <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1802.03685.pdf">论文地址</a></p>
-<h1 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h1><p>作者希望用神经网络来解决SAT问题，提出了NeuroSAT模型。</p>
+<h1 id="引入">引入</h1>
+<p>作者希望用神经网络来解决SAT问题，提出了NeuroSAT模型。</p>
 <p>NeuroSAT在训练过程中对每个问题的监督只有“可满足”和“不可满足”两种状态。测试时，每次给一个SAT问题P，NeuroSAT就会给出这个问题是否可满足，而且如果一个问题被判定为可满足，我们<strong>几乎总是</strong>可以从激活函数中找到一组合法的值代入。</p>
 <p>他们又对模型进行了修改，输入的是有少量矛盾的不可满足问题，让模型自己去找到矛盾并改正，他们把这个修改叫NeuroUNSAT。</p>
-<h1 id="问题建立"><a href="#问题建立" class="headerlink" title="问题建立"></a>问题建立</h1><p>SAT问题的定义：存在一组值代入后使得公式P为真，那么P是可满足的；否则P是不可满足的。</p>
-<h1 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h1><p>SAT问题都具有比较简单的句法，因此用RNN之类的东西可以直接encode进向量空间里。但是，命题逻辑的语义里包含了丰富的不变性，如排列不变性（$P\wedge Q = Q \wedge P$）和否定不变性（$P$和$\neg P$可满足性相同），这些不变量用句法级别的encoding会被忽略。</p>
-<p>由此作者提出了他们的架构NeuroSAT，既保留了排列不变性，也保留了否定不变性。对于一个SAT问题，每个字面量和每个子句(clause)都被encode为无向图中的一个节点，如果某个字面量出现在了一个子句中，那么把他们对应的节点连起来。NeuroSAT通过不断地把“信息”在图中传来传去对向量空间表示进行不断的精化。在任何一个时间点，每个字面量和每个子句都有一个embedding。每次迭代由两部分组成：首先，每个子句都接收到它的邻居（字面量）节点的信息，并且依据这个信息更新自己的embedding。然后，每个字面量都接收到它的邻居（子句）和它的补节点（对于字面量$P$，它会收到来自$\overline{P}$的信息，反之亦然）的信息，并且依据这个信息更新自己的embedding。</p>
+<h1 id="问题建立">问题建立</h1>
+<p>SAT问题的定义：存在一组值代入后使得公式P为真，那么P是可满足的；否则P是不可满足的。</p>
+<h1 id="模型">模型</h1>
+<p>SAT问题都具有比较简单的句法，因此用RNN之类的东西可以直接encode进向量空间里。但是，命题逻辑的语义里包含了丰富的不变性，如排列不变性（<span class="math inline">\(P\wedge Q = Q \wedge P\)</span>）和否定不变性（<span class="math inline">\(P\)</span>和<span class="math inline">\(\neg P\)</span>可满足性相同），这些不变量用句法级别的encoding会被忽略。</p>
+<p>由此作者提出了他们的架构NeuroSAT，既保留了排列不变性，也保留了否定不变性。对于一个SAT问题，每个字面量和每个子句(clause)都被encode为无向图中的一个节点，如果某个字面量出现在了一个子句中，那么把他们对应的节点连起来。NeuroSAT通过不断地把“信息”在图中传来传去对向量空间表示进行不断的精化。在任何一个时间点，每个字面量和每个子句都有一个embedding。每次迭代由两部分组成：首先，每个子句都接收到它的邻居（字面量）节点的信息，并且依据这个信息更新自己的embedding。然后，每个字面量都接收到它的邻居（子句）和它的补节点（对于字面量<span class="math inline">\(P\)</span>，它会收到来自<span class="math inline">\(\overline{P}\)</span>的信息，反之亦然）的信息，并且依据这个信息更新自己的embedding。</p>
 <img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130133955785.png" class>
-
 <p>左半部分是迭代的第一步，右半部分是第二步。</p>
-<p>具体地来讲，模型用两个向量$L_{init}, C_{init}$（都是$\mathbb{R}^d$）初始化，包含三个多层感知机$L_{msg}, C_{msg}, L_{vote}$和两个有Layer-Norm的LSTM $L_u, C_u$。</p>
-<p>在每个时间点$t$，我们都用一个矩阵$L^{(t)}\in \mathbb{R}^{2n\times d}$来表示字面量的embedding（一共n个字面量，加上补就有2n个，每个的embedding维度都是d），一个矩阵$C^{(t)}\in \mathbb{R}^{m\times d}$来表示子句的embedding（一共m个子句，每个的embedding维度都是d）。他们分别用$L_{init}$和$C_{init}$堆起来进行初始化。同时，还有LSTM使用的隐状态$L^{(t)}_h$和$C_h^{(t)}$（尺寸和上面的对应），初始化为零矩阵。</p>
-<p>定义矩阵$M$为图的关联矩阵（原文叫邻接矩阵，但我记得离散2里把点和边的连通性矩阵叫关联矩阵，anyway），即$M_{ij}=1$当且仅当第$i$个字面量$l_i$出现在子句$c_j$中。</p>
-<p>定义<code>Flip</code>操作，每次接受一个矩阵L，将L中每个字面量对应的行替换为它的否定对应的行（即如果矩阵L的四行分别对应$P, Q, \neg P, \neg Q$，那么<code>Flip</code>后的矩阵四行分别对应$\neg P, \neg Q, P, Q$）然后输出。</p>
+<p>具体地来讲，模型用两个向量<span class="math inline">\(L_{init}, C_{init}\)</span>（都是<span class="math inline">\(\mathbb{R}^d\)</span>）初始化，包含三个多层感知机<span class="math inline">\(L_{msg}, C_{msg}, L_{vote}\)</span>和两个有Layer-Norm的LSTM <span class="math inline">\(L_u, C_u\)</span>。</p>
+<p>在每个时间点<span class="math inline">\(t\)</span>，我们都用一个矩阵<span class="math inline">\(L^{(t)}\in \mathbb{R}^{2n\times d}\)</span>来表示字面量的embedding（一共n个字面量，加上补就有2n个，每个的embedding维度都是d），一个矩阵<span class="math inline">\(C^{(t)}\in \mathbb{R}^{m\times d}\)</span>来表示子句的embedding（一共m个子句，每个的embedding维度都是d）。他们分别用<span class="math inline">\(L_{init}\)</span>和<span class="math inline">\(C_{init}\)</span>堆起来进行初始化。同时，还有LSTM使用的隐状态<span class="math inline">\(L^{(t)}_h\)</span>和<span class="math inline">\(C_h^{(t)}\)</span>（尺寸和上面的对应），初始化为零矩阵。</p>
+<p>定义矩阵<span class="math inline">\(M\)</span>为图的关联矩阵（原文叫邻接矩阵，但我记得离散2里把点和边的连通性矩阵叫关联矩阵，anyway），即<span class="math inline">\(M_{ij}=1\)</span>当且仅当第<span class="math inline">\(i\)</span>个字面量<span class="math inline">\(l_i\)</span>出现在子句<span class="math inline">\(c_j\)</span>中。</p>
+<p>定义<code>Flip</code>操作，每次接受一个矩阵L，将L中每个字面量对应的行替换为它的否定对应的行（即如果矩阵L的四行分别对应<span class="math inline">\(P, Q, \neg P, \neg Q\)</span>，那么<code>Flip</code>后的矩阵四行分别对应<span class="math inline">\(\neg P, \neg Q, P, Q\)</span>）然后输出。</p>
 <p>一次迭代过程表示如下（注意和上面文字描述的版本相对应）：</p>
 <img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131101904684.png" class>
-
-<p>第一行是更新子句矩阵，用关联矩阵去乘$L_{msg}$作用下的$L^{(t)}$，每个子句就只受到它相关的字面量的影响。</p>
-<p>第二行是更新字面量矩阵，除了隐状态$L_h^{(t)}$和$M\text{C}_{msg}(C^{t+1})$以外，他还引入了<code>Flip(L(t))</code>来引入否定不变性。</p>
-<p>在$T$次迭代后（一开始设置的最长迭代步数），用最后的一个全连接$L_{vote}(L^{(T)})$来得到结果向量$L_*^{(T)}\in\mathbb{R^{2n}}$，每个字面量得到一个标量值；再将这个向量取平均得到$y^{(t)}=\text{mean}(L_*^{(T)})\in \mathbb{R}$，通过训练使得$y^{(T)}$和真实标签$\phi(P)$之间的sigmoid cross-entropy loss最小。</p>
+<p>第一行是更新子句矩阵，用关联矩阵去乘<span class="math inline">\(L_{msg}\)</span>作用下的<span class="math inline">\(L^{(t)}\)</span>，每个子句就只受到它相关的字面量的影响。</p>
+<p>第二行是更新字面量矩阵，除了隐状态<span class="math inline">\(L_h^{(t)}\)</span>和<span class="math inline">\(M\text{C}_{msg}(C^{t+1})\)</span>以外，他还引入了<code>Flip(L(t))</code>来引入否定不变性。</p>
+<p>在<span class="math inline">\(T\)</span>次迭代后（一开始设置的最长迭代步数），用最后的一个全连接<span class="math inline">\(L_{vote}(L^{(T)})\)</span>来得到结果向量<span class="math inline">\(L_*^{(T)}\in\mathbb{R^{2n}}\)</span>，每个字面量得到一个标量值；再将这个向量取平均得到<span class="math inline">\(y^{(t)}=\text{mean}(L_*^{(T)})\in \mathbb{R}\)</span>，通过训练使得<span class="math inline">\(y^{(T)}\)</span>和真实标签<span class="math inline">\(\phi(P)\)</span>之间的sigmoid cross-entropy loss最小。</p>
 <p>这个模型的好处：</p>
 <ul>
 <li>在架构设计上引入了排列不变形和否定不变性</li>
 <li>与问题规模无关，可以处理各种规模的问题</li>
 </ul>
-<h1 id="训练数据"><a href="#训练数据" class="headerlink" title="训练数据"></a>训练数据</h1><p>作者希望让模型有比较好的泛化能力，而不只是从某些领域内学得很好而其他地方很烂。</p>
-<p>因此作者创建了一个问题集$\mathbf{SR}(n)$，由包含$n$个变量的SAT问题对组成，每对中一个是可满足的，一个是不可满足的，而且他们只在一个子句中对一个字面量取否定就可以相互转换（换言之，加上/去掉一个$\neg$，这两个问题就一模一样）。</p>
+<h1 id="训练数据">训练数据</h1>
+<p>作者希望让模型有比较好的泛化能力，而不只是从某些领域内学得很好而其他地方很烂。</p>
+<p>因此作者创建了一个问题集<span class="math inline">\(\mathbf{SR}(n)\)</span>，由包含<span class="math inline">\(n\)</span>个变量的SAT问题对组成，每对中一个是可满足的，一个是不可满足的，而且他们只在一个子句中对一个字面量取否定就可以相互转换（换言之，加上/去掉一个<span class="math inline">\(\neg\)</span>，这两个问题就一模一样）。</p>
 <p>怎么取的我就不关心了。</p>
-<h1 id="预测可满足性"><a href="#预测可满足性" class="headerlink" title="预测可满足性"></a>预测可满足性</h1><p>首先在$\mathbf{SR}(40)$上做（虽然这种东西对于现代SAT求解器来说很容易，但在ML方面来看仍然是困难的）。</p>
+<h1 id="预测可满足性">预测可满足性</h1>
+<p>首先在<span class="math inline">\(\mathbf{SR}(40)\)</span>上做（虽然这种东西对于现代SAT求解器来说很容易，但在ML方面来看仍然是困难的）。</p>
 <p>朴素LSTM直接歇逼，准确率不足50%（即不如瞎蒙）；MiniSAT求解器平均需要backjump 10次（这意味着拆十次存在量词/全称量词），做超过100次基本逻辑推理。</p>
-<p>NeuroSAT用<code>d=128</code>，每个多层感知机都有3个隐层（也即一共5层？），Layer-Norm的参数选$10^{-10}$，跑26次迭代，用ADAM优化器，学习率$2\times 10^{-5}$，clip rate取0.65来全局地剪切梯度（这是不是那个dropout？）。为了方便训练，他们训的是$\mathbf{SR}(\mathbf{U}(10, 40))$，但在$\mathbf{SR}(40)$上测试，得到了85%的准确度。接下来作者试图了解如何从被认为是可满足的问题中decode出一组解。</p>
-<h1 id="解码满足条件"><a href="#解码满足条件" class="headerlink" title="解码满足条件"></a>解码满足条件</h1><img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131111537138.png" class>
-
+<p>NeuroSAT用<code>d=128</code>，每个多层感知机都有3个隐层（也即一共5层？），Layer-Norm的参数选<span class="math inline">\(10^{-10}\)</span>，跑26次迭代，用ADAM优化器，学习率<span class="math inline">\(2\times 10^{-5}\)</span>，clip rate取0.65来全局地剪切梯度（这是不是那个dropout？）。为了方便训练，他们训的是<span class="math inline">\(\mathbf{SR}(\mathbf{U}(10, 40))\)</span>，但在<span class="math inline">\(\mathbf{SR}(40)\)</span>上测试，得到了85%的准确度。接下来作者试图了解如何从被认为是可满足的问题中decode出一组解。</p>
+<h1 id="解码满足条件">解码满足条件</h1>
+<img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131111537138.png" class>
 <p>上图中，白色代表中立，蓝色表示倾向于不可满足，红色表示倾向于可满足，颜色深浅表示置信度高低。</p>
 <p>因此我们可以看出，一开始网络整体以较低的置信度倾向于不可满足，但从一个转折点开始，有的字面量开始以较高的置信度倾向于可满足，而且很快所有字面量都开始以高置信倾向于可满足，随后网络收敛。</p>
 <p>在正确地被判定为可满足的问题里，NeuroSAT的表现都差不太多。在NeuroSAT判定为不可满足的问题里，自始至终都是低置信的不可满足——它从来不会判定一个问题是高置信地不可满足。这意味着NeuroSAT会搜寻一个可满足性的【凭证】，只要找到就会开始判定可满足。</p>
 <p>作者认为虽然引入了n个字面量的否定，但是从结果来看NeuroSAT对每个字面量还是只用了一个bit来encode。</p>
 <p>如果把高维的字面量Embedding用PCA（主成分分析）降维投影到二维，那么可以发现，上文对应的转折点前红点（支持可满足）和蓝点（支持不可满足）是无法用一条线进行划分的，而转折点后则是可以轻易划分的。</p>
 <img data-src="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210131113320182.png" class>
-
 <p>因此作者认为，在转折点后挑一个时间点做PCA，然后红蓝点就分别对应了字面量取值的1和0，由此就找到了一组可行解。</p>
-<h1 id="向其他问题集泛化"><a href="#向其他问题集泛化" class="headerlink" title="向其他问题集泛化"></a>向其他问题集泛化</h1><h2 id="规模更大的问题"><a href="#规模更大的问题" class="headerlink" title="规模更大的问题"></a>规模更大的问题</h2><p>在小规模问题上训练，在大规模问题上推理，如果增加迭代次数，那么效果会提升（内心OS：MiniSAT也要backjump更多次啊 你这不是废话吗）。</p>
-<p>在$\mathbf{SR}(\mathbf{U}(10,40))$上训练的网络，在$\mathbf{SR}(200)$上也可以做，只是最好最好就是25%了……</p>
-<h2 id="不同类型的问题"><a href="#不同类型的问题" class="headerlink" title="不同类型的问题"></a>不同类型的问题</h2><p>用不同的生成随机图的方法整了一堆10个点、17条边的图，出了好多不同类型的问题比如图染色、domaining-set problem（我没查到这是啥??）、完全图搜索、点覆盖等等，最后保留了4888个问题。</p>
+<h1 id="向其他问题集泛化">向其他问题集泛化</h1>
+<h2 id="规模更大的问题">规模更大的问题</h2>
+<p>在小规模问题上训练，在大规模问题上推理，如果增加迭代次数，那么效果会提升（内心OS：MiniSAT也要backjump更多次啊 你这不是废话吗）。</p>
+<p>在<span class="math inline">\(\mathbf{SR}(\mathbf{U}(10,40))\)</span>上训练的网络，在<span class="math inline">\(\mathbf{SR}(200)\)</span>上也可以做，只是最好最好就是25%了……</p>
+<h2 id="不同类型的问题">不同类型的问题</h2>
+<p>用不同的生成随机图的方法整了一堆10个点、17条边的图，出了好多不同类型的问题比如图染色、domaining-set problem（我没查到这是啥??）、完全图搜索、点覆盖等等，最后保留了4888个问题。</p>
 <p>跑了512次迭代的NeuroSAT达到了85%的准确度。</p>
-<h1 id="寻找UNSAT-core"><a href="#寻找UNSAT-core" class="headerlink" title="寻找UNSAT core"></a>寻找UNSAT core</h1><p>在$\mathbf{SR}(\mathbf{U}(10,40))$上训练的NeuroSAT找可行解比较好，但不会给出不可行的证明，它没有暴力遍历可能性，而是随机地去撞大运。</p>
-<p>但是作者又构造了一种新的数据集叫$\mathbf{SRC}(n,u)$，和$\mathbf{SR}(n)$类似，但是每个不可实现的问题都有一个已经不可满足的子句$u$（叫unsat core）（这里unsat core是只要把一个$\neg$加上或去掉就会变回可满足的子句）</p>
+<h1 id="寻找unsat-core">寻找UNSAT core</h1>
+<p>在<span class="math inline">\(\mathbf{SR}(\mathbf{U}(10,40))\)</span>上训练的NeuroSAT找可行解比较好，但不会给出不可行的证明，它没有暴力遍历可能性，而是随机地去撞大运。</p>
+<p>但是作者又构造了一种新的数据集叫<span class="math inline">\(\mathbf{SRC}(n,u)\)</span>，和<span class="math inline">\(\mathbf{SR}(n)\)</span>类似，但是每个不可实现的问题都有一个已经不可满足的子句<span class="math inline">\(u\)</span>（叫unsat core）（这里unsat core是只要把一个<span class="math inline">\(\neg\)</span>加上或去掉就会变回可满足的子句）</p>
 <p>在这种集合上训练的NeuroSAT（叫做NeuroUNSAT）会一上来就高置信地支持不可满足，然后在一个转折点开始低置信地支持可满足（如果判定可满足）或者在某个/某些字面量上以极其高的置信支持不可满足（如果判定不可满足）。</p>
 
       
@@ -870,14 +1127,14 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
