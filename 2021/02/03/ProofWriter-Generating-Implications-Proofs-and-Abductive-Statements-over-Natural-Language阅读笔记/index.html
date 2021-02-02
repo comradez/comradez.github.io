@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="论文链接 废话： 我感觉这就是拿着T5做了个finetune……它的迭代式模型很有意思，也很暴力。刚看到一次性模型和迭代式模型的表现差不多的时候我还挺失望的，后来发现迭代式模型在泛化能力上的优势还是有的。 感觉是不是可以怎么优化一下迭代式模型的迭代过程，不要没头苍蝇式的地乱撞。不行可以backward chaining？ 摘要 作者提出了一个叫做ProofWriter的生成式模型，既可以用自生成理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ProofWriter: Generating Implications, Proofs, and Abductive Statements over Natural Language阅读笔记">
+<meta property="og:url" content="http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="cy&#39;s blog">
+<meta property="og:description" content="论文链接 废话： 我感觉这就是拿着T5做了个finetune……它的迭代式模型很有意思，也很暴力。刚看到一次性模型和迭代式模型的表现差不多的时候我还挺失望的，后来发现迭代式模型在泛化能力上的优势还是有的。 感觉是不是可以怎么优化一下迭代式模型的迭代过程，不要没头苍蝇式的地乱撞。不行可以backward chaining？ 摘要 作者提出了一个叫做ProofWriter的生成式模型，既可以用自生成理">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-02T17:05:56.000Z">
+<meta property="article:modified_time" content="2021-02-02T17:08:02.675Z">
+<meta property="article:author" content="茨月">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ProofWriter: Generating Implications, Proofs, and Abductive Statements over Natural Language阅读笔记 | cy's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">cy's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">猫猫窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ProofWriter: Generating Implications, Proofs, and Abductive Statements over Natural Language阅读笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-03 01:05:56 / 修改时间：01:08:02" itemprop="dateCreated datePublished" datetime="2021-02-03T01:05:56+08:00">2021-02-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language阅读笔记/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2012.13048.pdf">论文链接</a></p>
+<p>废话：</p>
+<p>我感觉这就是拿着T5做了个finetune……它的迭代式模型很有意思，也很暴力。刚看到一次性模型和迭代式模型的表现差不多的时候我还挺失望的，后来发现迭代式模型在泛化能力上的优势还是有的。</p>
+<p>感觉是不是可以怎么优化一下迭代式模型的迭代过程，不要没头苍蝇式的地乱撞。不行可以backward chaining？</p>
+<h1 id="摘要">摘要</h1>
+<p>作者提出了一个叫做ProofWriter的生成式模型，既可以用自生成理论的含义，又可以写出用自然语言表示的证明过程。</p>
+<h1 id="引入">引入</h1>
+<p>已有的自然语言进行逻辑推理的模型仅限于对给定标签的真假判定，而不能基于事实去推理出新的性质。</p>
+<p>作者提出了ProofWriter模型，每次都会进行一次单步的推理并且生成简单的证明，然后将推理的结果加入到语境中以供下一次继续推理，并且基于这些碎片的单步推理构建完整的证明。</p>
+
+<p>单步推理的可信度是极高的，而且证明过程中每一步决策都可以清晰地看出（比起那些事后再分析模型决策的方法要更可靠）。而且这样的模型的效果比一步到底生成完整证明的模型效果好。</p>
+<p>生成方法还有一些全新的应用：首先，ProofWriter生成的含义是自然语言的，从而允许枚举许多结果，而不是单纯给推理之前就定好的假设一个一个赋针值。其次，ProofWriter还可以生成诱导性的陈述，即给定一个理论和一个无法证明的结论，ProofWriter会尝试找到那个缺失的条件（如果存在的话）而且给出添加这个条件之后的证明。</p>
+<h1 id="相关工作">相关工作</h1>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2010.02830.pdf">PRover</a></p>
+<p>第一个尝试去做证明生成的，但是效果并不好，上文中已经被作者鞭尸好几次了</p></li>
+<li><p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2009.14786.pdf">Measuring Systematic Generalization in Neural Proof Generation with Transformers</a></p>
+<p>也尝试了做证明的生成，但是它是从许多例子里去得到一些【已经给定的】规则，然后用于推理，和本文的路子不同</p></li>
+</ul>
+<h1 id="实现方法">实现方法</h1>
+<p>第一次看到这么事无巨细的论文作者……对于初学者而言简直是天使</p>
+<h2 id="名词定义">名词定义</h2>
+<ul>
+<li><span class="math inline">\(C\)</span>表示<span class="math inline">\(theory\)</span>，是由fact <span class="math inline">\(F\)</span>和rule <span class="math inline">\(R\)</span>组成的英文句子集合。我们也将<span class="math inline">\(C\)</span>叫做<span class="math inline">\(context\)</span>
+<ul>
+<li>笔记里提到的理论和语境都是<span class="math inline">\(C\)</span></li>
+</ul></li>
+<li><span class="math inline">\(Q\)</span>表示<span class="math inline">\(Question\)</span>，是一个英文句子表示的假设，其真值可以单纯由<span class="math inline">\(C\)</span>中的信息确定。
+<ul>
+<li>笔记里提到的问题<strong>可能</strong>是<span class="math inline">\(Q\)</span></li>
+</ul></li>
+<li><span class="math inline">\(A\)</span>表示<span class="math inline">\(answer\)</span>，在封闭世界假设中<span class="math inline">\(A\in\{True, False\}\)</span>，在开放世界假设中 <span class="math inline">\(A\in\{True, False, Unknown\}\)</span></li>
+<li><span class="math inline">\(P\)</span>表示<span class="math inline">\(proof\)</span></li>
+<li><span class="math inline">\(I\)</span>表示<span class="math inline">\(implication\)</span>，一个可以由<span class="math inline">\(C\)</span>推导出的事实。
+<ul>
+<li>笔记中提到的含义都是<span class="math inline">\(I\)</span></li>
+</ul></li>
+</ul>
+<p>【个人加的一个】笔记中提到的“事实”对应英文fact，表示一个陈述，不代表它的真值是<span class="math inline">\(True\)</span>或<span class="math inline">\(False\)</span>。</p>
+<p>作者定义了三种任务：</p>
+<ul>
+<li><p><span class="math inline">\(\textbf{proof(question-answering)}\)</span></p>
+<p>给定<span class="math inline">\(C\)</span>和假定的事实<span class="math inline">\(Q\)</span>，求<span class="math inline">\(A\)</span>和<span class="math inline">\(P\)</span>（如果存在）</p></li>
+<li><p><span class="math inline">\(\textbf{enumeration}\)</span></p>
+<p>给定<span class="math inline">\(C\)</span>，生成<span class="math inline">\(I\)</span>，越多越好</p></li>
+<li><p><span class="math inline">\(\textbf{abduction}\)</span></p>
+<p>给定<span class="math inline">\(C\)</span>和期望证明的事实<span class="math inline">\(Q\)</span>，寻找辅助事实<span class="math inline">\(f_m\)</span>，使得<span class="math inline">\(C\)</span>在添加上<span class="math inline">\(f_m\)</span>后可以证明出<span class="math inline">\(Q\)</span></p></li>
+</ul>
+<h2 id="语义">语义</h2>
+<p>一个事实为<span class="math inline">\(True\)</span>，要么它已知，要么它可以表示为为<span class="math inline">\(True\)</span>的规则推理出的结论。</p>
+<p>对于<span class="math inline">\(False\)</span>，作者采取了两种不同的假设：</p>
+<ul>
+<li>封闭世界假设(Closed World Assumption)采取否定即假（Negation As Failure）原则，只允许<span class="math inline">\(True\)</span>和<span class="math inline">\(False\)</span>出现，不能被证明为<span class="math inline">\(True\)</span>的都是<span class="math inline">\(False\)</span></li>
+<li>开放世界假设(Open World Assumption)则允许第三种真值<span class="math inline">\(Unknown\)</span>的出现，不能被证明为<span class="math inline">\(True\)</span>或<span class="math inline">\(False\)</span>的事实被认为是<span class="math inline">\(Unknown\)</span></li>
+</ul>
+<p>两种不同的假设作者都做了实验，分别采用不同的数据集。</p>
+<h2 id="证明的表示">证明的表示</h2>
+<p>定义对事实<span class="math inline">\(f_q\)</span>的证明<span class="math inline">\(P\)</span>是一个有向无环图<span class="math inline">\((N,E)\)</span>。</p>
+<p><span class="math inline">\(P\)</span>中的每一个节点都要么是事实<span class="math inline">\(f\)</span>（基本字面量）或者规则<span class="math inline">\(r\)</span>（逻辑表达式），都是由英语表达的。</p>
+<p>P中的每一条边要么将一个事实连接到规则上，表示这个事实满足了规则的条件；要么将一个规则连接到事实上，表明这个事实是由规则推理出来的。因此，证明树上的每根树枝上事实和规则都会交替出现。</p>
+<p>证明中的事实分三种：已知事实<span class="math inline">\(f_i\in F\)</span>，否定事实<span class="math inline">\(f_{naf}\)</span>（依据否定即假的原则，一定是假的）和结论事实<span class="math inline">\(f_{conc}\)</span>（由规则推理出的事实）。依据定义，否定事实和结论事实都不出现在<span class="math inline">\(F\)</span>中。</p>
+
+<div data-align="center">
+三类fact的一个例子，naf1好像是凭空变出来的？
+</div>
+<h2 id="证明的编码">证明的编码</h2>
+<p>出现在语境里的每个事实和规则都有编号，fact1, fact2, ..., rule1, rule2, ...</p>
+<p>naf和conc的fact也会有编号，naf1, naf2, ..., conc1, conc2,...，但因为它们并没有出现在语境里，因此要额外用以下的形式来表示："with conc1: xxx. conc2: xxx ..."</p>
+<p>&amp;表示合取<span class="math inline">\(\wedge\)</span>，%表示<span class="math inline">\(\to\)</span>，#表示<span class="math inline">\(\leftarrow\)</span></p>
+<h2 id="模型">模型</h2>
+<p>用了预训练Transformer T5，用了最大的T5-11B模型。默认超参数，Adafactor优化器，40000步，batch size为8，用validation score最高的那个checkpoint（通常情况下是最后一个）。</p>
+<p>三种不同任务有不同输入输出格式。</p>
+<h3 id="本领一生成证明">本领一：生成证明</h3>
+<p>作者采用了两种方法来生成：</p>
+<ul>
+<li><p>一次性</p>
+<p>训练模型输入理论和问题，一次性生成完整证明和答案</p></li>
+<li><p>迭代式</p>
+<p>训练模型输入理论和问题，每次输出一个单步证明</p>
+<p>不断迭代直到推不出更多结果为止</p>
+<p>然后用单步证明组装完整证明</p></li>
+</ul>
+<h3 id="本领二含义枚举">本领二：含义枚举</h3>
+<p>给定C，预测I</p>
+<h3 id="本领三单事实诱导证明">本领三：（单事实）诱导证明</h3>
+<p>这个只在开放世界假设上做。</p>
+<p>【这部分没看懂】</p>
+<h1 id="数据集">数据集</h1>
+<p>采用数据集<span class="math inline">\(RuleTaker D^*\)</span>（包括D0、D1、D2、D3和D5），针对封闭世界假设和开放世界假设分别做了两个变种，包含原版在内的三种数据集被称为<span class="math inline">\(D^*(\text{orig}), D^*(\text{CWA}), D^*(\text{OWA})\)</span>。</p>
+<p>Birds-Electricity数据集规模小、来自真实世界，由人类手写，用来衡量训练数据以外的模型表现。</p>
+<p>ParaRules数据集测试将知识转化为更自然的语言的能力。</p>
+<h1 id="结果">结果</h1>
+<h2 id="本领一生成证明-1">本领一：生成证明</h2>
+<h3 id="与以往工作相比">与以往工作相比</h3>
+<h4 id="in-domain">in-domain</h4>
+<p>一次性和迭代式的结果几乎完全相同。</p>
+<p>生成答案的准确度和PRover一致，正确证明的数目明显更多。</p>
+<h4 id="out-of-domain">Out of Domain</h4>
+<p>一次性和迭代式都强于PRover</p>
+<p>迭代式模型的鲁棒性明显更好。</p>
+<h3 id="一次性和迭代式的比较">一次性和迭代式的比较</h3>
+<p>准确度表现差不多</p>
+<p>迭代式模型在较长证明的泛化能力上明显强于一次性模型，也有更好的鲁棒性</p>
+<h3 id="验证一次性模型生成的证明">验证一次性模型生成的证明</h3>
+<p>直接针对证明的中间结果向模型提问即可，提供了更好的可解释性和可验证性。</p>
+<h2 id="本领二含义枚举-1">本领二：含义枚举</h2>
+<p>迭代式模型效果更好。</p>
+<h2 id="本领三单事实诱导证明-1">本领三：（单事实）诱导证明</h2>
+<p>预测的factM和真实的factM匹配度挺高的</p>
+<p>在D3-Ab上训练的模型，在D3和D5上测试的结果高度一致，这可能暗示D5-Ab实际上不是out-of-domain的（虽然D5的问题都是比D3的推理步骤更深，但是它们都是可证明的，走一个事实换成不可证明的之后可能其分布与D3-Ab没有本质区别）。</p>
+<h1 id="讨论">讨论</h1>
+<h2 id="一次性vs迭代式">一次性vs迭代式</h2>
+<p>一次性模型短平快且有效，但迭代式的泛化能力更好，尤其是在更深的推理上。</p>
+<p>尽管单步推理的误差会积累，但是由于单步推理精度实在太高，在较深的推理方面叠加之后效果仍然比一次性好。</p>
+<p>迭代式也有缺点：首先它需要生成所有可能的知识才能做推理，效率很低。其次，在推理出的中间结果过多后，它可能会突破512token的限制，爆模型……</p>
+<h2 id="隐式知识">隐式知识</h2>
+<p>很多模型需要所有应用的规则都被显式表征出来。</p>
+<p>ProofWriter可以利用自己的诱导能力首先找到那个缺失的事实，再去进行证明。</p>
+<p>这样就可以更好地理解隐式知识在推理中的应用。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" rel="prev" title="HOTPOTQA: A Dataset for Diverse, Explainable Question Answering阅读笔记">
+      <i class="fa fa-chevron-left"></i> HOTPOTQA: A Dataset for Diverse, Explainable Question Answering阅读笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">2.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">实现方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8D%E8%AF%8D%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">名词定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89"><span class="nav-number">4.2.</span> <span class="nav-text">语义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%81%E6%98%8E%E7%9A%84%E8%A1%A8%E7%A4%BA"><span class="nav-number">4.3.</span> <span class="nav-text">证明的表示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%81%E6%98%8E%E7%9A%84%E7%BC%96%E7%A0%81"><span class="nav-number">4.4.</span> <span class="nav-text">证明的编码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.5.</span> <span class="nav-text">模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E9%A2%86%E4%B8%80%E7%94%9F%E6%88%90%E8%AF%81%E6%98%8E"><span class="nav-number">4.5.1.</span> <span class="nav-text">本领一：生成证明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E9%A2%86%E4%BA%8C%E5%90%AB%E4%B9%89%E6%9E%9A%E4%B8%BE"><span class="nav-number">4.5.2.</span> <span class="nav-text">本领二：含义枚举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E9%A2%86%E4%B8%89%E5%8D%95%E4%BA%8B%E5%AE%9E%E8%AF%B1%E5%AF%BC%E8%AF%81%E6%98%8E"><span class="nav-number">4.5.3.</span> <span class="nav-text">本领三：（单事实）诱导证明</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">5.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">结果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E9%A2%86%E4%B8%80%E7%94%9F%E6%88%90%E8%AF%81%E6%98%8E-1"><span class="nav-number">6.1.</span> <span class="nav-text">本领一：生成证明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E4%BB%A5%E5%BE%80%E5%B7%A5%E4%BD%9C%E7%9B%B8%E6%AF%94"><span class="nav-number">6.1.1.</span> <span class="nav-text">与以往工作相比</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#in-domain"><span class="nav-number">6.1.1.1.</span> <span class="nav-text">in-domain</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#out-of-domain"><span class="nav-number">6.1.1.2.</span> <span class="nav-text">Out of Domain</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E6%AC%A1%E6%80%A7%E5%92%8C%E8%BF%AD%E4%BB%A3%E5%BC%8F%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">6.1.2.</span> <span class="nav-text">一次性和迭代式的比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E4%B8%80%E6%AC%A1%E6%80%A7%E6%A8%A1%E5%9E%8B%E7%94%9F%E6%88%90%E7%9A%84%E8%AF%81%E6%98%8E"><span class="nav-number">6.1.3.</span> <span class="nav-text">验证一次性模型生成的证明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E9%A2%86%E4%BA%8C%E5%90%AB%E4%B9%89%E6%9E%9A%E4%B8%BE-1"><span class="nav-number">6.2.</span> <span class="nav-text">本领二：含义枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E9%A2%86%E4%B8%89%E5%8D%95%E4%BA%8B%E5%AE%9E%E8%AF%B1%E5%AF%BC%E8%AF%81%E6%98%8E-1"><span class="nav-number">6.3.</span> <span class="nav-text">本领三：（单事实）诱导证明</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">讨论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E6%AC%A1%E6%80%A7vs%E8%BF%AD%E4%BB%A3%E5%BC%8F"><span class="nav-number">7.1.</span> <span class="nav-text">一次性vs迭代式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E7%9F%A5%E8%AF%86"><span class="nav-number">7.2.</span> <span class="nav-text">隐式知识</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="茨月"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">茨月</p>
+  <div class="site-description" itemprop="description">计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/comradez" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;comradez" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.tapechat.net/u/ma8muL/ZHBR0I2H" title="Tape → https:&#x2F;&#x2F;www.tapechat.net&#x2F;u&#x2F;ma8muL&#x2F;ZHBR0I2H" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>Tape</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" title="Ayayayayayaya → https:&#x2F;&#x2F;thwiki.cc&#x2F;%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" rel="noopener" target="_blank"><i class="fab fa-canadian-maple-leaf fa-fw"></i>Ayayayayayaya</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">茨月</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zcyblog.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/";
+    this.page.identifier = "2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language阅读笔记/";
+    this.page.title = "ProofWriter: Generating Implications, Proofs, and Abductive Statements over Natural Language阅读笔记";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://zcyblog.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
