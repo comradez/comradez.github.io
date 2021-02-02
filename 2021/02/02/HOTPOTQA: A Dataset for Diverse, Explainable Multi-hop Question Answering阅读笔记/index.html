@@ -20,20 +20,24 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="出分了，花了好久才挤进info网站，过了一会信息化中心就把查成绩页面改成了“暂时无法提供服务”，可能服务器直接歇逼了……GPA比起去年跌了不少，考虑到这学期整体性地不顺利，也算在预料之内。电子学听不懂，overfit了，结果就差不到1分的总评就可以上岸；大物没复习到一维无限深势阱，结果就差了这一道选择题。但纠结这个也没有什么意义了。怎么说呢，凭我自己个人志趣选的所有课，【除了翻车翻到姥姥家的人工神">
+  <meta name="description" content="论文地址 引入 现有的QA数据集大多数并不涉及复杂的推理过程（只在一个文段内推理，或者只需要一步推理）。 那些需要多跳推理的数据集，则主要围绕已有的知识库构建，限制了其多样性（问题一定围绕着知识库的架构来走），问题的解答也很单一。 另外，问题的监督粒度也太粗，只能针对问题来监督回答是否正确。 基于这三个问题，作者提出了HotpotQA数据集，特点在于：  多跳推理 不基于任何的范式，更加自然 引入">
 <meta property="og:type" content="article">
-<meta property="og:title" content="期末出分有感">
-<meta property="og:url" content="http://example.com/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/index.html">
+<meta property="og:title" content="HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记">
+<meta property="og:url" content="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="cy&#39;s blog">
-<meta property="og:description" content="出分了，花了好久才挤进info网站，过了一会信息化中心就把查成绩页面改成了“暂时无法提供服务”，可能服务器直接歇逼了……GPA比起去年跌了不少，考虑到这学期整体性地不顺利，也算在预料之内。电子学听不懂，overfit了，结果就差不到1分的总评就可以上岸；大物没复习到一维无限深势阱，结果就差了这一道选择题。但纠结这个也没有什么意义了。怎么说呢，凭我自己个人志趣选的所有课，【除了翻车翻到姥姥家的人工神">
+<meta property="og:description" content="论文地址 引入 现有的QA数据集大多数并不涉及复杂的推理过程（只在一个文段内推理，或者只需要一步推理）。 那些需要多跳推理的数据集，则主要围绕已有的知识库构建，限制了其多样性（问题一定围绕着知识库的架构来走），问题的解答也很单一。 另外，问题的监督粒度也太粗，只能针对问题来监督回答是否正确。 基于这三个问题，作者提出了HotpotQA数据集，特点在于：  多跳推理 不基于任何的范式，更加自然 引入">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-01-22T09:28:02.000Z">
-<meta property="article:modified_time" content="2021-01-22T09:32:11.334Z">
+<meta property="og:image" content="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201235641909.png">
+<meta property="og:image" content="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202000140730.png">
+<meta property="og:image" content="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202002327969.png">
+<meta property="og:image" content="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202003325551.png">
+<meta property="article:published_time" content="2021-02-01T16:34:50.000Z">
+<meta property="article:modified_time" content="2021-02-02T03:16:55.837Z">
 <meta property="article:author" content="茨月">
-<meta property="article:tag" content="树洞">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201235641909.png">
 
-<link rel="canonical" href="http://example.com/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/">
+<link rel="canonical" href="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
 
 <script id="page-configurations">
@@ -46,7 +50,7 @@
   };
 </script>
 
-  <title>期末出分有感 | cy's blog</title>
+  <title>HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记 | cy's blog</title>
   
 
 
@@ -162,7 +166,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -175,7 +179,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          期末出分有感
+          HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记
         </h1>
 
         <div class="post-meta">
@@ -186,7 +190,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-22 17:28:02 / 修改时间：17:32:11" itemprop="dateCreated datePublished" datetime="2021-01-22T17:28:02+08:00">2021-01-22</time>
+              <time title="创建时间：2021-02-02 00:34:50 / 修改时间：11:16:55" itemprop="dateCreated datePublished" datetime="2021-02-02T00:34:50+08:00">2021-02-02</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -194,7 +198,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BA%9F%E8%AF%9D/" itemprop="url" rel="index"><span itemprop="name">废话</span></a>
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
                 </span>
             </span>
 
@@ -207,8 +211,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/01/22/期末出分有感/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/02/HOTPOTQA: A Dataset for Diverse, Explainable Multi-hop Question Answering阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -223,7 +227,43 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>出分了，花了好久才挤进info网站，过了一会信息化中心就把查成绩页面改成了“暂时无法提供服务”，可能服务器直接歇逼了……<br>GPA比起去年跌了不少，考虑到这学期整体性地不顺利，也算在预料之内。电子学听不懂，overfit了，结果就差不到1分的总评就可以上岸；大物没复习到一维无限深势阱，结果就差了这一道选择题。<br>但纠结这个也没有什么意义了。<br>怎么说呢，凭我自己个人志趣选的所有课，【除了翻车翻到姥姥家的人工神经网络以外】还都是4.0，这算是一点宽慰。<br>至少我以后回顾我的大二上，我会想起我头铁单刷人神、在夜里一边痛斥队友摸鱼一边调megstudio的经历；我会回忆起一边骂唐宏岩作业多一边乖乖写题的经历；我会想起对着一道写出了悬垂指针bug结果调了两天的题在gdb里不停地nnnnn的经历。<br>概率统计和数据结构这种正派硬课我还是认真听了、也有充分能力学好的，至于张雷和李列明的两门司马课程我还是希望它们尽快消失在历史的长河中。</p>
+        <p><a target="_blank" rel="noopener" href="https://www.aclweb.org/anthology/D18-1259.pdf">论文地址</a></p>
+<h1 id="引入">引入</h1>
+<p>现有的QA数据集大多数并不涉及复杂的推理过程（只在一个文段内推理，或者只需要一步推理）。</p>
+<p>那些需要多跳推理的数据集，则主要围绕已有的知识库构建，限制了其多样性（问题一定围绕着知识库的架构来走），问题的解答也很单一。</p>
+<p>另外，问题的监督粒度也太粗，只能针对问题来监督回答是否正确。</p>
+<p>基于这三个问题，作者提出了HotpotQA数据集，特点在于：</p>
+<ul>
+<li>多跳推理</li>
+<li>不基于任何的范式，更加自然</li>
+<li>引入了一类全新的“实体比较”类问题，可以测试模型在常识方面的理解</li>
+</ul>
+<h1 id="数据采集">数据采集</h1>
+<p>问题的提出基于文本而非知识库，保证其多样性。</p>
+<h2 id="实体比较类问题">实体比较类问题</h2>
+<p>两个实体在某一属性方面进行比较。</p>
+<p>例如“谁在NBA效力过的球队更多，乔丹还是科比？”需要对实体<code>乔丹</code>和实体<code>科比</code>在<code>效力过的NBA球队数目</code>上进行比较，然后选出一个进行回答。</p>
+<p>另一种实体比较类问题是yes/no问题，比如“铁娘子和AC/DC乐队来自同一个国家吗？”</p>
+<h2 id="采集支持信息">采集支持信息</h2>
+<p>比起对每个问题只提供一个答案，作者还对每个问题都列出了一个<code>supporting fact</code>集合，从集合中可以获取回答问题所需的所有知识。</p>
+<p>这一方面可以提供更强力的监督，另一方面可以通过让模型预测<code>supporting fact</code>然后和真实的相比较来衡量模型的可解释性。</p>
+<h1 id="数据集">数据集</h1>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201235641909.png" class>
+<div data-align="center">
+对数据集内问题的划分
+</div>
+<p>大多数答案是文段内的实体，同时也有其他属性如日期、数字和形容词之类。</p>
+<p>约42%的问题需要链式推理（需要找到桥接实体来实现第二步推理），有一些问题依赖桥接实体的属性，还有一些问题需要通过同时满足多个属性来找到答案实体。这些都是多条推理的形式。</p>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202000140730.png" class>
+<h1 id="实验">实验</h1>
+<p>作者采取了<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1710.10723.pdf">这篇文章</a>内的模型作为基线模型，但加上了很多新鲜技巧，例如字级模型、自注意力、双向注意力等。</p>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202002327969.png" class>
+<p>为了回答问题，作者引入了一个三向分类器用来输出：yes/no/用文本回答问题。在回答时，首先确定问题的回答是不是yes/no。是就直接输出，不是就进一步用最高概率的词拿出来作为文本回答。</p>
+<p>模型用两种基准测试来衡量。</p>
+<p>在Distractor测试中，为了测量模型应对噪声的能力，喂给模型的10个文段中有两个是“金”文段（即用来构筑问题的文段本身），而剩下的8个是噪声，10个文段打乱后投喂给模型。</p>
+<p>在Full wiki测试中，为了测量模型在实际应用中的效果，测试时将向模型投喂所有的wikipedia页面的开头几段，并不指定或加入金文段。</p>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202003325551.png" class>
+<p>人类在测试中还是吊打了基线的……</p>
 
     </div>
 
@@ -232,9 +272,6 @@
     
 
       <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E6%A0%91%E6%B4%9E/" rel="tag"># 树洞</a>
-          </div>
 
         
 
@@ -242,12 +279,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/22/Hello-World/" rel="prev" title="Hello World">
-      <i class="fa fa-chevron-left"></i> Hello World
+    <a href="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/" rel="prev" title="更换hexo的渲染引擎">
+      <i class="fa fa-chevron-left"></i> 更换hexo的渲染引擎
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/" rel="next" title="Rust泛型简单笔记">
-      Rust泛型简单笔记 <i class="fa fa-chevron-right"></i>
+    <a href="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" rel="next" title="HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记">
+      HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -314,6 +351,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E5%85%A5"><span class="nav-number">1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86"><span class="nav-number">2.</span> <span class="nav-text">数据采集</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E4%BD%93%E6%AF%94%E8%BE%83%E7%B1%BB%E9%97%AE%E9%A2%98"><span class="nav-number">2.1.</span> <span class="nav-text">实体比较类问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%87%E9%9B%86%E6%94%AF%E6%8C%81%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.</span> <span class="nav-text">采集支持信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">3.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.</span> <span class="nav-text">实验</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -440,6 +478,59 @@
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
@@ -455,9 +546,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "http://example.com/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/";
-    this.page.identifier = "2021/01/22/期末出分有感/";
-    this.page.title = "期末出分有感";
+    this.page.url = "http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/";
+    this.page.identifier = "2021/02/02/HOTPOTQA: A Dataset for Diverse, Explainable Multi-hop Question Answering阅读笔记/";
+    this.page.title = "HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {

@@ -185,15 +185,6 @@
 
               <time title="创建时间：2021-02-02 00:34:50 / 修改时间：00:36:00" itemprop="dateCreated datePublished" datetime="2021-02-02T00:34:50+08:00">2021-02-02</time>
             </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
-                </span>
-            </span>
 
           
   
@@ -256,6 +247,124 @@
 <p>在Distractor测试中，为了测量模型应对噪声的能力，喂给模型的10个文段中有两个是“金”文段（即用来构筑问题的文段本身），而剩下的8个是噪声，10个文段打乱后投喂给模型。</p>
 <p>在Full wiki测试中，为了测量模型在实际应用中的效果，测试时将向模型投喂所有的wikipedia页面的开头几段，并不指定或加入金文段。</p>
 <img data-src="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202003325551.png" class>
+<p>人类在测试中还是吊打了基线的……</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-02 00:34:50 / 修改时间：11:16:55" itemprop="dateCreated datePublished" datetime="2021-02-02T00:34:50+08:00">2021-02-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/02/HOTPOTQA: A Dataset for Diverse, Explainable Multi-hop Question Answering阅读笔记/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://www.aclweb.org/anthology/D18-1259.pdf">论文地址</a></p>
+<h1 id="引入">引入</h1>
+<p>现有的QA数据集大多数并不涉及复杂的推理过程（只在一个文段内推理，或者只需要一步推理）。</p>
+<p>那些需要多跳推理的数据集，则主要围绕已有的知识库构建，限制了其多样性（问题一定围绕着知识库的架构来走），问题的解答也很单一。</p>
+<p>另外，问题的监督粒度也太粗，只能针对问题来监督回答是否正确。</p>
+<p>基于这三个问题，作者提出了HotpotQA数据集，特点在于：</p>
+<ul>
+<li>多跳推理</li>
+<li>不基于任何的范式，更加自然</li>
+<li>引入了一类全新的“实体比较”类问题，可以测试模型在常识方面的理解</li>
+</ul>
+<h1 id="数据采集">数据采集</h1>
+<p>问题的提出基于文本而非知识库，保证其多样性。</p>
+<h2 id="实体比较类问题">实体比较类问题</h2>
+<p>两个实体在某一属性方面进行比较。</p>
+<p>例如“谁在NBA效力过的球队更多，乔丹还是科比？”需要对实体<code>乔丹</code>和实体<code>科比</code>在<code>效力过的NBA球队数目</code>上进行比较，然后选出一个进行回答。</p>
+<p>另一种实体比较类问题是yes/no问题，比如“铁娘子和AC/DC乐队来自同一个国家吗？”</p>
+<h2 id="采集支持信息">采集支持信息</h2>
+<p>比起对每个问题只提供一个答案，作者还对每个问题都列出了一个<code>supporting fact</code>集合，从集合中可以获取回答问题所需的所有知识。</p>
+<p>这一方面可以提供更强力的监督，另一方面可以通过让模型预测<code>supporting fact</code>然后和真实的相比较来衡量模型的可解释性。</p>
+<h1 id="数据集">数据集</h1>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201235641909.png" class>
+<div data-align="center">
+对数据集内问题的划分
+</div>
+<p>大多数答案是文段内的实体，同时也有其他属性如日期、数字和形容词之类。</p>
+<p>约42%的问题需要链式推理（需要找到桥接实体来实现第二步推理），有一些问题依赖桥接实体的属性，还有一些问题需要通过同时满足多个属性来找到答案实体。这些都是多条推理的形式。</p>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202000140730.png" class>
+<h1 id="实验">实验</h1>
+<p>作者采取了<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1710.10723.pdf">这篇文章</a>内的模型作为基线模型，但加上了很多新鲜技巧，例如字级模型、自注意力、双向注意力等。</p>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202002327969.png" class>
+<p>为了回答问题，作者引入了一个三向分类器用来输出：yes/no/用文本回答问题。在回答时，首先确定问题的回答是不是yes/no。是就直接输出，不是就进一步用最高概率的词拿出来作为文本回答。</p>
+<p>模型用两种基准测试来衡量。</p>
+<p>在Distractor测试中，为了测量模型应对噪声的能力，喂给模型的10个文段中有两个是“金”文段（即用来构筑问题的文段本身），而剩下的8个是噪声，10个文段打乱后投喂给模型。</p>
+<p>在Full wiki测试中，为了测量模型在实际应用中的效果，测试时将向模型投喂所有的wikipedia页面的开头几段，并不指定或加入金文段。</p>
+<img data-src="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202003325551.png" class>
 <p>人类在测试中还是吊打了基线的……</p>
 
       
@@ -1249,7 +1358,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
