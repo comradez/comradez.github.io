@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="论文地址 摘要作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。 引入首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉">
+  <meta name="description" content="论文地址 摘要 作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。 引入 首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏">
 <meta property="og:type" content="article">
 <meta property="og:title" content="NLProlog: Reasoning with Weak Unification for Question Answering in Natural Language阅读笔记">
 <meta property="og:url" content="http://example.com/2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="cy&#39;s blog">
-<meta property="og:description" content="论文地址 摘要作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。 引入首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉">
+<meta property="og:description" content="论文地址 摘要 作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。 引入 首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-01-31T07:43:02.000Z">
 <meta property="article:modified_time" content="2021-01-31T07:44:00.135Z">
@@ -223,15 +223,21 @@
 
       
         <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1906.06187.pdf">论文地址</a></p>
-<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。</p>
-<h1 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h1><p>首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉底的出生地是哪里？，回答雅典则是朴素的答案匹配，回答希腊则意味着需要经过一步逻辑推理，这就是多跳推理。</p>
+<h1 id="摘要">摘要</h1>
+<p>作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。</p>
+<h1 id="引入">引入</h1>
+<p>首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉底的出生地是哪里？，回答雅典则是朴素的答案匹配，回答希腊则意味着需要经过一步逻辑推理，这就是多跳推理。</p>
 <p>以往的自然语言多跳推理一般采用神经模型，可以处理自然语言的多样性和模糊性，但可解释性很差，而且需要大量数据才能拥有泛化能力，而且一直没能解决如何引入领域内已有知识这个问题。</p>
 <p>与之相反，基于规则的逻辑推理模型就非常易于解释，而且在小数据下泛化能力也非常强，但是对噪声的鲁棒性非常差，所以对自然语言这种模糊的东西很难处理。</p>
 <p>因此作者提出了NLProlog，将符号推理器、规则学习方法和实体表示结合起来，从而实现一个在自然语言上进行基于规则的多跳推理的模型。它是部分可解释的，而且很容易引入先验知识。同时，它不需要自然语言被转化为逻辑形式作为中介。</p>
 <p>NLProlog的核心是类似Prolog的backward chaining定理证明器，只不过对symbol的比较（unification过程）被替换为可微的（也就是神经的）相似度函数，对两个symbol的分布表示的相似程度进行衡量。这个过程由基于预训练的sentence embedding的、端到端的sentence encoder完成，然后在下游任务上finetune即可，这个下游任务的finetune过程也就是引入领域内的逻辑规则的过程。</p>
 <p>作者在两个QA数据集上evaluate了这个模型，效果不戳。</p>
-<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>我先跳过这里，感觉和正文关系有限</p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>每个Prolog程序都包含若干以下形式的霍恩子句：<br>$$<br>h(f_1^h, …,f_n^h) \Leftarrow p_1(f_1^1,…,f_m^1),\wedge,…,\wedge,p_B(f_1^B,…,f_l^B)<br>$$<br>其中$h, p_i(1\leq i\leq B)$是谓词符号，$f_i^j$要么是函数，要么是变量。所有函数的集合称为$\mathcal{F}$，所有谓词的集合称为$\mathcal{P}$。$h(f_1^h, …,f_n^h)$被称为<code>head</code></p>
+<h1 id="相关工作">相关工作</h1>
+<p>我先跳过这里，感觉和正文关系有限</p>
+<h1 id="背景">背景</h1>
+<p>每个Prolog程序都包含若干以下形式的霍恩子句： <span class="math display">\[
+h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_1^B,...,f_l^B)
+\]</span> 其中<span class="math inline">\(h, p_i(1\leq i\leq B)\)</span>是谓词符号，<span class="math inline">\(f_i^j\)</span>要么是函数，要么是变量。所有函数的集合称为<span class="math inline">\(\mathcal{F}\)</span>，所有谓词的集合称为<span class="math inline">\(\mathcal{P}\)</span>。<span class="math inline">\(h(f_1^h, ...,f_n^h)\)</span>被称为<code>head</code></p>
 
     </div>
 
@@ -334,7 +340,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

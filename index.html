@@ -158,115 +158,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="茨月">
-      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cy's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">HOTPOTQA: A Dataset for Diverse, Explainable阅读笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-02-02 00:34:50 / 修改时间：00:36:00" itemprop="dateCreated datePublished" datetime="2021-02-02T00:34:50+08:00">2021-02-02</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable阅读笔记/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://www.aclweb.org/anthology/D18-1259.pdf">论文地址</a></p>
-<h1 id="引入">引入</h1>
-<p>现有的QA数据集大多数并不涉及复杂的推理过程（只在一个文段内推理，或者只需要一步推理）。</p>
-<p>那些需要多跳推理的数据集，则主要围绕已有的知识库构建，限制了其多样性（问题一定围绕着知识库的架构来走），问题的解答也很单一。</p>
-<p>另外，问题的监督粒度也太粗，只能针对问题来监督回答是否正确。</p>
-<p>基于这三个问题，作者提出了HotpotQA数据集，特点在于：</p>
-<ul>
-<li>多跳推理</li>
-<li>不基于任何的范式，更加自然</li>
-<li>引入了一类全新的“实体比较”类问题，可以测试模型在常识方面的理解</li>
-</ul>
-<h1 id="数据采集">数据采集</h1>
-<p>问题的提出基于文本而非知识库，保证其多样性。</p>
-<h2 id="实体比较类问题">实体比较类问题</h2>
-<p>两个实体在某一属性方面进行比较。</p>
-<p>例如“谁在NBA效力过的球队更多，乔丹还是科比？”需要对实体<code>乔丹</code>和实体<code>科比</code>在<code>效力过的NBA球队数目</code>上进行比较，然后选出一个进行回答。</p>
-<p>另一种实体比较类问题是yes/no问题，比如“铁娘子和AC/DC乐队来自同一个国家吗？”</p>
-<h2 id="采集支持信息">采集支持信息</h2>
-<p>比起对每个问题只提供一个答案，作者还对每个问题都列出了一个<code>supporting fact</code>集合，从集合中可以获取回答问题所需的所有知识。</p>
-<p>这一方面可以提供更强力的监督，另一方面可以通过让模型预测<code>supporting fact</code>然后和真实的相比较来衡量模型的可解释性。</p>
-<h1 id="数据集">数据集</h1>
-<img data-src="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201235641909.png" class>
-<div data-align="center">
-对数据集内问题的划分
-</div>
-<p>大多数答案是文段内的实体，同时也有其他属性如日期、数字和形容词之类。</p>
-<p>约42%的问题需要链式推理（需要找到桥接实体来实现第二步推理），有一些问题依赖桥接实体的属性，还有一些问题需要通过同时满足多个属性来找到答案实体。这些都是多条推理的形式。</p>
-<img data-src="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202000140730.png" class>
-<h1 id="实验">实验</h1>
-<p>作者采取了<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1710.10723.pdf">这篇文章</a>内的模型作为基线模型，但加上了很多新鲜技巧，例如字级模型、自注意力、双向注意力等。</p>
-<img data-src="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202002327969.png" class>
-<p>为了回答问题，作者引入了一个三向分类器用来输出：yes/no/用文本回答问题。在回答时，首先确定问题的回答是不是yes/no。是就直接输出，不是就进一步用最高概率的词拿出来作为文本回答。</p>
-<p>模型用两种基准测试来衡量。</p>
-<p>在Distractor测试中，为了测量模型应对噪声的能力，喂给模型的10个文段中有两个是“金”文段（即用来构筑问题的文段本身），而剩下的8个是噪声，10个文段打乱后投喂给模型。</p>
-<p>在Full wiki测试中，为了测量模型在实际应用中的效果，测试时将向模型投喂所有的wikipedia页面的开头几段，并不指定或加入金文段。</p>
-<img data-src="/2021/02/02/HOTPOTQA-A-Dataset-for-Diverse-Explainable%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202003325551.png" class>
-<p>人类在测试中还是吊打了基线的……</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -703,15 +594,21 @@
 
       
           <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1906.06187.pdf">论文地址</a></p>
-<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。</p>
-<h1 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h1><p>首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉底的出生地是哪里？，回答雅典则是朴素的答案匹配，回答希腊则意味着需要经过一步逻辑推理，这就是多跳推理。</p>
+<h1 id="摘要">摘要</h1>
+<p>作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。</p>
+<h1 id="引入">引入</h1>
+<p>首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉底的出生地是哪里？，回答雅典则是朴素的答案匹配，回答希腊则意味着需要经过一步逻辑推理，这就是多跳推理。</p>
 <p>以往的自然语言多跳推理一般采用神经模型，可以处理自然语言的多样性和模糊性，但可解释性很差，而且需要大量数据才能拥有泛化能力，而且一直没能解决如何引入领域内已有知识这个问题。</p>
 <p>与之相反，基于规则的逻辑推理模型就非常易于解释，而且在小数据下泛化能力也非常强，但是对噪声的鲁棒性非常差，所以对自然语言这种模糊的东西很难处理。</p>
 <p>因此作者提出了NLProlog，将符号推理器、规则学习方法和实体表示结合起来，从而实现一个在自然语言上进行基于规则的多跳推理的模型。它是部分可解释的，而且很容易引入先验知识。同时，它不需要自然语言被转化为逻辑形式作为中介。</p>
 <p>NLProlog的核心是类似Prolog的backward chaining定理证明器，只不过对symbol的比较（unification过程）被替换为可微的（也就是神经的）相似度函数，对两个symbol的分布表示的相似程度进行衡量。这个过程由基于预训练的sentence embedding的、端到端的sentence encoder完成，然后在下游任务上finetune即可，这个下游任务的finetune过程也就是引入领域内的逻辑规则的过程。</p>
 <p>作者在两个QA数据集上evaluate了这个模型，效果不戳。</p>
-<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>我先跳过这里，感觉和正文关系有限</p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>每个Prolog程序都包含若干以下形式的霍恩子句：<br>$$<br>h(f_1^h, …,f_n^h) \Leftarrow p_1(f_1^1,…,f_m^1),\wedge,…,\wedge,p_B(f_1^B,…,f_l^B)<br>$$<br>其中$h, p_i(1\leq i\leq B)$是谓词符号，$f_i^j$要么是函数，要么是变量。所有函数的集合称为$\mathcal{F}$，所有谓词的集合称为$\mathcal{P}$。$h(f_1^h, …,f_n^h)$被称为<code>head</code></p>
+<h1 id="相关工作">相关工作</h1>
+<p>我先跳过这里，感觉和正文关系有限</p>
+<h1 id="背景">背景</h1>
+<p>每个Prolog程序都包含若干以下形式的霍恩子句： <span class="math display">\[
+h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_1^B,...,f_l^B)
+\]</span> 其中<span class="math inline">\(h, p_i(1\leq i\leq B)\)</span>是谓词符号，<span class="math inline">\(f_i^j\)</span>要么是函数，要么是变量。所有函数的集合称为<span class="math inline">\(\mathcal{F}\)</span>，所有谓词的集合称为<span class="math inline">\(\mathcal{P}\)</span>。<span class="math inline">\(h(f_1^h, ...,f_n^h)\)</span>被称为<code>head</code></p>
 
       
     </div>
@@ -934,66 +831,72 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="End-to-End-Differentiable-Proving"><a href="#End-to-End-Differentiable-Proving" class="headerlink" title="End-to-End Differentiable Proving"></a>End-to-End Differentiable Proving</h1><p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1705.11040.pdf">论文链接</a></p>
-<h2 id="写在前面的废话"><a href="#写在前面的废话" class="headerlink" title="写在前面的废话"></a>写在前面的废话</h2><p>刚开始认认真真地看论文，只是看的速度实在是太慢了。感觉记录下来的东西有点类似于不正式的翻译，非常流水账，但是什么东西都不记又什么都记不住，左耳朵进右耳朵出了。<br>学长分配给的论文还有6篇，这篇也刚刚看完结构和LOSS，道阻且长……</p>
-<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><h3 id="知识库自动补全（automated-Knowledge-Base-completion）"><a href="#知识库自动补全（automated-Knowledge-Base-completion）" class="headerlink" title="知识库自动补全（automated Knowledge Base completion）"></a><a target="_blank" rel="noopener" href="https://paperswithcode.com/task/knowledge-base-completion/latest">知识库自动补全</a>（automated Knowledge Base completion）</h3><p>给定知识库中已有的一部分信息，自动推导出缺失的信息。</p>
-<h3 id="多跳的（multi-hop）"><a href="#多跳的（multi-hop）" class="headerlink" title="多跳的（multi-hop）"></a>多跳的（multi-hop）</h3><p>与一步的逻辑推理相对，指$A, \wedge (A\to B),\wedge (B\to C) , \wedge (C\to D)\Rightarrow D$这类需要经过多步的推理。</p>
-<h3 id="次符号的（subsymbolic）"><a href="#次符号的（subsymbolic）" class="headerlink" title="次符号的（subsymbolic）"></a>次符号的（subsymbolic）</h3><p>我还没理解。似乎是指粒度比符号更小？</p>
-<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>目前的知识库自动补全SOTA模型使用神经链预测模型(neural link prediction model)来学习符号的分布向量表示。向量表示允许模型通过相似性来对未知的事实进行泛化。</p>
+          <h1 id="end-to-end-differentiable-proving">End-to-End Differentiable Proving</h1>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1705.11040.pdf">论文链接</a></p>
+<h2 id="写在前面的废话">写在前面的废话</h2>
+<p>刚开始认认真真地看论文，只是看的速度实在是太慢了。感觉记录下来的东西有点类似于不正式的翻译，非常流水账，但是什么东西都不记又什么都记不住，左耳朵进右耳朵出了。 学长分配给的论文还有6篇，这篇也刚刚看完结构和LOSS，道阻且长……</p>
+<h2 id="前置知识">前置知识</h2>
+<h3 id="知识库自动补全automated-knowledge-base-completion"><a target="_blank" rel="noopener" href="https://paperswithcode.com/task/knowledge-base-completion/latest">知识库自动补全</a>（automated Knowledge Base completion）</h3>
+<p>给定知识库中已有的一部分信息，自动推导出缺失的信息。</p>
+<h3 id="多跳的multi-hop">多跳的（multi-hop）</h3>
+<p>与一步的逻辑推理相对，指<span class="math inline">\(A\, \wedge (A\to B)\,\wedge (B\to C) \, \wedge (C\to D)\Rightarrow D\)</span>这类需要经过多步的推理。</p>
+<h3 id="次符号的subsymbolic">次符号的（subsymbolic）</h3>
+<p>我还没理解。似乎是指粒度比符号更小？</p>
+<h2 id="introduction">Introduction</h2>
+<p>目前的知识库自动补全SOTA模型使用神经链预测模型(neural link prediction model)来学习符号的分布向量表示。向量表示允许模型通过相似性来对未知的事实进行泛化。</p>
 <p>然而，神经链预测模型对于需要多个步骤进行预测的情况预测不佳（A是B的父亲，B是C的家长=&gt;A是C的祖父或祖母）。与之相反，符号定理证明器(symbolic theorem prover)正好可以处理这类问题。进一步，归纳逻辑程序设计(Inductive Logic Programming)利用这些证明器来从数据中学到可解释的规则并且在完成知识库的过程中进行应用。 但是，symbolic prover在subsymbolic表示的学习和相似度比较上能力比较差，这限制了他们对相似但不完全相同的询问进行泛化的能力。</p>
 <p>尽管逻辑和机器学习的联系的问题已经由统计相关学习方法(statistical relational learning approaches)所解决了，以往的模型要么不支持次符号表示的推理，要么不是端到端训练出来的。神经多跳推理模型(neural multi-hop reasoning chain)通过将推理链encode到向量空间上去（也就是：在与答案进行比对之前，先迭代地将subsymbolic representation进行refine），在某种程度上解决了这个问题。但是它也有问题：可解释性差，而且难以显式地将领域内知识（例如作为某条规则）传递进去。</p>
 <p>受到Prolog的反向链式算法和使用次符号表示的可微的归一化操作的方法，作者提出了Neural Theorem Prover。</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>概念简介：</p>
-<p>一个<code>atom</code>包含一个谓词和若干个项，因为我们考虑的是无函数的一阶逻辑，每个项只能是常量或者变量。例如，$[grandfatherOf, \textbf{Q}, BART]$是一个包含了谓词<code>grandfatherOf</code>和两个项（变量<code>Q</code>和常量<code>BART</code>）的<code>atom</code></p>
-<p>一个<code>rule</code>形如$H\text{:-}B$，其中H是一个<code>atom</code>，B是一系列<code>atom</code>的合取（可能为空），（代表B推出H）</p>
+<h2 id="background">Background</h2>
+<p>概念简介：</p>
+<p>一个<code>atom</code>包含一个谓词和若干个项，因为我们考虑的是无函数的一阶逻辑，每个项只能是常量或者变量。例如，<span class="math inline">\([grandfatherOf, \textbf{Q}, BART]\)</span>是一个包含了谓词<code>grandfatherOf</code>和两个项（变量<code>Q</code>和常量<code>BART</code>）的<code>atom</code></p>
+<p>一个<code>rule</code>形如<span class="math inline">\(H\text{:-}B\)</span>，其中H是一个<code>atom</code>，B是一系列<code>atom</code>的合取（可能为空），（代表B推出H）</p>
 <p>一个不含变量的<code>rule</code>叫做<code>ground rule</code>，一个B为空的<code>rule</code>叫做<code>fact</code></p>
-<p>一个<code>substitution set</code>形如$\psi={X_1/t_1, X_2/t_2,…,X_N/t_N}$，其中$X_i$是变量，而$t_i$是用于替换变量的值。将一个<code>substitution set</code>应用于一个<code>atom</code>即为将这个<code>atom</code>中的所有变量替换为<code>substitution set</code>中对应的替换值。</p>
-<p>给定一个query（也称作goal），以$[grandfatherOf, \textbf{Q}, BART]$为例，我们可以用Prolog’s backward chaining algorithm来找到Q适合的替换值。</p>
+<p>一个<code>substitution set</code>形如<span class="math inline">\(\psi=\{X_1/t_1, X_2/t_2,...,X_N/t_N\}\)</span>，其中<span class="math inline">\(X_i\)</span>是变量，而<span class="math inline">\(t_i\)</span>是用于替换变量的值。将一个<code>substitution set</code>应用于一个<code>atom</code>即为将这个<code>atom</code>中的所有变量替换为<code>substitution set</code>中对应的替换值。</p>
+<p>给定一个query（也称作goal），以<span class="math inline">\([grandfatherOf, \textbf{Q}, BART]\)</span>为例，我们可以用Prolog's backward chaining algorithm来找到Q适合的替换值。</p>
 <p>总地来说，这个算法基于两个函数，OR和AND。</p>
 <p>首先，OR遍历所有的<code>rule</code>（包括<code>fact</code>），将每个<code>rule</code>的H和goal进行合并（谓词相同才可以合并，用goal里的对象对应地替换<code>rule</code>里的对象），同时更新<code>substitution set</code>。因为只要有一条<code>rule</code>能够成功合并就足够了，所以这个操作称作OR。</p>
 <p>当合并成功后，OR会调用AND来证明<code>rule</code>的body中的所有<code>rule</code>（也叫作subgoal）。AND首先将<code>substitution set</code>应用于第一个<code>atom</code>，然后继续调用OR来证明他；随后对每一个body中的<code>atom</code>都做相同的事情。只有所有的<code>atom</code>都被证明才可以说明goal被证明，所以这个操作叫做AND。</p>
 <p>举一个例子：</p>
-<p>goal是$[grandfatherOf, \textbf{Q}, BART]$。</p>
-<p>有一条<code>rule</code>是$[grandfatherOf, \textbf{X}, \textbf{Y}]\text{:-}[[fatherOf, \textbf{X}, \textbf{Z}],[parentOf, \textbf{Z}, \textbf{Y}]]$</p>
-<p>这样OR操作合并后得到的subgoal就是$[fatherOf,\textbf{Q},\textbf{Z}]$和$[parentOf,\textbf{Z}, BART]$，然后再用AND操作分别去证明。</p>
+<p>goal是<span class="math inline">\([grandfatherOf, \textbf{Q}, BART]\)</span>。</p>
+<p>有一条<code>rule</code>是<span class="math inline">\([grandfatherOf, \textbf{X}, \textbf{Y}]\text{:-}[[fatherOf, \textbf{X}, \textbf{Z}],[parentOf, \textbf{Z}, \textbf{Y}]]\)</span></p>
+<p>这样OR操作合并后得到的subgoal就是<span class="math inline">\([fatherOf,\textbf{Q},\textbf{Z}]\)</span>和<span class="math inline">\([parentOf,\textbf{Z}, BART]\)</span>，然后再用AND操作分别去证明。</p>
 <p>个人感觉英文wiki上的算法说明更明确易懂……</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210128224251578.png" class>
-
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210128224319624.png" class>
-
-<h3 id="Differentiable-Prover"><a href="#Differentiable-Prover" class="headerlink" title="Differentiable Prover"></a>Differentiable Prover</h3><p>我们将NTP的构建表述为一系列<code>module</code>的构建。每个<code>module</code>输入一些离散的对象（如<code>atom</code>和<code>rule</code>）和一个<code>proof state</code>，同时输出若干新的<code>proof state</code>。</p>
-<p>一个<code>proof state</code>$S = (\psi, \rho)$由<code>substitution set</code> $\psi$和神经网络$\rho$构成。其中$\psi$是截至目前的<code>substitution set</code>，$\rho$会输出一个（部分）证明的<code>success score</code>（是实数）。尽管离散的对象和<code>substitution set</code>都只在建立网络的过程中用到，一旦网络建立完成，在训练和测试的时候对于不同的proof我们就可以计算连续的proof <code>success score</code>。</p>
+<h3 id="differentiable-prover">Differentiable Prover</h3>
+<p>我们将NTP的构建表述为一系列<code>module</code>的构建。每个<code>module</code>输入一些离散的对象（如<code>atom</code>和<code>rule</code>）和一个<code>proof state</code>，同时输出若干新的<code>proof state</code>。</p>
+<p>一个<code>proof state</code><span class="math inline">\(S = (\psi, \rho)\)</span>由<code>substitution set</code> <span class="math inline">\(\psi\)</span>和神经网络<span class="math inline">\(\rho\)</span>构成。其中<span class="math inline">\(\psi\)</span>是截至目前的<code>substitution set</code>，<span class="math inline">\(\rho\)</span>会输出一个（部分）证明的<code>success score</code>（是实数）。尽管离散的对象和<code>substitution set</code>都只在建立网络的过程中用到，一旦网络建立完成，在训练和测试的时候对于不同的proof我们就可以计算连续的proof <code>success score</code>。</p>
 <p><code>module</code>由离散的对象和<code>substitution set</code>实例化。他们构成了一个表示（部分）证明的<code>success score</code>的神经网络，同时递归地实例化子<code>module</code>来继续证明。</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210128234749898.png" class>
-
-<p>所有<code>module</code>都共享以下声明：$D\times S\to S^N$，其中D是控制网络构建的域，S是<code>proof state</code>的域，N是输出<code>proof state</code>的数目。进一步地，我们记$S_\psi$为<code>proof state</code> S对应的<code>substitution set</code>，$S_p$为它对应的神经网络</p>
-<h4 id="合并模块"><a href="#合并模块" class="headerlink" title="合并模块"></a>合并模块</h4><p>在backward chaining中，两个<code>atom</code>的合并是核心（例如，一个是我们要证明的goal，另一个是一条<code>rule</code>的<code>rule head</code>）。在朴素的backward chaining中，两个非变量的符号要检查是否一致——一致才可以合并，否则直接退出。然而，我们希望的是让它对于不完全一致而含义类似（e.g. <code>grandfatherOf</code>和<code>grandpaOf</code>）的也进行合并，因此我们通过神经网络来衡量两个符号在向量空间中的相似性。</p>
-<p>unify模块就用来更新<code>substitution set</code>并创建一个可以比较非变量符号的向量表示的相似性的神经网络。它的签名形如$L\times L\times S\to S$，其中L是由所有项的列表构成的集合（L中的元素都是包含若干项的列表），S是<code>proof state</code>的定义域。unify模块接受两个<code>atom</code>（表示为项的集合形式）和一个上游<code>proof state</code>，返回一个下游<code>proof state</code>。</p>
-<p>unify模块首先遍历两个<code>atom</code>并且比较这些符号，如果一个符号是变量那么更新<code>substitution set</code>；否则将他们通过一个径向基函数(<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Radial_basis_function">radial basis function</a>)核，作者选取的超参数$\mu=\frac{1}{\sqrt{2}}$</p>
+<p>所有<code>module</code>都共享以下声明：<span class="math inline">\(D\times S\to S^N\)</span>，其中D是控制网络构建的域，S是<code>proof state</code>的域，N是输出<code>proof state</code>的数目。进一步地，我们记<span class="math inline">\(S_\psi\)</span>为<code>proof state</code> S对应的<code>substitution set</code>，<span class="math inline">\(S_p\)</span>为它对应的神经网络</p>
+<h4 id="合并模块">合并模块</h4>
+<p>在backward chaining中，两个<code>atom</code>的合并是核心（例如，一个是我们要证明的goal，另一个是一条<code>rule</code>的<code>rule head</code>）。在朴素的backward chaining中，两个非变量的符号要检查是否一致——一致才可以合并，否则直接退出。然而，我们希望的是让它对于不完全一致而含义类似（e.g. <code>grandfatherOf</code>和<code>grandpaOf</code>）的也进行合并，因此我们通过神经网络来衡量两个符号在向量空间中的相似性。</p>
+<p>unify模块就用来更新<code>substitution set</code>并创建一个可以比较非变量符号的向量表示的相似性的神经网络。它的签名形如<span class="math inline">\(L\times L\times S\to S\)</span>，其中L是由所有项的列表构成的集合（L中的元素都是包含若干项的列表），S是<code>proof state</code>的定义域。unify模块接受两个<code>atom</code>（表示为项的集合形式）和一个上游<code>proof state</code>，返回一个下游<code>proof state</code>。</p>
+<p>unify模块首先遍历两个<code>atom</code>并且比较这些符号，如果一个符号是变量那么更新<code>substitution set</code>；否则将他们通过一个径向基函数(<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Radial_basis_function">radial basis function</a>)核，作者选取的超参数<span class="math inline">\(\mu=\frac{1}{\sqrt{2}}\)</span></p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130092554431.png" class>
-
 <p>具体的unify规则如上所示，如果两个<code>atom</code>都空，那么输入<code>proof state</code>不变；如果只有一个为空，那么unify失败；如果两个都不为空，那么按照下面的两个公式逐元素进行unify。</p>
-<p>其中$S’$是新<code>proof state</code>，$\nu$是变量符号的集合，$h/g$表示用值g替换变量h（也就是更新<code>substitution set</code>的过程）。这里的$S_\rho’$实际上是一个神经网络，min里面的值是【如果将这组输入喂给神经网络那么神经网络会输出的结果】。</p>
-<p>注意到$S_\rho$的值一定落在$(0,1]$上。</p>
-<h4 id="OR模块"><a href="#OR模块" class="headerlink" title="OR模块"></a>OR模块</h4><p>or模块的签名为$L\times \mathbb{N}\times S\to S^N$，其中L是所有goal <code>atom</code>的集合，$\mathbb{N}$是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。</p>
+<p>其中<span class="math inline">\(S&#39;\)</span>是新<code>proof state</code>，<span class="math inline">\(\nu\)</span>是变量符号的集合，<span class="math inline">\(h/g\)</span>表示用值g替换变量h（也就是更新<code>substitution set</code>的过程）。这里的<span class="math inline">\(S_\rho&#39;\)</span>实际上是一个神经网络，min里面的值是【如果将这组输入喂给神经网络那么神经网络会输出的结果】。</p>
+<p>注意到<span class="math inline">\(S_\rho\)</span>的值一定落在<span class="math inline">\((0,1]\)</span>上。</p>
+<h4 id="or模块">OR模块</h4>
+<p>or模块的签名为<span class="math inline">\(L\times \mathbb{N}\times S\to S^N\)</span>，其中L是所有goal <code>atom</code>的集合，<span class="math inline">\(\mathbb{N}\)</span>是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。</p>
 <p>基于unify模块，or模块的定义是</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130100730881.png" class>
-
 <p>类似backward chaining中的做法，对每个<code>rule</code>取出head去unify，然后对unify得到的东西去做and操作。</p>
-<h4 id="and模块"><a href="#and模块" class="headerlink" title="and模块"></a>and模块</h4><p>首先定义一个辅助函数substitute，只要可能就会在<code>atom</code>中将变量替换（能换的尽量换）</p>
+<h4 id="and模块">and模块</h4>
+<p>首先定义一个辅助函数substitute，只要可能就会在<code>atom</code>中将变量替换（能换的尽量换）</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130101058127.png" class>
-
-<p>and模块的签名签名为$L\times \mathbb{N}\times S\to S^N$，其中L是所有<code>goal atom</code>的集合，$\mathbb{N}$是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。（和or一样）</p>
+<p>and模块的签名签名为<span class="math inline">\(L\times \mathbb{N}\times S\to S^N\)</span>，其中L是所有<code>goal atom</code>的集合，<span class="math inline">\(\mathbb{N}\)</span>是正整数集（指明神经网络最长的推理长度），S是输入<code>proof state</code>，输出若干个<code>proof state</code>。（和or一样）</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130101519851.png" class>
-
-<p>如果S是FAIL，或者剩余的步数是0，那么and操作都会失败。如果<code>atom</code>集合为空，那么直接将输入<code>proof state</code>输出。否则将<code>atom</code>集合中的每个元素拿出来，经过substitute替换后用or去递归建立神经网络。hexo </p>
-<h4 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h4><p>最终通过以下公式计算<code>success score</code></p>
+<p>如果S是FAIL，或者剩余的步数是0，那么and操作都会失败。如果<code>atom</code>集合为空，那么直接将输入<code>proof state</code>输出。否则将<code>atom</code>集合中的每个元素拿出来，经过substitute替换后用or去递归建立神经网络。hexo</p>
+<h4 id="聚合">聚合</h4>
+<p>最终通过以下公式计算<code>success score</code></p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130102203392.png" class>
-
-<h3 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h3><p>NTP loss用负对数定义</p>
+<h3 id="训练">训练</h3>
+<p>NTP loss用负对数定义</p>
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130102950882.png" class>
-
 <img data-src="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210130103012084.png" class>
+
       
     </div>
 
@@ -1074,30 +977,39 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="泛型基本语法"><a href="#泛型基本语法" class="headerlink" title="泛型基本语法"></a>泛型基本语法</h2><h3 id="函数中的泛型"><a href="#函数中的泛型" class="headerlink" title="函数中的泛型"></a>函数中的泛型</h3><p>回忆一下函数的定义</p>
+          <h2 id="泛型基本语法">泛型基本语法</h2>
+<h3 id="函数中的泛型">函数中的泛型</h3>
+<p>回忆一下函数的定义</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">function_name</span></span>(params: types) -&gt; return_type &#123;</span><br><span class="line">    <span class="comment">//function_body</span></span><br><span class="line">    return_value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在函数中使用泛型，只需要在函数名后面加上尖括号，里面包裹类型名就可以了</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">function_name</span></span>&lt;T&gt;(params: types) -&gt; return_type &#123;</span><br><span class="line">    <span class="comment">//function_body</span></span><br><span class="line">    return_value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="结构体中的泛型"><a href="#结构体中的泛型" class="headerlink" title="结构体中的泛型"></a>结构体中的泛型</h3><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PointI32</span></span> &#123;</span><br><span class="line">    x: <span class="built_in">i32</span>,</span><br><span class="line">    y: <span class="built_in">i32</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="结构体中的泛型">结构体中的泛型</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PointI32</span></span> &#123;</span><br><span class="line">    x: <span class="built_in">i32</span>,</span><br><span class="line">    y: <span class="built_in">i32</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在类型后面加上尖括号，里面包裹类型名</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Point</span></span>&lt;T&gt; &#123;</span><br><span class="line">    x: T,</span><br><span class="line">    y: T,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>注意当用于构造的值不是同一类型时，（无论是否显式指定类型）rust不会进行类型转换而是会报错。</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a: <span class="built_in">i32</span> = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">let</span> b: <span class="built_in">isize</span> = <span class="number">20</span>;</span><br><span class="line"><span class="keyword">let</span> p1 = Point &#123;</span><br><span class="line">    x: a,</span><br><span class="line">    y: b,</span><br><span class="line">&#125; <span class="comment">//报错</span></span><br><span class="line"><span class="keyword">let</span> p2 = Point::&lt;<span class="built_in">i32</span>&gt; &#123;</span><br><span class="line">    x: a,</span><br><span class="line">    y: b,</span><br><span class="line">&#125; <span class="comment">//仍然报错</span></span><br></pre></td></tr></table></figure>
-<h3 id="枚举定义中的泛型"><a href="#枚举定义中的泛型" class="headerlink" title="枚举定义中的泛型"></a>枚举定义中的泛型</h3><p>和结构体类似，直接上两个喜闻乐见的例子</p>
+<h3 id="枚举定义中的泛型">枚举定义中的泛型</h3>
+<p>和结构体类似，直接上两个喜闻乐见的例子</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Option</span></span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="literal">Some</span>(T),</span><br><span class="line">    <span class="literal">None</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Result</span></span>&lt;T, E&gt; &#123;</span><br><span class="line">    <span class="literal">Ok</span>(T),</span><br><span class="line">    <span class="literal">Err</span>(E),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="方法定义中的泛型"><a href="#方法定义中的泛型" class="headerlink" title="方法定义中的泛型"></a>方法定义中的泛型</h3><p>和函数类似，在<code>impl</code>后面也要加泛型参数</p>
+<h3 id="方法定义中的泛型">方法定义中的泛型</h3>
+<p>和函数类似，在<code>impl</code>后面也要加泛型参数</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span>&lt;T&gt; Point&lt;T&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">x</span></span>(&amp;<span class="keyword">self</span>) -&gt; &amp;T &#123;</span><br><span class="line">        &amp;<span class="keyword">self</span>.x</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>也可以模板特化</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> Point&lt;<span class="built_in">f32</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">distance</span></span>(&amp;<span class="keyword">self</span>) -&gt; <span class="built_in">f32</span> &#123;</span><br><span class="line">        (<span class="keyword">self</span>.x.powi(<span class="number">2</span>) + <span class="keyword">self</span>.y.powi(<span class="number">2</span>)).sqrt()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Trait"><a href="#Trait" class="headerlink" title="Trait"></a>Trait</h2><p>个人的理解是提供不同类型的相同接口，也就是类似有继承的语言中虚函数的作用。</p>
+<h2 id="trait">Trait</h2>
+<p>个人的理解是提供不同类型的相同接口，也就是类似有继承的语言中虚函数的作用。</p>
 <p>官方的教程中将它解释为一个类似<code>interface</code>（当然继承虚基类也就是提供统一interface）的东西。</p>
 <p>例如</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Animal</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">behavior</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span> :</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">behavior</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Meow!&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> :</span> <span class="keyword">public</span> Animal &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">behavior</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Woof!&quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Animal*&gt; vec&#123;<span class="keyword">new</span> Cat(), <span class="keyword">new</span> Dog()&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> each : vec) &#123;</span><br><span class="line">        each-&gt;behavior();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在rust中可以写成</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Cat</span></span> &#123;&#125;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Dog</span></span> &#123;&#125;</span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Behavior</span></span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">behavior</span></span>(&amp;<span class="keyword">self</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">impl</span> Behavior <span class="keyword">for</span> Cat &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">behavior</span></span>(&amp;<span class="keyword">self</span>) &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Meow!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">impl</span> Behavior <span class="keyword">for</span> Dog &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">behavior</span></span>(&amp;<span class="keyword">self</span>) &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">&quot;Wooff!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Animal</span></span> &#123;</span><br><span class="line">    Cat(Cat),</span><br><span class="line">    Dog(Dog),</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> animals = <span class="built_in">vec!</span>[Animal::Cat(Cat&#123;&#125;), Animal::Dog(Dog&#123;&#125;)];</span><br><span class="line">    <span class="keyword">for</span> animal <span class="keyword">in</span> animals.iter() &#123; <span class="comment">//假定我们实现了IntoIterator...</span></span><br><span class="line">        <span class="keyword">match</span> animal &#123;</span><br><span class="line">            Animal::Cat(cat) =&gt; cat.behavior();</span><br><span class="line">            Animal::Dog(dog) =&gt; dog.behavior();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="定义trait"><a href="#定义trait" class="headerlink" title="定义trait"></a>定义trait</h3><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">TraitName</span></span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">SharedBehavior</span></span>(&amp;<span class="keyword">self</span>) -&gt; return_type; <span class="comment">//这里也可以实现，作为trait的默认实现。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="实现trait"><a href="#实现trait" class="headerlink" title="实现trait"></a>实现trait</h3><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> TraitName <span class="keyword">for</span> StructName &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">SharedBehavior</span></span>(&amp;<span class="keyword">self</span>) -&gt; return_type &#123;</span><br><span class="line">        <span class="comment">//function_body</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="在泛型中指定trait"><a href="#在泛型中指定trait" class="headerlink" title="在泛型中指定trait"></a>在泛型中指定trait</h3><p>有时候我们对泛型参数有一些要求，比如【可以比大小】：</p>
+<h3 id="定义trait">定义trait</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">TraitName</span></span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">SharedBehavior</span></span>(&amp;<span class="keyword">self</span>) -&gt; return_type; <span class="comment">//这里也可以实现，作为trait的默认实现。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="实现trait">实现trait</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">impl</span> TraitName <span class="keyword">for</span> StructName &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fn</span> <span class="title">SharedBehavior</span></span>(&amp;<span class="keyword">self</span>) -&gt; return_type &#123;</span><br><span class="line">        <span class="comment">//function_body</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="在泛型中指定trait">在泛型中指定trait</h3>
+<p>有时候我们对泛型参数有一些要求，比如【可以比大小】：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">GetLargest</span></span>&lt;T&gt;(list: &amp;[T]) -&gt; T &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut</span> largest = list[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">for</span> &amp;each <span class="keyword">in</span> list.iter() &#123;</span><br><span class="line">        <span class="keyword">if</span> each &gt; largest &#123; <span class="comment">//有问题，这里需要假定它可以比大小</span></span><br><span class="line">            largest = each;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    largest</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>为了给泛型参数加上更强的条件，我们给类型加上Trait Bound。如果需要多个Trait Bound，用+连接即可</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">GetLargest</span></span>&lt;T: <span class="built_in">PartialOrd</span> + <span class="built_in">Copy</span>&gt;(list: &amp;[T]) -&gt; T</span><br></pre></td></tr></table></figure>
@@ -1107,11 +1019,13 @@
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">GetLargest</span></span>&lt;T: <span class="built_in">PartialOrd</span> + <span class="built_in">Copy</span>&gt;(list: &amp;[T]) -&gt; T &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut</span> largest = list[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">for</span> &amp;each <span class="keyword">in</span> list.iter() &#123;</span><br><span class="line">        <span class="keyword">if</span> each &gt; largest &#123;</span><br><span class="line">            largest = each;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    largest</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>或者如果不要copy，返回引用，也可以这样</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">GetLargest</span></span>&lt;T: <span class="built_in">PartialOrd</span>&gt;(list: &amp;[T]) -&gt; &amp;T &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut</span> largest = &amp;list[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> list.iter() &#123;</span><br><span class="line">        <span class="keyword">if</span> each &gt; largest &#123;</span><br><span class="line">            largest = each;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    largest</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="返回实现了指定Trait-Bound的函数"><a href="#返回实现了指定Trait-Bound的函数" class="headerlink" title="返回实现了指定Trait Bound的函数"></a>返回实现了指定Trait Bound的函数</h3><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">funcion_name</span></span>(params: types) -&gt; <span class="keyword">impl</span> Trait_name</span><br></pre></td></tr></table></figure>
+<h3 id="返回实现了指定trait-bound的函数">返回实现了指定Trait Bound的函数</h3>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">funcion_name</span></span>(params: types) -&gt; <span class="keyword">impl</span> Trait_name</span><br></pre></td></tr></table></figure>
 <p>但这样只是依据返回值去自动推断类型，因此如果要</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (case) &#123;</span><br><span class="line">    <span class="keyword">return</span> Cat&#123;&#125;;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> Dog&#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>那还是不可以的。比较语法糖。</p>
-<h3 id="用Trait-Bound有条件地实现方法"><a href="#用Trait-Bound有条件地实现方法" class="headerlink" title="用Trait Bound有条件地实现方法"></a>用Trait Bound有条件地实现方法</h3><p>和函数没啥区别，在<code>impl</code>后面的类型里指定trait bound就可以了。</p>
+<h3 id="用trait-bound有条件地实现方法">用Trait Bound有条件地实现方法</h3>
+<p>和函数没啥区别，在<code>impl</code>后面的类型里指定trait bound就可以了。</p>
 
       
     </div>
@@ -1193,7 +1107,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>出分了，花了好久才挤进info网站，过了一会信息化中心就把查成绩页面改成了“暂时无法提供服务”，可能服务器直接歇逼了……<br>GPA比起去年跌了不少，考虑到这学期整体性地不顺利，也算在预料之内。电子学听不懂，overfit了，结果就差不到1分的总评就可以上岸；大物没复习到一维无限深势阱，结果就差了这一道选择题。<br>但纠结这个也没有什么意义了。<br>怎么说呢，凭我自己个人志趣选的所有课，【除了翻车翻到姥姥家的人工神经网络以外】还都是4.0，这算是一点宽慰。<br>至少我以后回顾我的大二上，我会想起我头铁单刷人神、在夜里一边痛斥队友摸鱼一边调megstudio的经历；我会回忆起一边骂唐宏岩作业多一边乖乖写题的经历；我会想起对着一道写出了悬垂指针bug结果调了两天的题在gdb里不停地nnnnn的经历。<br>概率统计和数据结构这种正派硬课我还是认真听了、也有充分能力学好的，至于张雷和李列明的两门司马课程我还是希望它们尽快消失在历史的长河中。</p>
+          <p>出分了，花了好久才挤进info网站，过了一会信息化中心就把查成绩页面改成了“暂时无法提供服务”，可能服务器直接歇逼了…… GPA比起去年跌了不少，考虑到这学期整体性地不顺利，也算在预料之内。电子学听不懂，overfit了，结果就差不到1分的总评就可以上岸；大物没复习到一维无限深势阱，结果就差了这一道选择题。 但纠结这个也没有什么意义了。 怎么说呢，凭我自己个人志趣选的所有课，【除了翻车翻到姥姥家的人工神经网络以外】还都是4.0，这算是一点宽慰。 至少我以后回顾我的大二上，我会想起我头铁单刷人神、在夜里一边痛斥队友摸鱼一边调megstudio的经历；我会回忆起一边骂唐宏岩作业多一边乖乖写题的经历；我会想起对着一道写出了悬垂指针bug结果调了两天的题在gdb里不停地nnnnn的经历。 概率统计和数据结构这种正派硬课我还是认真听了、也有充分能力学好的，至于张雷和李列明的两门司马课程我还是希望它们尽快消失在历史的长河中。</p>
 
       
     </div>
@@ -1275,8 +1189,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>忙里偷闲把博客建起来了，hexo确实太方便了。<br>希望这个blog可以督促自己学习和写整理，能帮到屏幕前的你的话那再好不过了。<br>总而言之——<br>Hello, world!</p>
+          <p>忙里偷闲把博客建起来了，hexo确实太方便了。 希望这个blog可以督促自己学习和写整理，能帮到屏幕前的你的话那再好不过了。 总而言之—— Hello, world!</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
       
     </div>
 
@@ -1358,7 +1273,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
