@@ -525,4 +525,138 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
         <tag>树洞</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Transformers as Soft Reasoners over Language阅读笔记</title>
+    <url>/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><a href="Transformers%20as%20Soft%20Reasoners%20over%20Language">论文链接</a></p>
+<p>单纯觉得这个灯泡表情非常魔性……</p>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203153124905.png" class title="我要一张色图">
+<h1 id="摘要">摘要</h1>
+<p>作者提出了名叫RuleTaker的推理模型，其中的事实和规则都是自然语言（而不需要逻辑表示或者概率表示这种规范表示），以Transformer为基础在自然语言上进行推理。</p>
+<p>值得一提的是，作者本人也不很信任这个推理，所以也叫它软推理……</p>
+<p>这一模型在两个人工创作的规则集上有较好的泛化表现。</p>
+<h1 id="引入">引入</h1>
+<p>以往的推理模型一般需要将规则和事实表示为规范形式，比如概率表示、逻辑表示。作者探索一条全新的路径：规则和事实都表示为自然语言，尝试利用transformer在自然语言上进行推理。</p>
+<p>与已有的许多任务不同，这里作者的任务是显式给定规则和事实，希望让transformer给出正确的结论。这张图片可以作为一个例子：</p>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203152837990.png" class>
+<p>作者的结论是在某种程度上Transformer可以用于推理，可以作为所谓的“soft theorem prover”。</p>
+<p>作者的研究存在一下假定和限制：</p>
+<ul>
+<li>规则是若干自然语言表示的<span class="math inline">\(condition\)</span>（下文均称为条件）的合取</li>
+<li>语义与logic programs with negation相同</li>
+<li>推理过程就是依据条件给出结论真值的过程</li>
+</ul>
+<p><span class="math display">\[
+[\wedge condition]^*\to conclusion
+\]</span></p>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203154207949.png" class>
+<p>至于Transformer是不是真的在“推理”，作者也不知道。。。</p>
+<p>几个问答：</p>
+<ul>
+<li><p><strong>Transformer可以基于规则来推理吗？</strong></p>
+<p>作者在合成的语言（不是人工创作的真自然语言）上训练和测试，得到了较好的结果。</p></li>
+<li><p><strong>训练出来的模型可以解决人工创作的推理问题吗？</strong></p>
+<p>zero-shot下可以达到90+的准确度。</p></li>
+<li><p><strong>这个结果可以在更自然的语言上继续保持吗？</strong></p>
+<p>对于众包出来的自然语言效果也不错。</p></li>
+<li><p><strong>模型可以找出答案来自哪些事实吗？</strong></p>
+<p>达到了94%的F1 score，对超过70%的问题都完美找到了，因此作者认为可以。</p></li>
+<li><p><strong>其他架构也可以推理吗？</strong></p>
+<p>作者用的是RoBERTa，BERT和ESIM（基于LSTM的一个模型）也可以，但是效果要差一点。</p>
+<p>这说明结果不限定于RoBERTa，甚至不限定于Transformer，但Transformer表现要更好一点。</p></li>
+</ul>
+<h1 id="数据集生成">数据集生成</h1>
+<p>作者生成了不同推理深度的若干不同数据集，但格式相同。</p>
+<p>数据集中的每个例子都是一个三元组<span class="math inline">\((context, statement, answer)\)</span>，其中<span class="math inline">\(context\)</span>形如<span class="math inline">\((fact^*, rule^*)\)</span>；<span class="math inline">\(statement\)</span>是问题——也即一个要验证真假的陈述句；<span class="math inline">\(answer\)</span>是<span class="math inline">\(True\)</span>或<span class="math inline">\(False\)</span>（此处依照封闭世界假设，如果<span class="math inline">\(statement\)</span>能被<span class="math inline">\(context\)</span>推理出来，那就是<span class="math inline">\(True\)</span>，否则都是<span class="math inline">\(False\)</span>，不存在<span class="math inline">\(Unknown\)</span>这种类型）。</p>
+<h2 id="综述">综述</h2>
+<p>要生成例子，首先生成一些小规模的理论（事实+规则），然后做前向推理得到一些含义（结论），然后从这些结论里选出一些作为<span class="math inline">\(statement\)</span>（答案为True）、再从那些无法证明的事实里选出一些作为<span class="math inline">\(statement\)</span>（在CWA下，答案为False）。</p>
+<p>所有的事实、规则和问题都是用简单的自然语言模板通过机器合成的英语。依照推理深度<span class="math inline">\(D\)</span>不同（<span class="math inline">\(D=0, D\leq 1, D\leq 2, D\leq 3, D\leq 5\)</span>）分别构建了<span class="math inline">\(D0, D1, D2, D3, D5\)</span>五个数据集（<span class="math inline">\(D0\)</span>就是不需要推理直接找答案）。</p>
+<p>前四个用于训练，最后一个用来测试泛化能力。</p>
+<h2 id="理论生成">理论生成</h2>
+<p>理论包含了两种事实</p>
+<ul>
+<li>属性 <span class="math inline">\(is(e_i, a_j)\)</span></li>
+<li>关系<span class="math inline">\(r_k(e_i, e_k)\)</span></li>
+</ul>
+<p><span class="math inline">\(is\)</span>用于将属性赋予实体，而<span class="math inline">\(r_k\)</span>用于将实体联系起来。</p>
+<p>理论具有如下的形式 <span class="math display">\[
+condition[\wedge condition]^*\to conclusion
+\]</span> 第一个<span class="math inline">\(condition\)</span>是一个谓词，它的第一个参数是变量，第二个参数是属性或实体。</p>
+<p>后面的<span class="math inline">\(condition\)</span>也是谓词，它的第一个参数要么是与前面相同的变量，要么是前面提到过的实体；第二个参数的新的属性或者新的实体。</p>
+<p>（这种情况下，规则最多含有一个变量）</p>
+<p>举一个例子，<code>If someone is young and round then they are kind</code>的标准形式是<span class="math inline">\(is(?X, Young)\,\wedge\,is(?X, Round)\to is(?X, Kind)\)</span>。</p>
+<p>作者随机生成的理论有两种：</p>
+<ul>
+<li>第一种只有<span class="math inline">\(is\)</span>谓词，从10个名字和14个属性里随机抽取4个实体和7个属性。</li>
+<li>第二种有<span class="math inline">\(is\)</span>和其他3个谓词（从6个谓词中随机抽取），从10个名字和10个属性里随机抽取4个实体和5个属性。</li>
+</ul>
+<h2 id="前向推理">前向推理</h2>
+<p>对于给定的理论，作者穷举它能找到的结论（领域有限，因此结论也有限）。</p>
+<h2 id="问题生成和英语合成">问题生成和英语合成</h2>
+<p>对于每个理论，作者找出各推理深度的结论各一个（比例，在<span class="math inline">\(D2\)</span>数据集中，一个结论会找<span class="math inline">\(D=0, 1,2\)</span>的结论各一个作为问题）作为问题（答案为True）。</p>
+<p>对于每个True问题，作者通过将它的结论取否定来构造一个False问题。</p>
+<p>然后再找相同数目的无法证明的事实（CWA下这就等同于False），把其中一半的事实取否定再把真值改成True。这样最终True和False问题各一半。 <span class="math display">\[
+context: \\
+小明喜欢吃苹果\\
+小亮喜欢吃香蕉\\
+如果一个人喜欢吃苹果，那么他很可爱\\
+statement:\\
+小明很可爱(True) \\
+小明不可爱(False) \\
+小亮很可爱(False，因为不可证明(也不可证伪)) \\
+小亮不可爱(同样是False，因为不可证明(也不可证伪)\\
+\neg \,小亮很可爱(True，因为小亮很可爱是False)
+\]</span> 最后用简单的If-Then英语模板生成合成的语言。</p>
+<h1 id="实验">实验</h1>
+<h2 id="模型">模型</h2>
+<p>用了 <span class="math inline">\(RoBERTa\)</span>，首先在RACE数据集上finetune过，超参数也和RACE上finetune的RoBERTa相一致。</p>
+<p>输入格式如下： <span class="math display">\[
+[CLS]\,context\,[SEP]\,statement\,[SEP]
+\]</span> 输出取对数，大于0就是真，小于0就是假。</p>
+<p>loss用交叉熵。</p>
+<h2 id="roberta能回答推理问题吗">RoBERTa能回答推理问题吗？</h2>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203172348122.png" class>
+<ul>
+<li>可以，超过99%的准确度表明了这一点</li>
+<li>D0上训练的模型完全不能用于推理</li>
+<li>D1、D2上训练的模型泛化能力不好，但D3上训练的模型在D5上泛化得很不错</li>
+</ul>
+<p>为了测试模型抵御干扰的能力，他们又做了一些扰动：</p>
+<p>对于每个True的结论，他们尝试删除证明过程中用到的一个句子（从而试图把真值从True变成False），看模型是否能做出正确的inference。</p>
+<ul>
+<li>总体准确度几乎不变</li>
+<li>对于那些希望把真值翻转的20000个问题，有81%的真值被翻转了，所以说模型具有一定的鲁棒性</li>
+</ul>
+<h2 id="人工生成的数据集上的表现">人工生成的数据集上的表现</h2>
+<p>用到了Bird数据集和Electricity数据集</p>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203173334675.png" class>
+<ul>
+<li>除了D0上训练的模型以外，几乎所有的模型都完美解决了Bird问题</li>
+<li>D5上训练的模型在（除了一个以外的）所有数据集上都得到了90%+的分数</li>
+</ul>
+<h2 id="用人工转译的规则做推理">用人工转译的规则做推理</h2>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203173104649.png" class>
+<p>人工转译后fact和rule都变得更复杂了，新的数据集叫做ParaRules。注意ParaRules里只包含第一类理论（只有is谓词的那个）</p>
+<p>没有在ParaRules上训练过的模型做zero-shot推理，效果尚可。在D3和ParaRules上训练过的模型效果就很好了。</p>
+<img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203173319013.png" class>
+<h2 id="改用其他模型架构">改用其他模型架构</h2>
+<p>为了探究模型在多大程度上依赖RoBERTa架构，作者又尝试了其他模型，包括原始BERT、基于LSTM的ESIM模型和一个可分解的注意力模型DECOMP（用于证明这个数据集并不trivial）。</p>
+<p>最好的BERT在D5上准确度超过了95%，而ESIM只有约80%。对照组DECOMP只有57.4%，说明模型并不平凡可解。</p>
+<p>为了说明预训练的用处，作者采取一个策略，从每个event中将一个词随机替换从而使得句子毫无语法可言。在这种情况下，RoBERTa的准确度显著下降了，这说明预训练带来的语言知识使得学习变得更加容易</p>
+<ul>
+<li>预训练比非预训练模型更好</li>
+<li>结论不只依赖Transformer，但Transformer会比其他模型表现更好</li>
+</ul>
+<h1 id="未来的发展">未来的发展</h1>
+<ul>
+<li>扩大理论的规模</li>
+<li>更全面地生成训练数据</li>
+<li>规范的定理证明</li>
+<li>自然语言推理</li>
+</ul>
+]]></content>
+      <categories>
+        <category>炼丹</category>
+      </categories>
+  </entry>
 </search>
