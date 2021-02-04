@@ -186,6 +186,202 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">PROVER: Proof Generation for Interpretable Reasoning over Rules阅读笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-04 15:34:12 / 修改时间：15:36:58" itemprop="dateCreated datePublished" datetime="2021-02-04T15:34:12+08:00">2021-02-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules阅读笔记/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2010.02830.pdf">论文链接</a></p>
+<p>废话：</p>
+<p>看了这三篇我才反应过来我看的顺序好像有点问题……</p>
+<p>Soft Reasoner是最先的，这篇PRover是第二个，然后才是ProofWriter（那个基于T5-11B，全程diss PRover的）。</p>
+<p>反正是用神经方法做推理……玄而又玄，众妙之门</p>
+<h1 id="摘要">摘要</h1>
+<p>作者提出了PRover，一个可解释的、基于Transformer的模型，既可以在自然语言规则库上进行推理（判断对错），也可以写出推理结论的证明。</p>
+<h1 id="引入">引入</h1>
+<p><a target="_blank" rel="noopener" href="https://zcy.moe/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">这篇文章</a>提出了在自然语言的规则库上进行推理的全新任务，还给了一个模型。但作者认为，仅仅给出判断是不够的，还应该写出证明。</p>
+<p>因此他们提出了PRover模型，既可以在自然语言规则库上判断给定事实的真假，还可以写出（模拟的）证明过程。</p>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204121859197.png" class>
+<p><a target="_blank" rel="noopener" href="https://zcy.moe/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#bulb">沙雕灯泡</a>没了（悲）</p>
+<p>在本文中，证明以连接了相关的规则和事实的有向图表示。</p>
+<p>PRover的架构由三个模块构成，一个QA模块用来输出0/1预测（用来回答）、一个节点模块用来选择证明中用到的规则和事实、一个边模块用来预测节点模块选出的规则和事实的关系（用来写证明）。</p>
+<h1 id="方法">方法</h1>
+<p>PRover接受的输入是一个语境<span class="math inline">\(C\)</span>（包括事实F和规则R）和一个与语境相关的问题<span class="math inline">\(Q\)</span>，输出一个答案<span class="math inline">\(A \in \{True,False\}\)</span>和一个证明P。</p>
+<h2 id="证明的表示">证明的表示</h2>
+<p>证明P被表示为一个有向图<span class="math inline">\(\mathcal P=(\mathcal{N},\mathcal{E})\)</span>，<span class="math inline">\(\mathcal{N}\)</span>表示节点，<span class="math inline">\(\mathcal{E}\)</span>表示边。每个节点要么是事实<span class="math inline">\(f\in F\)</span>，要么是规则<span class="math inline">\(r \in R\)</span>，要么是NAF（Negation As Failure，下文将解释）节点。</p>
+<p>每条边要么由事实（或NAF节点）指向规则，要么由规则指向规则。这条有向边意味着这个事实、NAF或规则被那个被指向的规则使用了。</p>
+<p>数学表示如下： <span class="math display">\[
+\mathcal{P} = (\mathcal N, \mathcal E) \\
+\mathcal N \subset R\,\cup\,F\,\cup\,NAF \\
+\mathcal E \subset \mathcal N \times \mathcal N
+\]</span> <img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204122948219.png" class></p>
+<p>以上是三类证明的例子：</p>
+<ul>
+<li><p>没有用到NAF的成功证明（Q1、Q2）</p></li>
+<li><p>用到了NAF的成功证明（Q4、Q5）</p>
+<p>NAF是一条非单调的推理规则，它的作用是从“不能证明S”得到“S的否定”</p>
+<p>（这跟之前看到的CWA是一致的，也就是整不出来就是假）</p></li>
+<li><p>失败的证明（Q3）</p>
+<p>如果一个陈述不能由给定的规则库推理出来，则生成一个证明树上最浅的分支。</p></li>
+</ul>
+<h2 id="任务描述">任务描述</h2>
+<p>每个训练用例都形如<span class="math inline">\((C_i=\{F_i, R_i\}, Q_i, A_i, P_i)\)</span>，即一个语境、一个问题、一个正确答案、一个证明。</p>
+<p>要生成证明图，需要</p>
+<ol type="1">
+<li>找到证明中要用到的节点</li>
+<li>找到节点之间的边的联系</li>
+<li>验证一些全局约束（比如连通性）来确保证明是合理的</li>
+</ol>
+<p>对于第一个要求，我们对于每个节点都预测一个0/1标签来表明它在证明中出现/不出现。对于第二个要求，我们对于边预测0/1标签来表明它出现/不出现。对于第三个要求，我们在训练和推理的时候都施加约束。训练时，我们mask掉以下三类边的标签：自环、没有出现（在证明中）的节点之间的边，以及事实到事实和规则到事实的边。</p>
+<p>这样就施加了一个语义约束，保证边在选定的节点集内部是连贯的，同时也简化了学习的过程。</p>
+<h2 id="prover">PRover</h2>
+<p>PRover基于RoBERTa，由QA模块、节点模块和边模块三部分构成，其中QA模块和RuleTakers完全一致。</p>
+<p>向RoBERTa投喂的输入由语境和问题构成，具体形式如下：</p>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204132109349.png" class>
+<h3 id="qa模块">QA模块</h3>
+<p>RoBERTa的输出是语境中每个token的embedding，同时还有一个[CLS]的embedding（记为<span class="math inline">\(t_{[CLS]}\)</span>）。</p>
+<p>我们用以下公式计算答案的概率： <span class="math display">\[
+P_{QA}=\sigma(H_{QA}(t_{[CLS]}))
+\]</span> 其中<span class="math inline">\(\sigma\)</span>是softmax函数，而<span class="math inline">\(H_{QA}\)</span>是一个带有dropout概率p的双层全连接。</p>
+<h3 id="节点模块">节点模块</h3>
+<p>对于语境中的每个成员（要么是规则要么是事实，统称为<span class="math inline">\(RF_i\)</span>），我们将它包含的所有token embedding取平均值得到这个规则或事实的embedding，即 <span class="math display">\[
+t_{RF_i}=MP(\{t_{w_j^{(i)}}\}_{j=1}^m)
+\]</span> （<span class="math inline">\(\{w_j^{(i)}\}_{j=1}^m\)</span>是<span class="math inline">\(RF_i\)</span>对应的所有token，<span class="math inline">\(\{t_{w_j^{(i)}}\}_{j=1}^m\)</span>是这些token对应的embedding，MP是mean pooling）</p>
+<p>对于NAF节点，我们有特殊的处理。</p>
+<p>由于t_{[CLS]}蕴含了所有可推理出的事实，而我们希望t_{NAF}可以编码所有包含否定的事实。对于一个包含否定的事实，如果它的反面是不能由语境推理出来的，那么任务它本身是True（见Q4的推理中"The bald eagle is not kind"，它的反面"The bald eagle is kind"是不能推理得到的，因此它是True）。</p>
+<p>我们希望将t_{NAF}表示为<span class="math inline">\(t_{[CLS]}\)</span>（所有可以推理出的事实）的一个函数，来表示所有不能被推理出的事实的反面。虽然一个证明中可能有很多个NAF，但是我们将他们放在一起，学习一个统一的表示。</p>
+<p>我们用以下公式计算节点的概率： <span class="math display">\[
+P_{Node}=\sigma(H_{Node}(\{t_{RF_i}\}_{i=1}^k, t_{NAF}))
+\]</span> 其中<span class="math inline">\(H_{Node}\)</span>结构和<span class="math inline">\(H_{QA}\)</span>类似。</p>
+<h2 id="边模块">边模块</h2>
+<p>在我们已经生成了所有事实、规则和NAF的表示之后，我们来学习它们之间的边的表示。</p>
+<p>我们定义由节点<span class="math inline">\(RF_i\)</span>到<span class="math inline">\(RF_j\)</span>的边的表示为 <span class="math display">\[
+t_{(RF_i,RF_j)} = [t_{RF_i},t_{RF_j},(t_{RF_i}-t_{RF_j})]
+\]</span> （这里的减法是逐分量减，表征方向）</p>
+<p>然后用以下公式计算边的概率 <span class="math display">\[
+P_{Edge}=\sigma(H_{Edge}(\{t_{(RF_i,RF_j)}\}_{i,j=1}^{k+1})) \\
+其中t_{RF_{k+1}} = t_{NAF}
+\]</span></p>
+<h2 id="loss">LOSS</h2>
+<p>三部分都用二元交叉熵loss，相加得到总loss <span class="math display">\[
+L = L_{QA} + L_{Node} + L_{Edge}
+\]</span></p>
+<h2 id="整数线性规划作为全局约束">整数线性规划作为全局约束</h2>
+<h3 id="证明连通性">证明连通性</h3>
+<p>验证<span class="math inline">\(\mathcal P\)</span>是否联通，作者构造一个扩充图<span class="math inline">\(\mathcal P_{aug} = (\mathcal N_{aug}, \mathcal E_{aug})\)</span>，添加一个源点和一个汇点，由源向原图中的每个节点都引一条边，再从原图中的每个节点向汇引一条边。</p>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204141636739.png" class>
+<p>然后我们就可以在<span class="math inline">\(\mathcal P_{aug}\)</span>上跑最大流了（不会吧不会吧，不会有人把离散2忘干净了吧？）</p>
+<h3 id="最终的优化问题">最终的优化问题</h3>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204142231185.png" class>
+<p>其中<span class="math inline">\(\phi(m,n)\)</span>表示<span class="math inline">\(m\to n\)</span>的边存在的概率（由PRover预测）</p>
+<p>解这个带约束最优化问题就可以解出我们的证明啦！（这也太……玄妙了）</p>
+<h1 id="实验">实验</h1>
+<h2 id="数据集和指标">数据集和指标</h2>
+<ul>
+<li>DU0~DU5</li>
+<li>Birds-Electricity</li>
+<li>ParaRules</li>
+</ul>
+<p>都来自<a target="_blank" rel="noopener" href="https://zcy.moe/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">这篇文章</a>。</p>
+<p>衡量指标包括：</p>
+<ul>
+<li><p>节点准确度</p>
+<p>预测的证明中节点集与实际的节点集的匹配程度</p></li>
+<li><p>边准确度</p>
+<p>预测的证明中边集与实际的边集的匹配程度</p></li>
+<li><p>证明准确度</p>
+<p>预测的证明与实际证明的匹配程度</p></li>
+<li><p>完整准确度</p>
+<p>答案和证明都和标答完全一致</p></li>
+</ul>
+<h2 id="不同深度下的qa和证明准确度">不同深度下的QA和证明准确度</h2>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204143338820.png" class>
+<p>QA整体上最简单，然后是NA，再次是EA和PA</p>
+<h2 id="zero-shot评估">zero-shot评估</h2>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204143345257.png" class>
+<h2 id="向更深的问题泛化">向更深的问题泛化</h2>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204144527505.png" class>
+<h2 id="改变训练数据规模">改变训练数据规模</h2>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204144338113.png" class>
+<h2 id="在更复杂的语言上评估">在更复杂的语言上评估</h2>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210204144316610.png" class>
+<p>​</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1483,88 +1679,6 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="茨月">
-      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cy's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/" class="post-title-link" itemprop="url">期末出分有感</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-01-22 17:28:02 / 修改时间：17:32:11" itemprop="dateCreated datePublished" datetime="2021-01-22T17:28:02+08:00">2021-01-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BA%9F%E8%AF%9D/" itemprop="url" rel="index"><span itemprop="name">废话</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2021/01/22/%E6%9C%9F%E6%9C%AB%E5%87%BA%E5%88%86%E6%9C%89%E6%84%9F/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/01/22/期末出分有感/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>出分了，花了好久才挤进info网站，过了一会信息化中心就把查成绩页面改成了“暂时无法提供服务”，可能服务器直接歇逼了…… GPA比起去年跌了不少，考虑到这学期整体性地不顺利，也算在预料之内。电子学听不懂，overfit了，结果就差不到1分的总评就可以上岸；大物没复习到一维无限深势阱，结果就差了这一道选择题。 但纠结这个也没有什么意义了。 怎么说呢，凭我自己个人志趣选的所有课，【除了翻车翻到姥姥家的人工神经网络以外】还都是4.0，这算是一点宽慰。 至少我以后回顾我的大二上，我会想起我头铁单刷人神、在夜里一边痛斥队友摸鱼一边调megstudio的经历；我会回忆起一边骂唐宏岩作业多一边乖乖写题的经历；我会想起对着一道写出了悬垂指针bug结果调了两天的题在gdb里不停地nnnnn的经历。 概率统计和数据结构这种正派硬课我还是认真听了、也有充分能力学好的，至于张雷和李列明的两门司马课程我还是希望它们尽快消失在历史的长河中。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1635,7 +1749,7 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
