@@ -667,7 +667,7 @@ statement:\\
 <h1 id="引入">引入</h1>
 <p>已有的自然语言进行逻辑推理的模型仅限于对给定标签的真假判定，而不能基于事实去推理出新的性质。</p>
 <p>作者提出了ProofWriter模型，每次都会进行一次单步的推理并且生成简单的证明，然后将推理的结果加入到语境中以供下一次继续推理，并且基于这些碎片的单步推理构建完整的证明。</p>
-
+<img data-src="/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202225714440.png" class>
 <p>单步推理的可信度是极高的，而且证明过程中每一步决策都可以清晰地看出（比起那些事后再分析模型决策的方法要更可靠）。而且这样的模型的效果比一步到底生成完整证明的模型效果好。</p>
 <p>生成方法还有一些全新的应用：首先，ProofWriter生成的含义是自然语言的，从而允许枚举许多结果，而不是单纯给推理之前就定好的假设一个一个赋针值。其次，ProofWriter还可以生成诱导性的陈述，即给定一个理论和一个无法证明的结论，ProofWriter会尝试找到那个缺失的条件（如果存在的话）而且给出添加这个条件之后的证明。</p>
 <h1 id="相关工作">相关工作</h1>
@@ -719,7 +719,7 @@ statement:\\
 <p><span class="math inline">\(P\)</span>中的每一个节点都要么是事实<span class="math inline">\(f\)</span>（基本字面量）或者规则<span class="math inline">\(r\)</span>（逻辑表达式），都是由英语表达的。</p>
 <p>P中的每一条边要么将一个事实连接到规则上，表示这个事实满足了规则的条件；要么将一个规则连接到事实上，表明这个事实是由规则推理出来的。因此，证明树上的每根树枝上事实和规则都会交替出现。</p>
 <p>证明中的事实分三种：已知事实<span class="math inline">\(f_i\in F\)</span>，否定事实<span class="math inline">\(f_{naf}\)</span>（依据否定即假的原则，一定是假的）和结论事实<span class="math inline">\(f_{conc}\)</span>（由规则推理出的事实）。依据定义，否定事实和结论事实都不出现在<span class="math inline">\(F\)</span>中。</p>
-
+<img data-src="/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202231338762.png" class>
 <div data-align="center">
 三类fact的一个例子，naf1好像是凭空变出来的？
 </div>
@@ -1782,7 +1782,7 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
 
   <div class="links-of-blogroll motion-element">
     <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
-      Links
+      Friends
     </div>
     <ul class="links-of-blogroll-list">
         <li class="links-of-blogroll-item">
