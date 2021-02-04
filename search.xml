@@ -549,6 +549,7 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
 <p><span class="math display">\[
 [\wedge condition]^*\to conclusion
 \]</span></p>
+<p><a name="bulb"></a></p>
 <img data-src="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210203154207949.png" class>
 <p>至于Transformer是不是真的在“推理”，作者也不知道。。。</p>
 <p>几个问答：</p>
