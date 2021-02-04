@@ -14,6 +14,7 @@
 </ul>
 <p>回答是yes/no。</p>
 <p>这些问题都很短而且覆盖了很大的范围，人类表现约为87%，而baseline则是66%。</p>
+<a id="more"></a>
 <h1 id="引入">引入</h1>
 <img data-src="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210201131940802.png" class>
 <p>现有的问题集一般把推理步骤显式展现在问题里，比如Q2"Was Aristotle alive when the laptop was invented?"，但在日常生活中，推理的步骤要更隐式，比如Q1"Did Aristotle use a laptop?"。事实上，后一个问题可以与前一个问题用完全相同的步骤来进行解答（如上图所示），但是它需要模型推理出“我需要对这两个时间进行比较”这样一个策略。</p>
@@ -113,6 +114,7 @@
 <p>然而，神经链预测模型对于需要多个步骤进行预测的情况预测不佳（A是B的父亲，B是C的家长=&gt;A是C的祖父或祖母）。与之相反，符号定理证明器(symbolic theorem prover)正好可以处理这类问题。进一步，归纳逻辑程序设计(Inductive Logic Programming)利用这些证明器来从数据中学到可解释的规则并且在完成知识库的过程中进行应用。 但是，symbolic prover在subsymbolic表示的学习和相似度比较上能力比较差，这限制了他们对相似但不完全相同的询问进行泛化的能力。</p>
 <p>尽管逻辑和机器学习的联系的问题已经由统计相关学习方法(statistical relational learning approaches)所解决了，以往的模型要么不支持次符号表示的推理，要么不是端到端训练出来的。神经多跳推理模型(neural multi-hop reasoning chain)通过将推理链encode到向量空间上去（也就是：在与答案进行比对之前，先迭代地将subsymbolic representation进行refine），在某种程度上解决了这个问题。但是它也有问题：可解释性差，而且难以显式地将领域内知识（例如作为某条规则）传递进去。</p>
 <p>受到Prolog的反向链式算法和使用次符号表示的可微的归一化操作的方法，作者提出了Neural Theorem Prover。</p>
+<a id="more"></a>
 <h2 id="background">Background</h2>
 <p>概念简介：</p>
 <p>一个<code>atom</code>包含一个谓词和若干个项，因为我们考虑的是无函数的一阶逻辑，每个项只能是常量或者变量。例如，<span class="math inline">\([grandfatherOf, \textbf{Q}, BART]\)</span>是一个包含了谓词<code>grandfatherOf</code>和两个项（变量<code>Q</code>和常量<code>BART</code>）的<code>atom</code></p>
@@ -181,6 +183,7 @@
 <li>不基于任何的范式，更加自然</li>
 <li>引入了一类全新的“实体比较”类问题，可以测试模型在常识方面的理解</li>
 </ul>
+<a id="more"></a>
 <h1 id="数据采集">数据采集</h1>
 <p>问题的提出基于文本而非知识库，保证其多样性。</p>
 <h2 id="实体比较类问题">实体比较类问题</h2>
@@ -233,6 +236,7 @@
 <p>作者希望用神经网络来解决SAT问题，提出了NeuroSAT模型。</p>
 <p>NeuroSAT在训练过程中对每个问题的监督只有“可满足”和“不可满足”两种状态。测试时，每次给一个SAT问题P，NeuroSAT就会给出这个问题是否可满足，而且如果一个问题被判定为可满足，我们<strong>几乎总是</strong>可以从激活函数中找到一组合法的值代入。</p>
 <p>他们又对模型进行了修改，输入的是有少量矛盾的不可满足问题，让模型自己去找到矛盾并改正，他们把这个修改叫NeuroUNSAT。</p>
+<a id="more"></a>
 <h1 id="问题建立">问题建立</h1>
 <p>SAT问题的定义：存在一组值代入后使得公式P为真，那么P是可满足的；否则P是不可满足的。</p>
 <h1 id="模型">模型</h1>
@@ -293,6 +297,7 @@
     <content><![CDATA[<p><a href="https://arxiv.org/pdf/1906.06187.pdf">论文地址</a></p>
 <h1 id="摘要">摘要</h1>
 <p>作者将神经方法和逻辑推理结合起来，给出了一个新模型来处理自然语言上的多跳推理。作者提出，还是应用Prolog prover进行推理，但是应用了一个基于预训练语句encoder的相似度函数，通过反向传播来fine-tune相似度函数的表示。这样就可以在自然语言上实现基于规则的推理，也可以引入领域内的特定知识。</p>
+<a id="more"></a>
 <h1 id="引入">引入</h1>
 <p>首先介绍了一下什么是多跳推理。已知苏格拉底生于雅典、雅典在希腊，问苏格拉底的出生地是哪里？，回答雅典则是朴素的答案匹配，回答希腊则意味着需要经过一步逻辑推理，这就是多跳推理。</p>
 <p>以往的自然语言多跳推理一般采用神经模型，可以处理自然语言的多样性和模糊性，但可解释性很差，而且需要大量数据才能拥有泛化能力，而且一直没能解决如何引入领域内已有知识这个问题。</p>
@@ -321,6 +326,7 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
 <p>反正是用神经方法做推理……玄而又玄，众妙之门</p>
 <h1 id="摘要">摘要</h1>
 <p>作者提出了PRover，一个可解释的、基于Transformer的模型，既可以在自然语言规则库上进行推理（判断对错），也可以写出推理结论的证明。</p>
+<a id="more"></a>
 <h1 id="引入">引入</h1>
 <p><a href="https://zcy.moe/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">这篇文章</a>提出了在自然语言的规则库上进行推理的全新任务，还给了一个模型。但作者认为，仅仅给出判断是不够的，还应该写出证明。</p>
 <p>因此他们提出了PRover模型，既可以在自然语言规则库上判断给定事实的真假，还可以写出（模拟的）证明过程。</p>
@@ -443,6 +449,7 @@ L = L_{QA} + L_{Node} + L_{Edge}
 <p>感觉是不是可以怎么优化一下迭代式模型的迭代过程，不要没头苍蝇式的地乱撞。不行可以backward chaining？</p>
 <h1 id="摘要">摘要</h1>
 <p>作者提出了一个叫做ProofWriter的生成式模型，既可以用自生成理论的含义，又可以写出用自然语言表示的证明过程。</p>
+<a id="more"></a>
 <h1 id="引入">引入</h1>
 <p>已有的自然语言进行逻辑推理的模型仅限于对给定标签的真假判定，而不能基于事实去推理出新的性质。</p>
 <p>作者提出了ProofWriter模型，每次都会进行一次单步的推理并且生成简单的证明，然后将推理的结果加入到语境中以供下一次继续推理，并且基于这些碎片的单步推理构建完整的证明。</p>
@@ -570,6 +577,7 @@ L = L_{QA} + L_{Node} + L_{Edge}
 <figure class="highlight rust"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">function_name</span></span>(params: types) -&gt; return_type &#123;</span><br><span class="line">    <span class="comment">//function_body</span></span><br><span class="line">    return_value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在函数中使用泛型，只需要在函数名后面加上尖括号，里面包裹类型名就可以了</p>
 <figure class="highlight rust"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">function_name</span></span>&lt;T&gt;(params: types) -&gt; return_type &#123;</span><br><span class="line">    <span class="comment">//function_body</span></span><br><span class="line">    return_value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <h3 id="结构体中的泛型">结构体中的泛型</h3>
 <figure class="highlight rust"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">PointI32</span></span> &#123;</span><br><span class="line">    x: <span class="built_in">i32</span>,</span><br><span class="line">    y: <span class="built_in">i32</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在类型后面加上尖括号，里面包裹类型名</p>
@@ -631,6 +639,7 @@ L = L_{QA} + L_{Node} + L_{Edge}
 <p>作者提出了名叫RuleTaker的推理模型，其中的事实和规则都是自然语言（而不需要逻辑表示或者概率表示这种规范表示），以Transformer为基础在自然语言上进行推理。</p>
 <p>值得一提的是，作者本人也不很信任这个推理，所以也叫它软推理……</p>
 <p>这一模型在两个人工创作的规则集上有较好的泛化表现。</p>
+<a id="more"></a>
 <h1 id="引入">引入</h1>
 <p>以往的推理模型一般需要将规则和事实表示为规范形式，比如概率表示、逻辑表示。作者探索一条全新的路径：规则和事实都表示为自然语言，尝试利用transformer在自然语言上进行推理。</p>
 <p>与已有的许多任务不同，这里作者的任务是显式给定规则和事实，希望让transformer给出正确的结论。这张图片可以作为一个例子：</p>
@@ -760,6 +769,7 @@ statement:\\
     <title>更换hexo的渲染引擎</title>
     <url>/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/</url>
     <content><![CDATA[<p>今天写论文笔记的时候，发现hexo对mathjax渲染的时候Markdown和<span class="math inline">\(\LaTeX\)</span>会产生冲突，主要是<code>_</code>和<code>*</code>这两个字符。之前因为问题加个<code>\</code>就解决了，所以也没有在意。但是今天这个冲突比较厉害，一时间改不过来，去查找解决方案的时候发现可以把hexo的渲染引擎改为pandoc。</p>
+<a id="more"></a>
 <p>首先检查有没有安装pandoc <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo apt install pandoc</span><br></pre></td></tr></table></figure> 发现pandoc已经安装</p>
 <p>然后卸载默认渲染器，安装pandoc渲染插件</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">npm uninstall hexo-renderer-marked --save</span><br><span class="line">npm install hexo-renderer-pandoc --save</span><br></pre></td></tr></table></figure>

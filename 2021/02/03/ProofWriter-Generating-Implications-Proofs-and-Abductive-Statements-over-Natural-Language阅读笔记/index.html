@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202225714440.png">
 <meta property="og:image" content="http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202231338762.png">
 <meta property="article:published_time" content="2021-02-02T17:05:56.000Z">
-<meta property="article:modified_time" content="2021-02-02T17:08:02.675Z">
+<meta property="article:modified_time" content="2021-02-04T07:50:02.725Z">
 <meta property="article:author" content="茨月">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/image-20210202225714440.png">
@@ -214,10 +214,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-02-03 01:05:56 / 修改时间：01:08:02" itemprop="dateCreated datePublished" datetime="2021-02-03T01:05:56+08:00">2021-02-03</time>
+              <time title="创建时间：2021-02-03 01:05:56" itemprop="dateCreated datePublished" datetime="2021-02-03T01:05:56+08:00">2021-02-03</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-04 15:50:02" itemprop="dateModified" datetime="2021-02-04T15:50:02+08:00">2021-02-04</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -259,6 +265,7 @@
 <p>感觉是不是可以怎么优化一下迭代式模型的迭代过程，不要没头苍蝇式的地乱撞。不行可以backward chaining？</p>
 <h1 id="摘要">摘要</h1>
 <p>作者提出了一个叫做ProofWriter的生成式模型，既可以用自生成理论的含义，又可以写出用自然语言表示的证明过程。</p>
+<a id="more"></a>
 <h1 id="引入">引入</h1>
 <p>已有的自然语言进行逻辑推理的模型仅限于对给定标签的真假判定，而不能基于事实去推理出新的性质。</p>
 <p>作者提出了ProofWriter模型，每次都会进行一次单步的推理并且生成简单的证明，然后将推理的结果加入到语境中以供下一次继续推理，并且基于这些碎片的单步推理构建完整的证明。</p>
