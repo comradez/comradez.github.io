@@ -320,6 +320,8 @@ h(f_1^h, ...,f_n^h) \Leftarrow p_1(f_1^1,...,f_m^1)\,\wedge\,...\,\wedge\,p_B(f_
     <title>PROVER: Proof Generation for Interpretable Reasoning over Rules阅读笔记</title>
     <url>/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p><a href="https://arxiv.org/pdf/2010.02830.pdf">论文链接</a></p>
+<p>我家鲨鱼觉得我太摸了，亲自跑到电脑前面来替我写论文笔记(×</p>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/shark.jpg" class>
 <p>废话：</p>
 <p>看了这三篇我才反应过来我看的顺序好像有点问题……</p>
 <p>Soft Reasoner是最先的，这篇PRover是第二个，然后才是ProofWriter（那个基于T5-11B，全程diss PRover的）。</p>
@@ -776,6 +778,27 @@ statement:\\
 <p>当我满心欢喜地<code>hexo g</code>的时候，却发现报了错误<code>pandoc: Unknown extension: smart</code></p>
 <p>查过之后发现问题在于pandoc版本太低，需要改为2以上。 可是apt明明告诉我版本是最新的啊？ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pandoc --version</span><br></pre></td></tr></table></figure> 发现不但是1.19.2.4，而且还是i386……</p>
 <p>于是到官网上去下载，官网上也有现成的针对各大distro的安装包 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;github.com&#x2F;jgm&#x2F;pandoc&#x2F;releases&#x2F;download&#x2F;2.11.4&#x2F;pandoc-2.11.4-1-amd64.deb</span><br><span class="line">sudo dpkg -i pandoc-2.11.4-1-amd64.deb</span><br></pre></td></tr></table></figure> 然后再<code>hexo g</code>就可以啦！</p>
+]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>更换hexo的评论系统</title>
+    <url>/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<p>在刚搭起博客的时候，我用的评论系统是<a href="https://disqus.com/">Disqus</a>，大概长这个样子</p>
+<img data-src="/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/image-20210205174037408.png" class>
+<p>Disqus在世界范围内的用户很多，也比较有名。但问题也是显而易见的：需要登录社交账号来留言，太笨重；而且如果不科学上网，Disqus根本无法使用。</p>
+<p>因此，我希望能找到一个墙内可用、不需要登录的轻量的评论系统，然后我从<a href="blog.panda2134.site">同学的blog</a>那里看到了<a href="https://valine.js.org/">valine</a>。</p>
+<p>valine的使用需要基于BaaS平台leanCloud，依据<a href="https://valine.js.org/quickstart.html">快速开始页</a>进行设置就好。</p>
+<p>然后在<code>/themes/next/_config.yml</code>里配置：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">comments:</span></span><br><span class="line">  <span class="attr">active:</span> <span class="string">valine</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">valine:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">appid:</span> [<span class="string">自己的appid</span>]</span><br><span class="line">  <span class="attr">appkey:</span> [<span class="string">自己的appkey</span>]</span><br><span class="line">  <span class="attr">notify:</span> <span class="literal">false</span> <span class="comment"># 因为常看blog，就不用邮件提醒了</span></span><br><span class="line">  <span class="attr">verify:</span> <span class="literal">false</span> <span class="comment"># 不会有人在我这刷评论吧？</span></span><br><span class="line">  <span class="attr">placeholder:</span> <span class="string">(((*°▽°*)八(*°▽°*)))</span> <span class="comment"># 可可爱爱</span></span><br><span class="line">  <span class="attr">avatar:</span> <span class="string">https://www.gravatar.com/avatar/[自己的hash]</span> <span class="comment">#Gravatar的头像链接或者mp这种通用头像</span></span><br><span class="line">  <span class="attr">language:</span> <span class="string">zh-cn</span></span><br></pre></td></tr></table></figure>
+<p>然后<code>hexo clean &amp;&amp; hexo g</code>就可以了！</p>
+<p>大概长这个样子：</p>
+<img data-src="/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/image-20210205175008543.png" class>
+<p>清爽多了。</p>
+<p>又水了一篇blog。</p>
 ]]></content>
       <categories>
         <category>博客</category>

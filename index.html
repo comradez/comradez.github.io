@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
@@ -186,6 +186,100 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">更换hexo的评论系统</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-05 17:37:28 / 修改时间：17:53:12" itemprop="dateCreated datePublished" datetime="2021-02-05T17:37:28+08:00">2021-02-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%9A%E5%AE%A2/" itemprop="url" rel="index"><span itemprop="name">博客</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/05/更换hexo的评论系统/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在刚搭起博客的时候，我用的评论系统是<a target="_blank" rel="noopener" href="https://disqus.com/">Disqus</a>，大概长这个样子</p>
+<img data-src="/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/image-20210205174037408.png" class>
+<p>Disqus在世界范围内的用户很多，也比较有名。但问题也是显而易见的：需要登录社交账号来留言，太笨重；而且如果不科学上网，Disqus根本无法使用。</p>
+<p>因此，我希望能找到一个墙内可用、不需要登录的轻量的评论系统，然后我从<a href="blog.panda2134.site">同学的blog</a>那里看到了<a target="_blank" rel="noopener" href="https://valine.js.org/">valine</a>。</p>
+<p>valine的使用需要基于BaaS平台leanCloud，依据<a target="_blank" rel="noopener" href="https://valine.js.org/quickstart.html">快速开始页</a>进行设置就好。</p>
+<p>然后在<code>/themes/next/_config.yml</code>里配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">comments:</span></span><br><span class="line">  <span class="attr">active:</span> <span class="string">valine</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">valine:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">appid:</span> [<span class="string">自己的appid</span>]</span><br><span class="line">  <span class="attr">appkey:</span> [<span class="string">自己的appkey</span>]</span><br><span class="line">  <span class="attr">notify:</span> <span class="literal">false</span> <span class="comment"># 因为常看blog，就不用邮件提醒了</span></span><br><span class="line">  <span class="attr">verify:</span> <span class="literal">false</span> <span class="comment"># 不会有人在我这刷评论吧？</span></span><br><span class="line">  <span class="attr">placeholder:</span> <span class="string">(((*°▽°*)八(*°▽°*)))</span> <span class="comment"># 可可爱爱</span></span><br><span class="line">  <span class="attr">avatar:</span> <span class="string">https://www.gravatar.com/avatar/[自己的hash]</span> <span class="comment">#Gravatar的头像链接或者mp这种通用头像</span></span><br><span class="line">  <span class="attr">language:</span> <span class="string">zh-cn</span></span><br></pre></td></tr></table></figure>
+<p>然后<code>hexo clean &amp;&amp; hexo g</code>就可以了！</p>
+<p>大概长这个样子：</p>
+<img data-src="/2021/02/05/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F/image-20210205175008543.png" class>
+<p>清爽多了。</p>
+<p>又水了一篇blog。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -209,10 +303,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-02-04 15:34:12 / 修改时间：15:50:09" itemprop="dateCreated datePublished" datetime="2021-02-04T15:34:12+08:00">2021-02-04</time>
+              <time title="创建时间：2021-02-04 15:34:12" itemprop="dateCreated datePublished" datetime="2021-02-04T15:34:12+08:00">2021-02-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-05 17:56:15" itemprop="dateModified" datetime="2021-02-05T17:56:15+08:00">2021-02-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -230,10 +330,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -249,6 +349,8 @@
 
       
           <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2010.02830.pdf">论文链接</a></p>
+<p>我家鲨鱼觉得我太摸了，亲自跑到电脑前面来替我写论文笔记(×</p>
+<img data-src="/2021/02/04/PROVER-Proof-Generation-for-Interpretable-Reasoning-over-Rules%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/shark.jpg" class>
 <p>废话：</p>
 <p>看了这三篇我才反应过来我看的顺序好像有点问题……</p>
 <p>Soft Reasoner是最先的，这篇PRover是第二个，然后才是ProofWriter（那个基于T5-11B，全程diss PRover的）。</p>
@@ -331,10 +433,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/03/Transformers-as-Soft-Reasoners-over-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/03/Transformers-as-Soft-Reasoners-over-Language阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -432,10 +534,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/03/ProofWriter-Generating-Implications-Proofs-and-Abductive-Statements-over-Natural-Language阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -532,10 +634,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/02/HOTPOTQA:%20A%20Dataset%20for%20Diverse,%20Explainable%20Multi-hop%20Question%20Answering%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/02/HOTPOTQA: A Dataset for Diverse, Explainable Multi-hop Question Answering阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -637,10 +739,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/01/%E6%9B%B4%E6%8D%A2hexo%E7%9A%84%E6%B8%B2%E6%9F%93%E5%BC%95%E6%93%8E/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/01/更换hexo的渲染引擎/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -732,10 +834,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/02/01/Did-Aristotle-Use-a-Laptop-A-Question-Answering-Benchmark-with-Implicit-Reasoning-Strategies阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -837,10 +939,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/01/31/NLProlog-Reasoning-with-Weak-Unification-for-Question-Answering-in-Natural-Language阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -934,10 +1036,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -1033,10 +1135,10 @@
       <span class="post-meta-item-icon">
         <i class="far fa-comment"></i>
       </span>
-      <span class="post-meta-item-text">Valine：</span>
+      <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="valine" href="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/01/30/End-to-End-Differentiable-Proving阅读笔记/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -1070,106 +1172,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="茨月">
-      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cy's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Rust泛型简单笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-01-26 11:58:02" itemprop="dateCreated datePublished" datetime="2021-01-26T11:58:02+08:00">2021-01-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-02-04 15:50:15" itemprop="dateModified" datetime="2021-02-04T15:50:15+08:00">2021-02-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">编程语言</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="泛型基本语法">泛型基本语法</h2>
-<h3 id="函数中的泛型">函数中的泛型</h3>
-<p>回忆一下函数的定义</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">function_name</span></span>(params: types) -&gt; return_type &#123;</span><br><span class="line">    <span class="comment">//function_body</span></span><br><span class="line">    return_value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在函数中使用泛型，只需要在函数名后面加上尖括号，里面包裹类型名就可以了</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">function_name</span></span>&lt;T&gt;(params: types) -&gt; return_type &#123;</span><br><span class="line">    <span class="comment">//function_body</span></span><br><span class="line">    return_value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1259,7 +1261,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1444,33 +1446,15 @@
 
   
 
-
 <script>
-NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
-  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
-    var GUEST = ['nick', 'mail', 'link'];
-    var guest = 'nick,mail,link';
-    guest = guest.split(',').filter(item => {
-      return GUEST.includes(item);
-    });
-    new Valine({
-      el         : '#valine-comments',
-      verify     : false,
-      notify     : false,
-      appId      : 'DWTzr4RHT7lrB23F3bUPrWUa-gzGzoHsz',
-      appKey     : 'IP0M3sGnEaxg0AoAdBdI6m5E',
-      placeholder: "(((*°▽°*)八(*°▽°*)))",
-      avatar     : 'https://www.gravatar.com/avatar/0c4f6f96ada10cbac3834224cb0a478f',
-      meta       : guest,
-      pageSize   : '10' || 10,
-      visitor    : false,
-      lang       : 'zh-cn' || 'zh-cn',
-      path       : location.pathname,
-      recordIP   : false,
-      serverURLs : ''
-    });
-  }, window.Valine);
-});
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://zcyblog.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
 </script>
 
 </body>
