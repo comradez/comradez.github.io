@@ -186,6 +186,116 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">End-to-End Differentiable Proving阅读笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-30 10:40:11" itemprop="dateCreated datePublished" datetime="2021-01-30T10:40:11+08:00">2021-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-04 15:49:39" itemprop="dateModified" datetime="2021-02-04T15:49:39+08:00">2021-02-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="end-to-end-differentiable-proving">End-to-End Differentiable Proving</h1>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1705.11040.pdf">论文链接</a></p>
+<h2 id="写在前面的废话">写在前面的废话</h2>
+<p>刚开始认认真真地看论文，只是看的速度实在是太慢了。感觉记录下来的东西有点类似于不正式的翻译，非常流水账，但是什么东西都不记又什么都记不住，左耳朵进右耳朵出了。 学长分配给的论文还有6篇，这篇也刚刚看完结构和LOSS，道阻且长……</p>
+<h2 id="前置知识">前置知识</h2>
+<h3 id="知识库自动补全automated-knowledge-base-completion"><a target="_blank" rel="noopener" href="https://paperswithcode.com/task/knowledge-base-completion/latest">知识库自动补全</a>（automated Knowledge Base completion）</h3>
+<p>给定知识库中已有的一部分信息，自动推导出缺失的信息。</p>
+<h3 id="多跳的multi-hop">多跳的（multi-hop）</h3>
+<p>与一步的逻辑推理相对，指<span class="math inline">\(A\, \wedge (A\to B)\,\wedge (B\to C) \, \wedge (C\to D)\Rightarrow D\)</span>这类需要经过多步的推理。</p>
+<h3 id="次符号的subsymbolic">次符号的（subsymbolic）</h3>
+<p>我还没理解。似乎是指粒度比符号更小？</p>
+<h2 id="introduction">Introduction</h2>
+<p>目前的知识库自动补全SOTA模型使用神经链预测模型(neural link prediction model)来学习符号的分布向量表示。向量表示允许模型通过相似性来对未知的事实进行泛化。</p>
+<p>然而，神经链预测模型对于需要多个步骤进行预测的情况预测不佳（A是B的父亲，B是C的家长=&gt;A是C的祖父或祖母）。与之相反，符号定理证明器(symbolic theorem prover)正好可以处理这类问题。进一步，归纳逻辑程序设计(Inductive Logic Programming)利用这些证明器来从数据中学到可解释的规则并且在完成知识库的过程中进行应用。 但是，symbolic prover在subsymbolic表示的学习和相似度比较上能力比较差，这限制了他们对相似但不完全相同的询问进行泛化的能力。</p>
+<p>尽管逻辑和机器学习的联系的问题已经由统计相关学习方法(statistical relational learning approaches)所解决了，以往的模型要么不支持次符号表示的推理，要么不是端到端训练出来的。神经多跳推理模型(neural multi-hop reasoning chain)通过将推理链encode到向量空间上去（也就是：在与答案进行比对之前，先迭代地将subsymbolic representation进行refine），在某种程度上解决了这个问题。但是它也有问题：可解释性差，而且难以显式地将领域内知识（例如作为某条规则）传递进去。</p>
+<p>受到Prolog的反向链式算法和使用次符号表示的可微的归一化操作的方法，作者提出了Neural Theorem Prover。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/26/Rust%E6%B3%9B%E5%9E%8B%E7%AE%80%E5%8D%95%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -517,7 +627,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
