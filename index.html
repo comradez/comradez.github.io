@@ -186,6 +186,516 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">GAMES101课堂笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-28 00:11:02 / 修改时间：00:15:43" itemprop="dateCreated datePublished" datetime="2021-02-28T00:11:02+08:00">2021-02-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">图形学</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="lecture-1-overview-of-computer-graphics">Lecture 1 Overview of Computer Graphics</h1>
+<ul>
+<li>什么是图形学？
+<ul>
+<li>很多例子</li>
+</ul></li>
+<li>为什么要学习计算机图形学？</li>
+<li>课程内容（主要分为四部分）
+<ul>
+<li>光栅化</li>
+<li>曲线和曲面</li>
+<li>光线追踪</li>
+<li>动画/仿真</li>
+</ul></li>
+</ul>
+<h2 id="光栅化-rasterization">光栅化 Rasterization</h2>
+<p>把几何实体投影到屏幕上</p>
+<p>（CG界认为能够达到30fps可以算实时real-time，低于则为离线offline）</p>
+<h2 id="曲线和曲面-curves-and-meshes">曲线和曲面 Curves and Meshes</h2>
+<p>如何表现曲线和曲面，偏几何</p>
+<h2 id="光线追踪-ray-tracing">光线追踪 Ray Tracing</h2>
+<p>将光线从观察者/照相机向各个像素发射光</p>
+<p>Ray Tracing比较慢，但质量好（Trade-off）。</p>
+<h2 id="动画与仿真-animation-simulation">动画与仿真 Animation / Simulation</h2>
+<p>字面意思</p>
+<ul>
+<li>本课<strong>不包括</strong>：
+<ul>
+<li>OpenGL/DirectX/Vulcan</li>
+<li>着色器语法</li>
+<li>三维建模/游戏开发</li>
+<li>Computer Vision / Deep Learning</li>
+</ul></li>
+</ul>
+<p>学习的是图形学，不是图形学API！</p>
+<ul>
+<li>课程细节
+<ul>
+<li>没有硬件编程</li>
+</ul></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="http://www.smartchair.org/GAMES2020Course-YLQ">作业网站</a></p>
+<p>有 大 作 业</p>
+<h1 id="lecture-2-review-of-linear-algebra">Lecture 2 Review of Linear Algebra</h1>
+<ul>
+<li>图形学依赖的内容：
+<ul>
+<li>基础的数学
+<ul>
+<li>线性代数、微积分、统计学</li>
+</ul></li>
+<li>基础物理
+<ul>
+<li>光学、力学</li>
+</ul></li>
+<li>杂项
+<ul>
+<li>信号处理、数值分析</li>
+</ul></li>
+<li>一点点美感:-D</li>
+</ul></li>
+</ul>
+<h2 id="向量">向量</h2>
+<ul>
+<li>向量</li>
+<li>单位向量</li>
+<li>向量求和（平行四边形、三角形法则）</li>
+<li>直角坐标系</li>
+<li>点乘
+<ul>
+<li>查询向量的夹角/余弦夹角</li>
+<li>找一个向量在另一个向量上的投影
+<ul>
+<li>如查询<span class="math inline">\(\mathbf{b}\)</span>在<span class="math inline">\(\mathbf{a}\)</span>上的投影，只需计算<span class="math inline">\(\frac{\mathbf{a\cdot b}}{\Vert\mathbf{a}\Vert} \hat{\mathbf{a}}\)</span>（也就是<span class="math inline">\((\mathbf{\hat{a}\cdot b})\mathbf{\hat{a}}\)</span>）</li>
+</ul></li>
+<li>对向量进行分解</li>
+<li>确定向量的方向（同向、反向）</li>
+</ul></li>
+<li><a id="叉乘">叉乘</a>
+<ul>
+<li><strong>右手坐标系</strong>：<span class="math inline">\(\mathbf{x}\times\mathbf{y} = +\mathbf{z}\)</span>，否则为左手系。本课中三维坐标系都是右手系。</li>
+<li>判定左/右、内/外
+<ul>
+<li>如果<span class="math inline">\(\mathbf{a\times b}\)</span>的z方向为正，则<span class="math inline">\(\mathbf{a}\)</span>在<span class="math inline">\(\mathbf{b}\)</span>的右侧。</li>
+<li>给定三角形ABC（顺序无关），分别考察<span class="math inline">\(\mathbf{AB\times AP}\)</span>、<span class="math inline">\(\mathbf{BC\times BP}\)</span>、<span class="math inline">\(\mathbf{CA\times CP}\)</span>可以判断P在三角形内/外：三个方向相同（都在左边/都在右边）为内部，否则为外部</li>
+</ul></li>
+</ul></li>
+<li>正交基
+<ul>
+<li>对于三维单位正交基<span class="math inline">\(\mathbf{u, v,w}\)</span>，任意向量<span class="math inline">\(\mathbf{p}\)</span>，恒有<span class="math inline">\(\mathbf{p} = \mathbf{(p\cdot u)u+(p\cdot v)v+(p\cdot w)w}\)</span></li>
+</ul></li>
+<li>矩阵</li>
+<li>矩阵乘法
+<ul>
+<li>矩阵乘法<span class="math inline">\(\iff\)</span>变换，如关于y轴做反射</li>
+</ul></li>
+<li>转置</li>
+<li>单位阵、逆矩阵</li>
+<li>叉乘<span class="math inline">\(\iff\)</span>对偶阵的乘</li>
+</ul>
+<h1 id="lecture-3-transformation">Lecture 3 Transformation</h1>
+<p>本节内容：</p>
+<ul>
+<li>为什么要学习变换</li>
+<li>2D变换：旋转、缩放、裁剪</li>
+<li>齐次坐标</li>
+<li>组合变换</li>
+<li>3D变换（？）</li>
+</ul>
+<h2 id="缩放">缩放</h2>
+<p><span class="math display">\[
+\begin{bmatrix}s &amp; 0 \\ 0 &amp; s\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}sx \\ sy\end{bmatrix} \\
+\begin{bmatrix}s_x &amp; 0 \\ 0 &amp; s_y\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}s_xx \\ s_yy\end{bmatrix} \\
+\]</span></p>
+<p>分别表示同比例和不同比例的缩放</p>
+<h2 id="反射">反射</h2>
+<h3 id="关于y轴反射">关于y轴反射</h3>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210226215611347.png" class>
+<p><span class="math display">\[
+\begin{bmatrix}-1 &amp; 0 \\ 0 &amp; 1\end{bmatrix} \begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}-x \\ y\end{bmatrix}
+\]</span></p>
+<h2 id="切变-shear">切变 Shear</h2>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210226214317502.png" class>
+<p>特点：</p>
+<ul>
+<li>垂直分量无变化</li>
+<li>水平分量中y=0时右移0，y=1时右移a</li>
+</ul>
+<p><span class="math display">\[
+\begin{bmatrix}1 &amp; a \\ 0 &amp; 1\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x + ay \\ y\end{bmatrix}
+\]</span></p>
+<h2 id="旋转">旋转</h2>
+<ul>
+<li>默认情况下关于原点，逆时针</li>
+</ul>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210226215952698.png" class>
+<p><span class="math display">\[
+\begin{bmatrix}\cos\theta &amp; -\sin\theta\\\sin\theta &amp; \cos\theta\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x\cos\theta-y\sin\theta \\ x\sin\theta+y\cos\theta\end{bmatrix}
+\]</span> 另附推导如下： <span class="math display">\[
+设旋转前的向量\mathbf{p}=\begin{bmatrix}x \\ y\end{bmatrix}对应的复数为 re^{i\phi} \\
+则有 \left\{\begin{aligned}
+x = r\cos\phi \\
+y = r\sin\phi 
+\end{aligned}\right. \\
+旋转\theta后得到的向量\mathbf{p&#39;}=\begin{bmatrix}x&#39; \\ y&#39;\end{bmatrix}对应的复数为re^{i(\theta+\phi)} \\
+则有 \left\{\begin{aligned}
+x&#39; = r\cos(\theta+\phi) = r\cos\theta\cos\phi - r\sin\theta\sin\phi=x\cos\theta-y\sin\theta  \\
+y&#39; = r\sin(\theta+\phi) = r\sin\theta\cos\phi + r\cos\theta\sin\phi=x\sin\theta+y\cos\theta 
+\end{aligned}\right. \\
+从而有\begin{bmatrix}x&#39; \\ y&#39;\end{bmatrix} = \begin{bmatrix}x\cos\theta-y\sin\theta \\ x\sin\theta+y\cos\theta\end{bmatrix} = \begin{bmatrix}\cos\theta &amp; -\sin\theta\\\sin\theta &amp; \cos\theta\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}
+\]</span> 以上统称——线性变换</p>
+<h2 id="齐次坐标">齐次坐标</h2>
+<p>平移不是齐次变换。</p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210226233255576.png" class>
+<p><span class="math display">\[
+\begin{bmatrix}x&#39; \\ y&#39;\end{bmatrix} = \begin{bmatrix}1 &amp; 0 \\ 0 &amp; 1\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} + \begin{bmatrix}t_x \\ t_y\end{bmatrix}
+\]</span> 不能表示为矩阵乘法，必须要加入一个非齐次项</p>
+<p>然而，我们不希望平移成为一个特殊的情况——我们给向量添加第三个分量，表示非齐次的常数 <span class="math display">\[
+\begin{bmatrix}x&#39; \\ y&#39; \\ 1\end{bmatrix} = \begin{bmatrix}x + t_x\\ y + t_y \\ 1\end{bmatrix} = \begin{bmatrix}1 &amp; 0 &amp; t_x \\ 0 &amp; 1 &amp; t_y \\ 0 &amp; 0 &amp; 1  \end{bmatrix}\begin{bmatrix}x \\ y \\ 1\end{bmatrix}
+\]</span> 这种情况下，一个二维的点被表示为 <span class="math display">\[
+\begin{bmatrix}x \\ y \\ 1\end{bmatrix}
+\]</span> 而一个二维向量被表示为 <span class="math display">\[
+\begin{bmatrix}x \\ y\\ 0 \end{bmatrix}
+\]</span> 考虑点和向量的加法运算：</p>
+<ul>
+<li>向量 + 向量 = 向量</li>
+<li>点 <span class="math inline">\(\pm\)</span> 向量 = 点</li>
+<li>点 - 点 = 向量</li>
+<li>点 + 点 = 这两个点的中点（我们认为二维点<span class="math inline">\(\begin{bmatrix}x \\ y \\ w\end{bmatrix}(w\neq 0)\)</span>等价于<span class="math inline">\(\begin{bmatrix}\frac{x}{w} \\ \frac{y}{w} \\ 1\end{bmatrix}\)</span>）</li>
+</ul>
+<p>仍然符合直觉且自恰。</p>
+<p>在引入齐次坐标后，所有的<strong>仿射变换</strong>都可以表示为<strong>齐次坐标</strong>意义下的<strong>线性变换</strong> <span class="math display">\[
+\begin{bmatrix}x&#39; \\ y&#39;\end{bmatrix} = \begin{bmatrix}a &amp; b \\ c &amp; d\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} + \begin{bmatrix}t_x \\ t_y\end{bmatrix} \iff \begin{bmatrix}x&#39; \\ y&#39; \\ 1\end{bmatrix} = \begin{bmatrix}a &amp; b &amp; t_x \\ c &amp; d &amp; t_y \\ 0 &amp; 0 &amp; 1\end{bmatrix}\begin{bmatrix}x \\ y \\ 1\end{bmatrix}
+\]</span> 引入齐次坐标后，上文的几个变换可以表示为： <span class="math display">\[
+缩放\begin{bmatrix}s_x &amp; 0 &amp; 0 \\ 0 &amp; s_y &amp; 0 \\ 0 &amp; 0 &amp; 1\end{bmatrix} \\
+旋转\begin{bmatrix}\cos\theta &amp; -\sin\theta &amp; 0 \\ \sin\theta &amp; \cos\theta &amp; 0 \\ 0 &amp; 0 &amp; 1\end{bmatrix} \\
+平移\begin{bmatrix}1 &amp; 0 &amp; t_x \\ 0 &amp; 1 &amp; t_y \\ 0 &amp; 0 &amp; 1  \end{bmatrix}
+\]</span> <strong>齐次坐标意义下，所有仿射变换对应的矩阵最后一行都是001</strong></p>
+<p><strong>其他（如投影）不一定</strong></p>
+<h2 id="逆变换">逆变换</h2>
+<p>乘逆矩阵即可。</p>
+<h2 id="变换的组合">变换的组合</h2>
+<p><span class="math display">\[
+变换\iff往向量左边乘一个矩阵 \\
+变换的组合 \iff 往向量左边依次乘多个矩阵 \\
+向量的变换不可随意交换顺序 \iff 矩阵乘法不交换
+\]</span></p>
+<p>对于点<span class="math inline">\(\begin{bmatrix}x \\ y \\ 1\end{bmatrix}\)</span>，依次应用仿射变换<span class="math inline">\(A_1, A_2, \cdots, A_n\)</span>，则等价于应用一个变换<span class="math inline">\(A_nA_{n-1}\cdots A_1\)</span></p>
+<p>我们对几种基本变换提供记号：<span class="math inline">\(\mathbf{T(p)}\)</span>为平移向量<span class="math inline">\(\mathbf{p}\)</span>，<span class="math inline">\(\mathbf{R}(\alpha)\)</span>为绕原点逆时针旋转角<span class="math inline">\(\alpha\)</span></p>
+<h3 id="如何绕给定点c旋转">如何绕给定点c旋转？</h3>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210226235658587.png" class>
+<p><span class="math display">\[
+\mathbf{T}(c)\cdot\mathbf{R}(\alpha)\cdot\mathbf{T(-c)}
+\]</span></p>
+<h2 id="d变换">3D变换</h2>
+<p>类似二维，我们也提供齐次坐标：</p>
+<p>点表示为<span class="math inline">\(\begin{bmatrix}x \\ y \\ z \\ 1\end{bmatrix}\)</span>，向量表示为<span class="math inline">\(\begin{bmatrix}x \\ y \\ z \\ 0\end{bmatrix}\)</span>，而且规定<span class="math inline">\(\begin{bmatrix}x \\ y \\ z \\ w\end{bmatrix}(w\neq 0) = \begin{bmatrix}\frac{x}{w} \\ \frac{y}{w} \\ \frac{z}{w} \\ 1\end{bmatrix}\)</span></p>
+<p>三位仿射变换表示为 <span class="math display">\[
+\begin{bmatrix}x&#39; \\ y&#39; \\ z&#39; \\ 1\end{bmatrix} = \begin{bmatrix}a &amp; b &amp; c &amp; t_x \\ d &amp; e &amp; f &amp; t_y \\ g &amp; h &amp; i &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix}\begin{bmatrix}x \\ y \\ z \\ 1\end{bmatrix}
+\]</span> 由于 <span class="math display">\[
+\begin{bmatrix}a &amp; b &amp; c &amp; t_x \\ d &amp; e &amp; f &amp; t_y \\ g &amp; h &amp; i &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} = \begin{bmatrix}1 &amp; 0 &amp; 0 &amp; t_x \\ 0 &amp; 1 &amp; 0 &amp; t_y \\ 0 &amp; 0 &amp; 1 &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix}\begin{bmatrix}a &amp; b &amp; c &amp; 0 \\ d &amp; e &amp; f &amp; 0 \\ g &amp; h &amp; i &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix}
+\]</span> 所以它表示”先线性变换，后平移“</p>
+<h1 id="lecture-4-transformation-cont.">Lecture 4 Transformation Cont.</h1>
+<p>今日内容：</p>
+<ul>
+<li>3D变换</li>
+<li>观测变换
+<ul>
+<li>视图/相机变换</li>
+<li>投影变换
+<ul>
+<li>正交投影</li>
+<li>透视投影</li>
+</ul></li>
+</ul></li>
+</ul>
+<h2 id="d变换-1">3D变换</h2>
+<p>类似二维，三维变换中有： <span class="math display">\[
+缩放S(s_x, s_y, s_z) = \begin{bmatrix}s_x &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; s_y &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; s_z &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+平移T(t_x, t_y, t_z) = \begin{bmatrix}1 &amp; 0 &amp; 0 &amp; t_x \\ 0 &amp; 1 &amp; 0 &amp; t_y \\ 0 &amp; 0 &amp; 1 &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+\]</span> 对于旋转则比较复杂…… <span class="math display">\[
+R_x(\alpha) = \begin{bmatrix}1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; \cos\alpha &amp; -\sin\alpha &amp; 0 \\ 0 &amp; \sin\alpha &amp; \cos\alpha &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+R_y(\alpha) = \begin{bmatrix}\cos\alpha &amp; 0 &amp; \sin\alpha &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \\ -\sin\alpha &amp; 0 &amp; \cos\alpha &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+R_z(\alpha) = \begin{bmatrix}\cos\alpha &amp; -\sin\alpha &amp; 0 &amp; 0 \\ \sin\alpha &amp; \cos\alpha &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+\]</span> 任意三维旋转则可表示为 <span class="math display">\[
+R_{xyz}(\alpha,\beta,\gamma) = R_x(\alpha)R_y(\beta)R_z(\gamma)
+\]</span> 罗德里格旋转公式 <span class="math display">\[
+\mathbf{R}(\mathbf{n}, \alpha) = \cos\alpha\cdot\mathbf{I} + (1 - \cos\alpha)\mathbf{n}\mathbf{n}^T + \sin\alpha\begin{bmatrix}0 &amp; -n_z &amp; n_y \\ n_z &amp; 0 &amp; -n_x \\ -n_y &amp; n_x &amp; 0  \end{bmatrix}\\
+（注意这个矩阵是\mathbf{n}的对偶阵，用于叉乘）
+\]</span></p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227180625788.png" class>
+<p>Q：为什么这里是一个三阶矩阵？在齐次坐标系下不应该是四阶矩阵吗？</p>
+<p>A：这是四阶矩阵的左上角那三阶。</p>
+<h2 id="视图变换">视图变换</h2>
+<p>什么是视图变换？</p>
+<p>思考如何照一张照片：</p>
+<ul>
+<li>找到一个地方，把人安排进去（模型变换 / 把场景建好、模型搭好）</li>
+<li>找一个好的角度，放好相机（视图变换）</li>
+<li>茄子（投影变换，3D→2D）</li>
+</ul>
+<p>首先，定义相机：</p>
+<ul>
+<li>相机位置Position <span class="math inline">\(\mathbf{e}\)</span></li>
+<li>镜头方向Look-at direction <span class="math inline">\(\hat g\)</span></li>
+<li>上方向Up direction <span class="math inline">\(\hat t\)</span>（与镜头方向垂直）</li>
+</ul>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227111819410.png" class>
+<p>注意到相机和物体进行同样的变换时，得到的照片完全相同</p>
+<p>因此我们可以做变换：</p>
+<ul>
+<li><p>相机位置固定在原点</p></li>
+<li><p>镜头方向固定在-Z</p></li>
+<li><p>上方向固定在Y</p>
+<p>（为什么那个方向是-Z呢，因为这门课约定所有坐标系都是右手系）</p></li>
+</ul>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227112142599.png" class>
+<p>如何做这样的变换？</p>
+<ol type="1">
+<li><p>平移到原点</p></li>
+<li><p>把<span class="math inline">\(\hat g\)</span>转到-Z</p></li>
+<li><p>把<span class="math inline">\(\hat t\)</span>转到Y</p>
+<p>这样<span class="math inline">\(\hat g \times \hat t\)</span>自然就是X</p></li>
+</ol>
+<p>平移变换为： <span class="math display">\[
+T_{view} = \begin{bmatrix}1 &amp; 0 &amp; 0 &amp; -x_e \\ 0 &amp; 1 &amp; 0 &amp; -y_e \\ 0 &amp; 0 &amp; 1 &amp; -z_e \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+\]</span> 希望构造一个旋转阵，把<span class="math inline">\(\hat g\)</span>转到-Z，把<span class="math inline">\(\hat t\)</span>转到Y，把<span class="math inline">\(\hat g \times \hat t\)</span>转到X，这是不容易的。</p>
+<p>但是我们可以构造它的逆矩阵：把Y转到<span class="math inline">\(\hat t\)</span>，把Z转到<span class="math inline">\(-\hat g\)</span> ，旋转阵的逆矩阵如下： <span class="math display">\[
+R_{view}^{-1} =
+\begin{bmatrix}
+    x_{\hat g\times\hat t} &amp; x_t &amp; x_{-g} &amp; 0 \\
+    y_{\hat g\times\hat t} &amp; y_t &amp; y_{-g} &amp; 0 \\
+    z_{\hat g\times\hat t} &amp; z_t &amp; z_{-g} &amp; 0 \\
+    0 &amp; 0 &amp; 0 &amp; 1
+\end{bmatrix}
+\]</span></p>
+<p>结合旋转阵都是正交矩阵： <span class="math display">\[
+R_{view} = \begin{bmatrix}
+    x_{\hat g\times\hat t} &amp; y_{\hat g\times\hat t} &amp; z_{\hat g\times\hat t} &amp; 0 \\
+    x_t &amp; y_t &amp; z_t &amp; 0 \\
+    x_{-g} &amp; y_{-g} &amp; z_{-g} &amp; 0 \\
+    0 &amp; 0 &amp; 0 &amp; 1
+\end{bmatrix}
+\]</span> 因此视图变换阵 <span class="math display">\[
+M_{view} = R_{view}T_{view} = 
+\begin{bmatrix}
+    x_{\hat g\times\hat t} &amp; y_{\hat g\times\hat t} &amp; z_{\hat g\times\hat t} &amp; -x_e \\
+    x_t &amp; y_t &amp; z_t &amp; -y_e \\
+    x_{-g} &amp; y_{-g} &amp; z_{-g} &amp; -z_e \\
+    0 &amp; 0 &amp; 0 &amp; 1
+\end{bmatrix}
+\]</span></p>
+<h2 id="投影变换">投影变换</h2>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227114816149.png" class>
+<p>左：透视投影；右：正交投影</p>
+<h3 id="正交投影">正交投影</h3>
+<p>最简单的做法：</p>
+<ul>
+<li>把相机摆在原点，镜头方向-Z，上方向Y</li>
+<li>把Z坐标扔掉</li>
+<li>把物体放缩并平移到<span class="math inline">\([-1,1]^2\)</span>上</li>
+</ul>
+<p>更本质的讨论：</p>
+<p>我们希望把空间立方体<span class="math inline">\([l,r]\times[b,t]\times[f,n]\)</span>映射到<span class="math inline">\([-1,1]^3\)</span>的规范立方体上去</p>
+<p>（注意：离我们越近，z轴的坐标越大）</p>
+<ul>
+<li>首先把立方体中心平移到原点（<span class="math inline">\(T(-\frac{l+r}{2}, -\frac{b+t}{2}, -\frac{f+n}{2})\)</span>）</li>
+<li>然后做缩放（<span class="math inline">\(S(\frac{2}{r-l}, \frac{2}{t-b},\frac{2}{n-f})\)</span>）</li>
+</ul>
+<p><span class="math display">\[
+M_{ortho} = \begin{bmatrix}\frac{2}{r-l} &amp; 0 &amp; 0 &amp; -\frac{r+l}{2} \\ 0 &amp; \frac{2}{t - b} &amp; 0 &amp; -\frac{t+b}{2} \\ 0 &amp; 0 &amp; \frac{2}{n-f} &amp; -\frac{f+n}{2} \\ 0 &amp; 0 &amp; 0 &amp; 1\end{bmatrix} \\
+\]</span></p>
+<h3 id="透视投影">透视投影</h3>
+<p>近大远小、平行线投影后不一定再平行，而会收敛于一点</p>
+<ul>
+<li><p>回忆一下点的定义</p>
+<p><span class="math inline">\(\begin{bmatrix}x \\ y \\ z \\ 1\end{bmatrix} = \begin{bmatrix}xz \\ yz \\ z^2 \\ z\end{bmatrix}(若z\neq 0)\)</span></p></li>
+</ul>
+<p>如何做透视投影？</p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227121608572.png" class>
+<ul>
+<li>首先把视锥frustum“挤压”成一个立方体cuboid</li>
+<li>然后做正交投影</li>
+</ul>
+<p>这个挤压过程类似上文的Shear，有以下性质：</p>
+<ul>
+<li>近平面永远不变</li>
+<li>远平面的z值不变</li>
+<li>远平面的中心不变</li>
+</ul>
+<p>怎么做这个挤压？（也就是求变换矩阵<span class="math inline">\(M_{persp\to ortho}\)</span>）</p>
+<p>对于原来的点<span class="math inline">\((x,y,z)\)</span>，假设变换后的点是<span class="math inline">\((x&#39;,y&#39;,z&#39;)\)</span></p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227122602518.png" class>
+<p>因为要压缩到cuboid上去，任意一个点的y和近平面上对应点的y有一个确定关系</p>
+<p>我们已经知道<span class="math inline">\(y&#39;=\frac{n}{z}y, x&#39; = \frac{n}{z}x\)</span> <span class="math display">\[
+\begin{bmatrix}x \\ y \\ z \\ 1\end{bmatrix} \mathop\Rightarrow\limits_{\text{变换}} \begin{bmatrix}\frac{nx}{z} \\ \frac{ny}{z} \\ ? \\ 1\end{bmatrix} =
+\begin{bmatrix}nx \\ ny \\ ?? \\ z\end{bmatrix}
+\]</span> 也就是说， <span class="math display">\[
+M_{persp\to ortho}\begin{bmatrix}x \\ y \\ z \\ 1\end{bmatrix} = \begin{bmatrix}nx \\ ny \\ ?? \\ z\end{bmatrix} 
+\]</span> 这已经可以确定<span class="math inline">\(M_{persp\to ortho}\)</span>的很多分量了 <span class="math display">\[
+M_{persp\to ortho} = \begin{bmatrix}n &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; n &amp; 0 &amp; 0 \\ ? &amp; ? &amp; ? &amp; ? \\ 0 &amp; 0 &amp; 1 &amp; 0\end{bmatrix} \\
+\begin{bmatrix}n &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; n &amp; 0 &amp; 0 \\ ? &amp; ? &amp; ? &amp; ? \\ 0 &amp; 0 &amp; 1 &amp; 0\end{bmatrix}\begin{bmatrix}x \\ y \\ z \\ 1\end{bmatrix} = \begin{bmatrix}nx \\ ny \\ ?? \\ z\end{bmatrix}
+\]</span> 结合上面的几条性质我们推测出第三行的值：</p>
+<p>近平面上的点不变，用n代替z，可以知道第三行前两列都是0，设为<span class="math inline">\(\begin{bmatrix}0 &amp; 0 &amp; A &amp; B\end{bmatrix}\)</span>，有<span class="math inline">\(An+B=n^2\)</span></p>
+<p>原平面上的点z值不变，有<span class="math inline">\(Af+B=f^2\)</span></p>
+<p>从而<span class="math inline">\(n, f\)</span>为方程<span class="math inline">\(x^2-Ax-B=0\)</span>的两个根，我们可以知道<span class="math inline">\(A = n+f, B = -nf\)</span></p>
+<p>从而： <span class="math display">\[
+M_{persp\to ortho} = \begin{bmatrix}n &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; n &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; n+f &amp; -nf \\ 0 &amp; 0 &amp; 1 &amp; 0\end{bmatrix} \\
+\]</span> 结合刚刚的正交投影，透视投影变换就是 <span class="math display">\[
+M_{persp} = M_{ortho} M_{persp\to ortho}
+\]</span></p>
+<h1 id="lecture-5-rasterization-1-triangles">Lecture 5 Rasterization 1 (Triangles)</h1>
+<p>这节课<strong>Pretty Easy</strong></p>
+<p>在上节课中，我们通过<strong>视图变换</strong>和<strong>投影变换</strong>把任意的三维场景都变到了<span class="math inline">\([-1,1]^3\)</span>这个<strong>标准立方体</strong>上去，接下来我们希望能在<strong>屏幕</strong>上将里面的内容绘制出来</p>
+<p>但什么是屏幕呢？</p>
+<ul>
+<li>一个pixel矩阵</li>
+<li>矩阵的尺寸称为分辨率</li>
+<li>是一种典型的光栅成像设备</li>
+</ul>
+<p>Raster == Screen (German)</p>
+<p>Rasterize == To draw onto the screen</p>
+<p>那么什么是像素呢？</p>
+<ul>
+<li>本课中认为：一个pixel是一个有确定颜色的小方块</li>
+<li>颜色是RGB的混合</li>
+</ul>
+<p>给出屏幕空间的定义（与虎书存在不同）</p>
+<ul>
+<li>左下角为原点</li>
+<li>向右为x轴，向上为y轴</li>
+<li>每个像素的坐标为<span class="math inline">\((x,y)\)</span>，其中x和y都是整数（从0开始）。
+<ul>
+<li>像素<span class="math inline">\((x,y)\)</span>的中心是<span class="math inline">\((x + 0.5, y+0.5)\)</span></li>
+<li>分辨率为<span class="math inline">\((\text{width}, \text{height})\)</span>的屏幕，其显示范围从<span class="math inline">\((0,0)\)</span>到<span class="math inline">\((\text{width}, \text{height})\)</span></li>
+</ul></li>
+</ul>
+<p>光栅化过程，就是把物体从<span class="math inline">\([-1,1]^3\)</span>映射到<span class="math inline">\([0,\text{width}]\times[0,\text{height}]\)</span>的过程</p>
+<p>这太简单了（不考虑遮挡）</p>
+<p>光栅化：</p>
+<ul>
+<li>与z坐标无关</li>
+<li>将<span class="math inline">\([-1,1]^2\)</span>变形到<span class="math inline">\([0,\text{width}]\times[0,\text{height}]\)</span>上
+<ul>
+<li>先平移<span class="math inline">\(T(\frac{\text{width}}{2}, \frac{\text{height}}{2})\)</span></li>
+<li>再缩放<span class="math inline">\(S(\frac{\text{width}}{2},\frac{\text{height}}{2})\)</span></li>
+</ul></li>
+</ul>
+<p><span class="math display">\[
+M_{viewport} =
+\begin{bmatrix}
+\frac{\text{width}}{2} &amp; 0 &amp; 0 &amp; \frac{\text{width}}{2} \\
+0 &amp; \frac{\text{height}}{2} &amp; 0 &amp; \frac{\text{height}}{2} \\
+0 &amp; 0 &amp; 1 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{bmatrix}
+\]</span></p>
+<p>为什么用三角网格？</p>
+<ul>
+<li>三角形是最基本的多边形
+<ul>
+<li>多边形可以三角剖分</li>
+</ul></li>
+<li>三角形有独特性质
+<ul>
+<li>一定共面，而四边形、多边形不保证在同一平面上</li>
+<li>内外定义明确，而更多边的图形都有凹凸性</li>
+<li>插值方便</li>
+</ul></li>
+</ul>
+<p>对于一个三角形，我们需要确定显示时哪些像素显色——完全覆盖的肯定有色，完全不触及的肯定没有颜色，部分则比较复杂</p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227210409273.png" class>
+<h2 id="方法一采样">方法一：采样</h2>
+<p>在若干点计算函数的值，可以把函数离散化</p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227210749575.png" class>
+<p>定义函数（注意xy不一定是整数） <span class="math display">\[
+\text{inside}(t,x,y) = \left\{\begin{aligned}
+&amp;1, 点(x,y)在三角形t内部 \\
+&amp;0, otherwise
+\end{aligned}\right.
+\]</span> 要采样这个三角形，只需要</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; x_max; x++)</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y &lt; y_max; y++)</span><br><span class="line">        image[x][y] = inside(triangle, x + <span class="number">0.5</span>, y + <span class="number">0.5</span>);</span><br></pre></td></tr></table></figure>
+<p>那么如何计算inside函数呢？</p>
+<p><a href="#叉乘">叉乘</a>！</p>
+<p>如何加速？</p>
+<p>可以只检测轴向包围盒内的pixel。<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227213237251.png" class></p>
+<p>或者用ITT来做</p>
+<img data-src="/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/image-20210227213519938.png" class>
+<p>预告：下节课抗锯齿</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/16/%E3%80%8A%E6%81%8B%E7%88%B1%E7%BB%AE%E8%B0%88-%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E5%A4%8F%E5%A4%A9%E3%80%8B%E6%B8%B8%E7%8E%A9%E6%84%9F%E6%83%B3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1071,105 +1581,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="茨月">
-      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cy's blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">LEARNING A SAT SOLVER FROM SINGLE-BIT SUPERVISION 阅读笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-01-30 13:44:22" itemprop="dateCreated datePublished" datetime="2021-01-30T13:44:22+08:00">2021-01-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-02-04 15:49:53" itemprop="dateModified" datetime="2021-02-04T15:49:53+08:00">2021-02-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1802.03685.pdf">论文地址</a></p>
-<h1 id="引入">引入</h1>
-<p>作者希望用神经网络来解决SAT问题，提出了NeuroSAT模型。</p>
-<p>NeuroSAT在训练过程中对每个问题的监督只有“可满足”和“不可满足”两种状态。测试时，每次给一个SAT问题P，NeuroSAT就会给出这个问题是否可满足，而且如果一个问题被判定为可满足，我们<strong>几乎总是</strong>可以从激活函数中找到一组合法的值代入。</p>
-<p>他们又对模型进行了修改，输入的是有少量矛盾的不可满足问题，让模型自己去找到矛盾并改正，他们把这个修改叫NeuroUNSAT。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1240,14 +1651,14 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

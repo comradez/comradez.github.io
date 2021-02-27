@@ -186,6 +186,105 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="茨月">
+      <meta itemprop="description" content="计算机系大二在读，喜欢猫猫，常打RTS和大战略游戏。有时会写点东西分享。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cy's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">LEARNING A SAT SOLVER FROM SINGLE-BIT SUPERVISION 阅读笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-30 13:44:22" itemprop="dateCreated datePublished" datetime="2021-01-30T13:44:22+08:00">2021-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-04 15:49:53" itemprop="dateModified" datetime="2021-02-04T15:49:53+08:00">2021-02-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%82%BC%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">炼丹</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1802.03685.pdf">论文地址</a></p>
+<h1 id="引入">引入</h1>
+<p>作者希望用神经网络来解决SAT问题，提出了NeuroSAT模型。</p>
+<p>NeuroSAT在训练过程中对每个问题的监督只有“可满足”和“不可满足”两种状态。测试时，每次给一个SAT问题P，NeuroSAT就会给出这个问题是否可满足，而且如果一个问题被判定为可满足，我们<strong>几乎总是</strong>可以从激活函数中找到一组合法的值代入。</p>
+<p>他们又对模型进行了修改，输入的是有少量矛盾的不可满足问题，让模型自己去找到矛盾并改正，他们把这个修改叫NeuroUNSAT。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/30/LEARNING-A-SAT-SOLVER-FROM-SINGLE-BIT-SUPERVISION-%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/30/End-to-End-Differentiable-Proving%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -627,14 +726,14 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
