@@ -837,7 +837,12 @@ statement:\\
   <entry>
     <title>GAMES101课堂笔记</title>
     <url>/2021/02/28/GAMES101%E8%AF%BE%E5%A0%82%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<h1 id="lecture-1-overview-of-computer-graphics">Lecture 1 Overview of Computer Graphics</h1>
+    <content><![CDATA[<h1 id="个人闲话">个人闲话</h1>
+<p>开课一年之后我才知道有这样一门课。知道GAMES是CCF牵头办的这件事之后，心里感觉有点怪怪的，像是一个几十年的老傻逼突然干了人事还干得挺好那种感觉。</p>
+<p>笔记比较粗糙，是随听随记的，会持续更新，有没有总体整理我不保证。</p>
+<p>作业似乎是不允许分享的，我就不贴了。</p>
+<a id="more"></a>
+<h1 id="lecture-1-overview-of-computer-graphics">Lecture 1 Overview of Computer Graphics</h1>
 <ul>
 <li>什么是图形学？
 <ul>
