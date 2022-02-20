@@ -1,0 +1,26 @@
+# The URL the site will be built for
+base_url = "https://zcy.moe"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+
+# Whether to build a search index to be used later on by a JavaScript library
+build_search_index = true
+
+theme = "hook"
+title = "Chris Zhang"
+
+[markdown]
+# Whether to do syntax highlighting
+# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
+highlight_code = true
+
+[extra]
+# Put all your custom variables here
+
+links = [
+    { title = "GitHub", href = "https://github.com/comradez"},
+    { title = "Ask Me", href = "https://www.tapechat.net/uu/ma8muL/ZHBR0I2H" },
+    { title = "Mail Me", href = "mailto: chuyan-z19 [at] mails [dot] tsinghua.edu.cn"},
+    { title = "Ayayayaya", href = "https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" }
+]
