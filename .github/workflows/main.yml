@@ -13,4 +13,4 @@ jobs:
           # Target branch
           PAGES_BRANCH: gh-pages
           # Provide personal access token
-          TOKEN: ${{ secrets.TOKEN }}
+          TOKEN: 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
