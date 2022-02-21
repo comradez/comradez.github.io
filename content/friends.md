@@ -11,8 +11,6 @@ Listed in the order they are added.
 
 [Ayaka](https://ayaka.shn.hk/)
 
-[Sukuna](https://www.sukunahust.com/)
-
 [Ashitemaru](https://ashitemaru.github.io/)
 
 [UNIDY](https://www.unidy.cn/)
