@@ -1,0 +1,12 @@
++++
+title = "ideas"
+extra.in_header = true
++++
+
+记录自己的胡思乱想。
+
+- 2022-03-03
+    - python.org 上的文档什么时候增加深色模式?
+
+- 2022-03-02
+    - M1 Pro/Max 应该出现在计算集群里而非 MacBook Pro 上。

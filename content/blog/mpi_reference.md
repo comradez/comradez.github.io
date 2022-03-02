@@ -51,15 +51,35 @@ date: 2022-03-01 01:04:44
     - status 是一个指向 `MPI_Status` 结构体的指针，这次接收的更多信息会保存在这个结构体里
         - 可以用 `MPI_STATUS_IGNORE` 来丢弃这个东西
 
+- `MPI_Send` 和 `MPI_Recv` 是阻塞的，在一次发送 / 接收完成前不会继续向下执行
+
+- 如果要发送自定义类型
+    - 将缓冲区强转 `void *`
+    - `count` 填个数 * `sizeof(MyType)`
+    - `datatype` 填 `MPI_BYTE`
+
 - `MPI_Status` 结构体中记录了这些东西
     - 发送端的进程编号
     - 消息的 tag
     - 消息的长度（在指定类型后，元素个数也就可以知道了）
 
-- 使用 `MPI_Get_count(MPI_Status* status, MPI_Datatype datatype, int* count)` 来得到消息中的元素个数。
+- 使用 `MPI_Get_count(MPI_Status* status, MPI_Datatype datatype, int* count)` 来得到消息中的实际元素个数。
 
 - 使用 `MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status* status)` 来在不接收的情况下得到 `MPI_Status`。
+    - 如果不能确切知道实际待接收的元素个数，可以先 `MPI_Probe` 拿到 `status`，用 `MPI_Get_count` 算出个数，最后再 `MPI_Recv`。此时就可以 `MPI_STATUS_IGNORE` 了。
 
 ### 多进程同步
 
-WIP
+- 使用 `MPI_Barrier(MPI_Comm communicator)` 来同步进程
+    - 必须所有进程都执行到这一句才会继续执行下去，否则整个程序会卡住
+
+- 使用 `MPI_Bcast(const void *buf, int count, MPI_Datatype datatype, int root, MPI_Comm comm)` 来广播 / 接受广播数据。
+    - 如果自己的进程编号是 root，则发送 `buf`，否则接收
+    - `MPI_Bcast` 使用一种树形广播算法来实现高效地广播
+        - 简单的测试表明在单机的多个核上（即不涉及网络通信），`MPI_Bcast` 的效率大概是朴素的线性实现的 $\log N$ 倍，即 2 线程性能一致、4 线程性能 2 倍，8 线程性能 3 倍...
+        - 它的广播行为和网络拓扑是否有关？换言之，对于异构集群，它是否会找比较“好”的广播路径？
+        
+### 杂项
+
+- 使用 `MPI_Wtime()` 计时
+    - 返回 1970-1-1 到现在为止的秒数，也即 UNIX 时间戳
