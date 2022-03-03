@@ -36,7 +36,7 @@ date: 2022-03-01 01:04:44
     - datatype 是数据类型，MPI 内部自己的枚举类，与 C 原生类型存在对应
     - dest 是目标 process 编号
     - tag 是编号，只有 tag 对应的消息才会被接收
-    - 最后一个参数干啥的啊，我现在只知道无脑填 `MPI_COMM_WORLD`
+    - comm 是组通讯器
 
 - 使用 `MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)` 来接收另一个 process 发来的数据
     - buf 是接收用缓冲区
@@ -47,7 +47,7 @@ date: 2022-03-01 01:04:44
         - 可以用 `MPI_ANY_SOURCE` 来接收所有源的消息
     - tag 是编号，只有 tag 对应的消息才会被接收
         - 可以用 `MPI_ANY_TAG` 来接收所有任意 tag 的消息
-    - 我还是只知道无脑填 `MPI_COMM_WORLD`
+    - comm 是组通讯器
     - status 是一个指向 `MPI_Status` 结构体的指针，这次接收的更多信息会保存在这个结构体里
         - 可以用 `MPI_STATUS_IGNORE` 来丢弃这个东西
 
@@ -78,7 +78,102 @@ date: 2022-03-01 01:04:44
     - `MPI_Bcast` 使用一种树形广播算法来实现高效地广播
         - 简单的测试表明在单机的多个核上（即不涉及网络通信），`MPI_Bcast` 的效率大概是朴素的线性实现的 $\log N$ 倍，即 2 线程性能一致、4 线程性能 2 倍，8 线程性能 3 倍...
         - 它的广播行为和网络拓扑是否有关？换言之，对于异构集群，它是否会找比较“好”的广播路径？
-        
+
+- 使用 `MPI_Scatter(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, int root, MPI_Comm communicator)` 来将一个缓冲区内的数据切分并将各段发送至其他进程。
+    - `send_data` 是发送缓冲区
+    - `send_count` 是待发送元素个数
+    - `send_datatype` 是待发送元素类型
+    - `recv_data` 是接收缓冲区
+    - `recv_count` 是接收元素个数
+        - 一般而言应当是 `send_count` 的约数
+    - `recv_datatype` 是待接收元素类型
+        - 一般和发送保持一致就可以了
+    - `root` 是发送进程
+    - `communicator` 是组通讯器
+
+![Bcast vs Scatter](https://mpitutorial.com/tutorials/mpi-scatter-gather-and-allgather/broadcastvsscatter.png)
+
+- 使用 `MPI_Gather(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, int root, MPI_Comm communicator)` 来将各进程内的数据接收至 root 进程的一个大缓冲区内，与 `MPI_Scatter` 正好相反。由于函数签名一致，参数也不赘述了。
+
+![Gather](https://mpitutorial.com/tutorials/mpi-scatter-gather-and-allgather/gather.png)
+
+- 一个常见工作方式是这样的
+    - 0 号 process 是 root process，其他为 worker process
+    - root 准备好数据后将数据 Scatter 到各个 worker process 上去，由 worker 执行操作
+    - 用 Barrier 保证所有 worker 操作都执行完毕
+    - root 再将所有数据 Gather 回来
+    - 感觉这其实和 Map 很像XD
+
+- 使用 `MPI_Allgather(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, MPI_Comm communicator)` 来实现先 Gather 再 Bcast 的操作，即完成后所有 process 的缓冲区中都是相同的副本。除去没有 root（也不需要了）以外，函数签名和 `MPI_Gather` 一致，不再赘述。
+
+![Allgather](https://mpitutorial.com/tutorials/mpi-scatter-gather-and-allgather/allgather.png)
+
+- 使用 `MPI_Reduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm communicator)` 来进行多进程数据的 reduce 操作。
+    - `send_data` 是各个进程待 reduce 的发送缓冲区
+    - `recv_data` 是 root 进程存放 reduce 结果的接收缓冲区
+    - `count` 是缓冲区中元素个数
+    - `datatype` 是元素类型
+    - `op` 是 MPI 预先定义的 reduce 操作，包括最大/最小值、求和/求积、按位与/或、最大/最小值所在 rank 等。
+    - `root` 是接收 reduce 结果的根进程
+    - `communicator` 是通讯器
+
+![count = 1 的 reduce](https://mpitutorial.com/tutorials/mpi-reduce-and-allreduce/mpi_reduce_1.png)
+![count = 2 的 reduce](https://mpitutorial.com/tutorials/mpi-reduce-and-allreduce/mpi_reduce_2.png)
+
+- `MPI_Allreduce` 和 `MPI_reduce` 的关系类似前面的 Allgather 和 gather，它将 reduce 后的数据发送给所有进程，因此签名为 `MPI_Allreduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator)`，没有 root，其余不变。
+
+![Allreduce](https://mpitutorial.com/tutorials/mpi-reduce-and-allreduce/mpi_allreduce_1.png)
+
+### 通讯器与组
+
+- 一个“组”可以视为一个 process 的集合
+
+- 一个通讯器对应一个组，用于组内 process 的相互通信
+    - `MPI_COMM_WORLD` 是包含所有 process 的全局通讯器
+    - 使用 `MPI_Comm_Rank(MPI_Comm comm, int *rank)` 来获取自己在通讯器内的 rank
+    - 使用 `MPI_Comm_Size(MPI_Comm comm, int *size)` 来获取这个通讯器中的线程数
+
+- 使用 `MPI_Comm_split(MPI_Comm comm, int color, int key, MPI_Comm* newcomm)` 来分割旧的 Communicator，创建新的
+    - `comm` 是旧的通讯器
+    - `color` 相同的进程会被分到同一个组（也即同一个新通讯器）内
+    - `rank` 的顺序会被用于确定新的组内的 rank
+    - `new_comm` 是新创建的通讯器
+
+例如，用 16 个 process 运行以下代码（只保留核心部分）：
+
+```c
+int world_rank, world_size;
+MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+int color = world_rank / 4;
+
+MPI_Comm row_comm;
+MPI_Comm_split(MPI_COMM_WORLD, color, world_rank, &row_comm);
+
+int row_rank, row_size;
+MPI_Comm_rank(row_comm, &row_rank);
+MPI_Comm_size(row_comm, &row_size);
+
+printf("World rank & size: %d / %d\t", world_rank, world_size);
+printf("Row rank & size: %d / %d\n", row_rank, row_size);
+```
+
+原本是 `(world_rank, 16)` 的 process 在新的通讯器中会变为 `(world_rank / 4, 16)`
+
+![MPI_Comm_split](https://mpitutorial.com/tutorials/introduction-to-groups-and-communicators/comm_split.png)
+
+如果将 `world_rank / 4` 改为 `world_rank % 4` 那么将会由横向划分变为纵向划分，原理类似。
+
+- 使用 `MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm)` 和 `MPI_Comm_create_group(MPI_Comm comm, MPI_Group group, int tag, MPI_Comm *newcomm)` 都可以由一个组创建新的通讯器。
+    - 没有很明白区别
+
+- `MPI_Group` 可以执行交、并等集合运算
+
+实话说，教程里这部分过于简略，基本上没看懂。
+
+听去年选课的同学说，课上实际使用 MPI 的时候，一般不需要分组创建通讯器，只需要 `MPI_COMM_WORLD` 一把梭即可，所以这里也不再深究了。
+
 ### 杂项
 
 - 使用 `MPI_Wtime()` 计时
