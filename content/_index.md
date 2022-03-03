@@ -11,4 +11,4 @@ Computer Graphics, 🦀.
 
 ## 一言
 
-> python.org 上的文档什么时候增加深色模式?
+> 清华,你妈什么时候死啊?
