@@ -5,6 +5,9 @@ extra.in_header = true
 
 记录自己的胡思乱想。
 
+- 2022-03-11
+    - 每次看到xsh这个缩写都会感到迷惑。我见过bash, zsh, fish, elvish 和 nushell, 怎么就没见过xsh呢?
+
 - 2022-03-05
     - 是不是太多的时间花在和打电话上了……
 
