@@ -5,6 +5,9 @@ extra.in_header = true
 
 记录自己的胡思乱想。
 
+- 2022-03-13
+    - 有个傻子在给TF卡分区的时候把root分区分成了fat32，然后想了好久为什么tar解压创建软硬链接总是失败。
+
 - 2022-03-11
     - 每次看到xsh这个缩写都会感到迷惑。我见过bash, zsh, fish, elvish 和 nushell, 怎么就没见过xsh呢?
 

@@ -13,4 +13,4 @@ Computer Graphics, 🦀.
 
 ## 一言
 
-> 每次看到xsh这个缩写都会感到迷惑。我见过bash, zsh, fish, elvish 和 nushell, 怎么就没见过xsh呢?
+> 有个傻子在给TF卡分区的时候把root分区分成了fat32，然后想了好久为什么tar解压创建软硬链接总是失败。
