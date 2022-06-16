@@ -15,4 +15,4 @@ Public key also available at [http://keys.openpgp.org](http://keys.openpgp.org) 
 
 ## 一言
 
-> 十三机兵防卫圈真好玩，嘿嘿嘿
+> MailSpring 都几年了还不支持 proxy... 真可惜。
