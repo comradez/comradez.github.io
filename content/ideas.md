@@ -5,6 +5,9 @@ extra.in_header = true
 
 记录自己的胡思乱想。
 
+- 2022-09-12
+    - SOP 和推荐信都好难写……
+
 - 2022-06-16
     - MailSpring 都几年了还不支持 proxy... 真可惜。
 

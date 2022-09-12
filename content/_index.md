@@ -7,7 +7,7 @@ Computer Graphics, 🦀.
 
 ❤️ @Radium_Azide.
 
-Public key also available at [http://keys.openpgp.org](http://keys.openpgp.org) with key-id 5B2840BDB2CE9360.
+Public key also available at [http://keys.openpgp.org](http://keys.openpgp.org) with key-id 7060D8651CEAB5BC or with my e-mail. See if you can find it :)
 
 以「茨月」为网名出现在简中互联网上。
 
@@ -15,4 +15,4 @@ Public key also available at [http://keys.openpgp.org](http://keys.openpgp.org) 
 
 ## 一言
 
-> MailSpring 都几年了还不支持 proxy... 真可惜。
+> SOP 和推荐信都好难写……
