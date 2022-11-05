@@ -7,7 +7,7 @@ Computer Graphics, 🦀.
 
 ❤️ @Radium_Azide.
 
-Public key also available at [http://keys.openpgp.org](http://keys.openpgp.org) with key-id 7060D8651CEAB5BC or with my e-mail. See if you can find it :)
+Public key also available at [http://keys.openpgp.org](http://keys.openpgp.org) with key-id `3EF9D6CAA7C37BAC`.
 
 以「茨月」为网名出现在简中互联网上。
 

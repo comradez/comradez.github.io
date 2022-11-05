@@ -20,8 +20,7 @@ highlight_code = true
 
 links = [
     { title = "GitHub", href = "https://github.com/comradez" },
-    { title = "Ask Me", href = "https://www.tapechat.net/uu/ma8muL/ZHBR0I2H" },
-    { title = "Mail Me", href = "mailto: chuyan-z19 [at] mails [dot] tsinghua.edu.cn" },
-    { title = "My Public Key", href = "https://zcy.moe/my_pub_key.key" },
+    { title = "Mail Me", href = "mailto: zcyjim [at] outlook [dot] com" },
+    { title = "My Public Key", href = "https://zcy.moe/public-key.pub" },
     { title = "Ayayayaya", href = "https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" }
 ]
