@@ -1,5 +1,5 @@
 +++
-title = "My Friends"
+title = "Friends"
 extra.in_header = true
 +++
 

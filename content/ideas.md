@@ -1,5 +1,5 @@
 +++
-title = "ideas"
+title = "Ideas"
 extra.in_header = true
 +++
 

@@ -1,5 +1,5 @@
 +++
-title = "resources"
+title = "Resources"
 extra.in_header = true
 +++
 
