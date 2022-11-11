@@ -21,5 +21,6 @@ highlight_code = true
 links = [
     { title = "GitHub", href = "https://github.com/comradez" },
     { title = "Mail Me", href = "mailto: zcyjim [at] outlook [dot] com" },
-    { title = "Ayayayaya", href = "https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" }
+    { title = "Ayayayaya", href = "https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" },
+    { title = "Channel", href = "https://t.me/cycathouse" },
 ]
