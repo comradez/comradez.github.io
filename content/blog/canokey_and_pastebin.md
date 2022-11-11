@@ -28,8 +28,11 @@ gpg --expert --full-gen-key
 ```
 
 类型选 (11) ECC (Set your own capabilities)
+
 启用功能设置为认证 (Certify)
+
 曲线选择 Curve 25519
+
 有效期限设置为 0(key does not expire)
 
 随后
