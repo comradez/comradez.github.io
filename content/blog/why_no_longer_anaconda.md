@@ -25,4 +25,4 @@ Anaconda 的 Python 则不然：为了保证行为的一致性和使用方便，
 
 ## 那用什么呢？
 
-我现在正在使用 [poetry](https://python-poetry.org/)。如果需要手动多版本依赖，可以考虑 [pyenv](https://github.com/pyenv/pyenv)。
+我现在正在使用 [poetry](https://python-poetry.org/)。如果需要手动多版本依赖，可以考虑 [pyenv](https://github.com/pyenv/pyenv) 配合 [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) 插件。
