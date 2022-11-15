@@ -78,13 +78,19 @@ $$
 $$
 其中
 $$
-\dot f = \frac{\partial f}{\partial\pi} \\
+\dot f = \frac{\partial f}{\partial\pi}
+$$
+$$
 \dot x = \frac{\partial x}{\partial\pi} \\
+$$
+$$
 \Delta f(x) = \lim_{\epsilon\to0^-}f(x+\epsilon \mathbf n) - \lim_{\epsilon\to0^+}f(x+\epsilon \mathbf n)
 $$
 此处的 \\(\dot x\\) 表示随着参数 \\(\pi\\) 的移动 ，边界的移动方向，而上述积分的两部分可以分别数值积分近似：
 $$
-\int_\Omega\dot f \text{d}\Omega \approx \frac{1}{N_i}\sum_{j=1}^{N_i}\dot f(x_j) \\
+\int_\Omega\dot f \text{d}\Omega \approx \frac{1}{N_i}\sum_{j=1}^{N_i}\dot f(x_j)
+$$
+$$
 \int_\Gamma\left\langle\mathbf{n}, \dot x\right\rangle \Delta f\text{d}\Gamma \approx \frac{1}{N_b}\sum_{j=1}^{N_b}\left\langle\mathbf{n}, \dot x\right\rangle\Delta f(x_j)
 $$
 因此我们解决了可微渲染的理论问题……
