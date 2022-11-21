@@ -7,6 +7,8 @@ Computer Graphics, 🦀.
 
 ❤️ @Radium_Azide.
 
+<a rel="me" href="https://o3o.ca/@CiYue">Mastodon dweller</a>.
+
 [Public key](https://zcy.moe/public-key.pub) also available at [http://keys.openpgp.org](http://keys.openpgp.org) with key-id `3EF9D6CAA7C37BAC`.
 
 Also see our work at [https://luisa-render.com](https://luisa-render.com), which is to be published at SIGGRAPH Asia 2022.
