@@ -9,9 +9,9 @@ Computer Graphics, 🦀.
 
 <a rel="me" href="https://o3o.ca/@CiYue">Mastodon dweller</a>.
 
-[Public key](https://zcy.moe/public-key.pub) also available at [http://keys.openpgp.org](http://keys.openpgp.org) with key-id `3EF9D6CAA7C37BAC`.
+[Public key](https://zcy.moe/public-key.pub) also available at [GitHub](https://github.com/comradez.gpg) with fingerprint `C814410124BD14629C48D6137CD93CD529A38A9B` or key-id `7CD93CD529A38A9B`.
 
-Also see our work at [https://luisa-render.com](https://luisa-render.com), which is to be published at SIGGRAPH Asia 2022.
+Also see our work at [https://luisa-render.com](https://luisa-render.com), which was published at SIGGRAPH Asia 2022.
 
 以「茨月」为网名出现在简中互联网上。
 
@@ -19,4 +19,4 @@ Also see our work at [https://luisa-render.com](https://luisa-render.com), which
 
 ## 一言
 
-> SOP 和推荐信都好难写……
+> 希望面试能给老师留下好印象……
