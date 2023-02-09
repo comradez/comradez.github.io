@@ -43,10 +43,8 @@ Radiative Backpropagation 的提出就提供了一种内存和时间开销都较
 
 记图像中每个像素为 \\(I_1, I_2, \cdots, I_n\\)，第 \\(k\\) 个像素的的测量值为 \\(W_k\\) 和 \\(L_i\\) 在空间 \\(\mathcal{A} \times S^2\\)的内积，即
 $$
-\begin{aligned}
-I_k &= \left\langle W_k, L_i\right\rangle \\
-&= \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
-\end{aligned}
+I_k = \left\langle W_k, L_i\right\rangle
+= \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
 $$
 其中 \\(W_k\\) 是 \\(I_k\\) 的重要性函数，\\(L_i\\) 是入射辐照度，\\(\mathcal{A}\\) 表示所有点，\\(S^2\\) 表示半球面。
 
@@ -75,9 +73,7 @@ $$
 #### 测量等式
 
 $$
-\begin{aligned}
-\partial_{\mathbf{x}}I_k &= \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
-\end{aligned}
+\partial_{\mathbf{x}}I_k = \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
 $$
 
 注意到此处没有 \\(W_k\\) 的梯度，这也是因为我们不考虑遮挡，因此重要性是不变的
@@ -158,28 +154,27 @@ $$
 另外定义两个算子，散射算子 \\(\mathcal{K}\\) 和传播算子 \\(\mathcal{G}\\) 为
 
 $$
-\begin{aligned}
-(\mathcal{K}h)(\mathbf{p},\mathbf{\omega}) &:= \int_{S^2}h(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}\\
-(\mathcal{G}h)(\mathbf{p},\mathbf{\omega}) &:= h(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
-\end{aligned}
+(\mathcal{K}h)(\mathbf{p},\mathbf{\omega}) := \int_{S^2}h(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}
+$$
+
+$$
+(\mathcal{G}h)(\mathbf{p},\mathbf{\omega}) := h(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
 $$
 
 那么根据以上三个定义可以得到两个等式，
 
 $$
-\begin{aligned}
-\partial_{\mathbf{x}}L_i &= \mathcal{G}\partial_{\mathbf{x}}L_o \\
-\partial_{\mathbf{x}}L_o &= \mathcal{K}\partial_{\mathbf{x}}L_i + \mathbf{Q} \\
-\end{aligned}
+\partial_{\mathbf{x}}L_i = \mathcal{G}\partial_{\mathbf{x}}L_o
+$$
+$$
+\partial_{\mathbf{x}}L_o = \mathcal{K}\partial_{\mathbf{x}}L_i + \mathbf{Q}
 $$
 
 分别对应传输等式和散射等式。根据 Veach 1997 年的一篇文章，我们可以直接得到一些结论，如
 
 $$
-\begin{aligned}
-\partial_{\mathbf{x}}L_o &= \mathcal{KG}\partial_{\mathbf{x}}L_o + \mathbf Q \\
-&= (I - \mathcal{KG})^{-1}\mathbf{Q} = \sum_{i=0}^{\infty}(\mathcal{KG})^i\mathbf Q
-\end{aligned}
+\partial_{\mathbf{x}}L_o = \mathcal{KG}\partial_{\mathbf{x}}L_o + \mathbf Q
+= (I - \mathcal{KG})^{-1}\mathbf{Q} = \sum_{i=0}^{\infty}(\mathcal{KG})^i\mathbf Q
 $$
 
 记 \\(\mathcal S := (I - \mathcal{KG})^{-1}\\)，那么有 \\(\mathcal {G, K, GS}\\) 均为自伴随 (self-adjoint) 线性算子
@@ -197,10 +192,10 @@ $$
 在有了 \\(A_e\\) 之后再定义类似的「入射伴随辐照度、出射伴随辐照度」 \\(A_i, A_o\\)，满足
 
 $$
-\begin{aligned}
-A_i &= \mathcal{G}A_o \\
-A_o &= \mathcal{K}A_i + A_e \\
-\end{aligned}
+A_i = \mathcal{G}A_o
+$$
+$$
+A_o = \mathcal{K}A_i + A_e
 $$
 
 这样我们就有了同样满足渲染基本等式的伴随辐照度 \\(A_e, A_o, A_i\\)，将反向传播变成了「另一次前向渲染」。
