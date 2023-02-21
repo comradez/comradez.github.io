@@ -19,4 +19,4 @@ Also see our work at [https://luisa-render.com](https://luisa-render.com), which
 
 ## 一言
 
-> 希望面试能给老师留下好印象……
+> path replay 比 radiative backpropagation 看起来科学很多
