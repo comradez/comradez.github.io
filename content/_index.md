@@ -5,9 +5,9 @@ Undergraduate at CST, Tsinghua University.
 
 Computer Graphics, 🦀.
 
-❤️ @Radium_Azide.
+I can cook pancakes!
 
-<a rel="me" href="https://o3o.ca/@CiYue">Mastodon dweller</a>.
+<a rel="me" href="https://mastodon.yuuta.moe/@ciyue">Fediverse dweller</a>.
 
 [Public key](https://zcy.moe/public-key.pub) also available at [GitHub](https://github.com/comradez.gpg) with fingerprint `C814410124BD14629C48D6137CD93CD529A38A9B` or key-id `7CD93CD529A38A9B`.
 

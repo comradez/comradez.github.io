@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css" integrity="sha384-Juol1FqnotbkyZUT5Z7gUPjQ9gzlwCENvUZTpQBAPxtusdwFLRy382PSDx5UUJ4/" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.js" integrity="sha384-97gW6UIJxnlKemYavrqDHSX3SiygeOwIZhwyOKRfSaf0JWKRVj9hLASHgFTzT+0O" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    {% block extra_head %}
+    <link rel="stylesheet" href="{{ get_url(path='style.css', cachebust=true) }}">
+    {% endblock extra_head %}
+</head>
+<body>
+    {% block header %}
+    <header class="space">
+        <h1>{{ config.title }}</h1>
+        {% set linked_pages = section.pages | filter(attribute="extra.in_header") %}
+        {% if config.extra.links or linked_pages %}
+        <nav class="header-links">
+            {% for link in config.extra.links %}
+            <a href="{{ link.href }}">{{ link.title }}</a>
+            {% endfor %}
+            {% for page in linked_pages %}
+            <a href="{{ page.permalink }}">{{ page.title }}</a>
+            {% endfor %}
+        </nav>
+        {% endif %}
+    </header>
+    {% endblock header %}
+    {% block content %}
+    {% set blog = get_section(path="blog/_index.md") %}
+    {% if section.content or blog.pages %}
+    <main>
+        {% if section.content %}
+        <div {% if blog.pages %}class="space"{% endif %}>
+            {{ section.content | safe }}
+        </div>
+        {% endif %}
+        {% if blog.pages %}
+        <h2>Recent posts</h2>
+        <ul>
+            {% for post in blog.pages | slice(end=20) %}
+            <li><a href="{{ post.permalink }}">{{ post.title }}</a></li>
+            {% endfor %}
+        </ul>
+        <p><a href="{{ blog.permalink }}">Archive</a></p>
+        {% endif %}
+    </main>
+    {% endif %}
+    {% endblock content %}
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="{{ get_url(path='dark_mode.svg') }}" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="{{ get_url(path='light_mode.svg') }}" width="24" height="24" alt=""></button>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>
