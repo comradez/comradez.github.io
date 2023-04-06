@@ -56,5 +56,7 @@ extra.in_header = true
 	- 使用优惠码「我要去装 Manjaro 了」以获得折扣 / F**k Manjaro Linux
 - Apex Legends 陪玩 / Apex Legends game companion
 	- 我打得很菜 / Carry me plz
+- 炒饭 / Fried Rice
+	- 你们测试工程师天天闲得没事做吗？/ You QAs are so idle, uh?
 
 价格请面议。 / Please contact me directly for the pricing.
