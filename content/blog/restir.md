@@ -3,8 +3,6 @@ title: Spatiotemporal reservoir resampling for real-time ray tracing with dynami
 date: 2023-08-06 23:19:44
 ---
 
-# Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting 笔记
-
 大名鼎鼎的 ReSTIR 采样器，用极为简单的数据结构实现了非常高效的采样。
 
 渲染方程本质上是积分，例如从点 \\(y\\) 向方向 \\(\vec{\omega}\\) 出射的 Radiance 是

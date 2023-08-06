@@ -1,7 +1,9 @@
 +++
 +++
 
-Undergraduate at CST, Tsinghua University.
+<del>Undergraduate at CST, Tsinghua University.</del>
+
+Graduate student at UC Santa Barbara.
 
 Computer Graphics, 🦀.
 
