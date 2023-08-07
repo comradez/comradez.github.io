@@ -1,9 +1,17 @@
 ---
-title: Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting 笔记
+title: Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting 阅读笔记
 date: 2023-08-06 23:19:44
 ---
 
+## 写在前面
+
 大名鼎鼎的 ReSTIR 采样器，用极为简单的数据结构实现了非常高效的采样。
+
+基本想法是用 Weighted Reservoir Sampling (WRS) 去进行 Resampled Importance Sampling (RIS)，然后通过 WRS 的性质添加了开销很低的时间与空间采样重用。
+
+随后分析了会导致偏差产生的情况和原因，并且给出了一个无偏版本的算法。
+
+## 问题提出
 
 渲染方程本质上是积分，例如从点 \\(y\\) 向方向 \\(\vec{\omega}\\) 出射的 Radiance 是
 $$
