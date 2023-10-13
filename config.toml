@@ -1,5 +1,5 @@
 # The URL the site will be built for
-base_url = "https://zcy.moe"
+base_url = "https://blog.zcy.moe"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
@@ -20,7 +20,7 @@ highlight_code = true
 
 links = [
     { title = "GitHub", href = "https://github.com/comradez" },
-    { title = "Mail Me", href = "mailto: zcyjim [at] outlook [dot] com" },
+    { title = "Mail Me", href = "mailto: me [at] zcy [dot] moe" },
     { title = "Ayayayaya", href = "https://thwiki.cc/%E5%B0%84%E5%91%BD%E4%B8%B8%E6%96%87" },
-    { title = "Channel", href = "https://t.me/cycathouse" },
+    # { title = "Channel", href = "https://t.me/cycathouse" },
 ]

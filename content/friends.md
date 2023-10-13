@@ -19,6 +19,6 @@ Listed in the order they are added.
 
 [rvalue](https://blog.rvalue.moe)
 
-[AliceZ](https://alicescribbles.github.io)
+[AliceZ](https://alicez.ink)
 
 [Yuuta](https://blog.yuuta.moe)
