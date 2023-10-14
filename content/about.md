@@ -14,7 +14,6 @@ extra.in_header = true
 
 - Pansexual.
 
-- [My Résumé](https://zcy.moe/CV.pdf)
 
 ## About this site
 
