@@ -3,19 +3,11 @@ title: "Paper Note: Generalized Resampled Importance Sampling"
 date: 2024-10-15 21:41:09
 ---
 
-# \[Paper Note\] GRIS - Generalized RIS
-
-这篇文章分为两个部分：
-
-一部分是对 ReSTIR 采样理论的补完，将自己视为 Importance Resampling for Global Illumination 中 RIS 理论的扩展，提出所谓的 GRIS or Generalized RIS 理论
-
-另一部分则是将这个理论应用在 path 复用上提出 ReSTIR PT
-
-
+[这篇文章](https://research.nvidia.com/publication/2022-07_generalized-resampled-importance-sampling-foundations-restir) 的内容主要分为两个部分：第一部分是对 ReSTIR 采样理论的补完，将自己视为 [Importance Resampling for Global Illumination](https://dl.acm.org/doi/10.5555/2383654.2383674) 中 RIS 理论的扩展，提出所谓的 GRIS or Generalized RIS 理论；另一部分则是将这个理论应用在 path 复用上提出 ReSTIR PT
 
 这篇笔记集中于 GRIS 理论
 
-# RIS 理论基础
+## RIS 理论基础
 
 ### 背景
 
@@ -168,6 +160,7 @@ unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
    如果 \\(\Omega_i = \Omega\\) 且 \\(T = id\\) 那么 Generalized RIS 退化回 RIS
 
 + 正确性证明
+
 <p>
    $$
    \begin{aligned}
@@ -194,7 +187,7 @@ unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
 
 ### 含 Shift Mapping 时 MIS 的必要性
 
-<img alt="Why MIS is needed" id="should-invert" src="/images/paper-note-gris/image.webp"/>
+<img alt="Why MIS is needed" id="should-invert" style="width: 85%" src="/images/paper-note-gris/image.webp"/>
 
 \\(\Omega\\) 里的一个 sample 可能来自多个 \\(\Omega_i\\)，因此必须要 MIS 来进行 balance —— 否则我们 MC 积分器里的估计项 \\(\frac{f(Y)}{p_Y(Y)}\\) 中的 \\(p_Y\\) 会不准确，进而导致偏差
 
