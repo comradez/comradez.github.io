@@ -1,5 +1,5 @@
 ---
-title: "Paper Note: Generalized Resampled Importance Sampling"
+title: "Paper Note: Generalized Resampled Importance Sampling - GRIS theory"
 date: 2024-10-15 21:41:09
 ---
 
