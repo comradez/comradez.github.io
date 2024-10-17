@@ -68,7 +68,7 @@ $$
 
 单次 RIS 的伪代码为：
 
-<img src="/images/restir/ris.png" id="should-invert"  alt="Pseudocode for RIS" style="zoom: 25%;" />
+<img src="/images/restir/ris.webp" id="should-invert"  alt="Pseudocode for RIS" style="zoom: 25%;" />
 
 ## 加权蓄水池采样 Weighted Reservoir Sampling, WRS
 
@@ -78,13 +78,13 @@ $$
 
 WRS 的伪代码如下，其中定义了一个蓄水池结构，实质上就是动态维护的「当前选中的样本」，每次从流中取得一个新值的时候随机决定要不要将它换掉：
 
-<img src="/images/restir/wrs.png" id="should-invert"  alt="Pseudocode for WRS" style="zoom: 25%;" />
+<img src="/images/restir/wrs.webp" id="should-invert"  alt="Pseudocode for WRS" style="zoom: 25%;" />
 
 ## 流式 RIS（结合 WRS 和 RIS）
 
 将 RIS 的 M 个采样使用 WRS 进行流式优化，就可以在增大采样数的同时降低内存占用。
 
-<img src="/images/restir/stream-ris.png" id="should-invert"  alt="Pseudocode for stream RIS" style="zoom: 25%;" />
+<img src="/images/restir/stream-ris.webp" id="should-invert"  alt="Pseudocode for stream RIS" style="zoom: 25%;" />
 
 仅仅使用流式 RIS 进行采样，同算力同时间下其降噪前的结果已经比 LightBVH 要明显更好，而同质量下用时会更短。
 
@@ -100,7 +100,7 @@ $$
 
 在不考虑遮挡项 \\(V\\) 的情况下，我们往往认为临近像素的 \\(\hat p \propto \rho\cdot L_e\cdot G\\) 是相似的，因此我们希望可以在当前像素重用周边像素的采样——一般情况下这意味着额外的存储，但在 WRS 下我们可以在不额外存储的情况下，直接合并两个或多个蓄水池：
 
-<img src="/images/restir/combining_reservoirs.png" id="should-invert"  alt="Pseudocode for reservoir combination" style="zoom: 25%;" />
+<img src="/images/restir/combining_reservoirs.webp" id="should-invert"  alt="Pseudocode for reservoir combination" style="zoom: 25%;" />
 
 其采样结果与直接对合并的序列采样等价。
 
@@ -112,7 +112,7 @@ $$
 
 这样我们得到了一个利用了时间和空间重用的、结合了 WRS 和 RIS 的采样方法。
 
-<img src="/images/restir/restir_biased.png" id="should-invert"  alt="Pseudocode for ReSTIR (but biased)" style="zoom: 25%;" />
+<img src="/images/restir/restir_biased.webp" id="should-invert"  alt="Pseudocode for ReSTIR (but biased)" style="zoom: 25%;" />
 
 ## 偏差分析
 
@@ -183,7 +183,7 @@ $$
 
 实际计算中，作者使用了 \\(\hat p_{q_i}(x_i)\\) 来模拟真实 PDF：因为只要真实 PDF 非零，它也一定非零。以下是一个平均权值（即上面两者中方法1）的无偏蓄水池合并算法的伪代码。
 
-<img src="/images/restir/combining_reservoirs_unbiased.png" id="should-invert"  alt="Pseudocode for unbiased reservoir combination" style="zoom: 25%;" />
+<img src="/images/restir/combining_reservoirs_unbiased.webp" id="should-invert"  alt="Pseudocode for unbiased reservoir combination" style="zoom: 25%;" />
 
 ## 实现细节
 

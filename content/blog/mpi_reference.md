@@ -91,11 +91,11 @@ date: 2022-03-01 01:04:44
     - `root` 是发送进程
     - `communicator` 是组通讯器
 
-<img alt="Bcast vs Scatter" id="should-invert" src="/images/mpi-reference/broadcastvsscatter.png">
+<img alt="Bcast vs Scatter" id="should-invert" src="/images/mpi-reference/broadcastvsscatter.webp">
 
 - 使用 `MPI_Gather(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, int root, MPI_Comm communicator)` 来将各进程内的数据接收至 root 进程的一个大缓冲区内，与 `MPI_Scatter` 正好相反。由于函数签名一致，参数也不赘述了。
 
-<img alt="Gather" id="should-invert" src="/images/mpi-reference/gather.png"/>
+<img alt="Gather" id="should-invert" src="/images/mpi-reference/gather.webp"/>
 
 - 一个常见工作方式是这样的
     - 0 号 process 是 root process，其他为 worker process
@@ -106,7 +106,7 @@ date: 2022-03-01 01:04:44
 
 - 使用 `MPI_Allgather(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, MPI_Comm communicator)` 来实现先 Gather 再 Bcast 的操作，即完成后所有 process 的缓冲区中都是相同的副本。除去没有 root（也不需要了）以外，函数签名和 `MPI_Gather` 一致，不再赘述。
 
-<img alt="Allgather" id="should-invert" src="/images/mpi-reference/allgather.png"/>
+<img alt="Allgather" id="should-invert" src="/images/mpi-reference/allgather.webp"/>
 
 - 使用 `MPI_Reduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm communicator)` 来进行多进程数据的 reduce 操作。
     - `send_data` 是各个进程待 reduce 的发送缓冲区
@@ -117,12 +117,12 @@ date: 2022-03-01 01:04:44
     - `root` 是接收 reduce 结果的根进程
     - `communicator` 是通讯器
 
-<img alt="count = 1 的 reduce" id="should-invert" src="/images/mpi-reference/mpi_reduce_1.png"/>
-<img alt="count = 2 的 reduce" id="should-invert" src="/images/mpi-reference/mpi_reduce_2.png"/>
+<img alt="count = 1 的 reduce" id="should-invert" src="/images/mpi-reference/mpi_reduce_1.webp"/>
+<img alt="count = 2 的 reduce" id="should-invert" src="/images/mpi-reference/mpi_reduce_2.webp"/>
 
 - `MPI_Allreduce` 和 `MPI_reduce` 的关系类似前面的 Allgather 和 gather，它将 reduce 后的数据发送给所有进程，因此签名为 `MPI_Allreduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator)`，没有 root，其余不变。
 
-<img alt="Allreduce" id="should-invert" src="/images/mpi-reference/mpi_allreduce_1.png"/>
+<img alt="Allreduce" id="should-invert" src="/images/mpi-reference/mpi_allreduce_1.webp"/>
 
 ### 通讯器与组
 
@@ -161,7 +161,7 @@ printf("Row rank & size: %d / %d\n", row_rank, row_size);
 
 原本是 `(world_rank, 16)` 的 process 在新的通讯器中会变为 `(world_rank / 4, 16)`
 
-<img alt="MPI_Comm_split" id="should-invert" src="/images/mpi-reference/comm_split.png"/>
+<img alt="MPI_Comm_split" id="should-invert" src="/images/mpi-reference/comm_split.webp"/>
 
 如果将 `world_rank / 4` 改为 `world_rank % 4` 那么将会由横向划分变为纵向划分，原理类似。
 

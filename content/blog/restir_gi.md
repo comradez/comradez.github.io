@@ -17,7 +17,7 @@ date: 2023-08-06 23:19:44
 
 一个像素对应的 `SAMPLE` 数据结构的定义如下，每个 buffer 都由 `width * height` 个 `SAMPLE` 组成。
 
-<img src="/images/restir_gi/sample.png" id="should-invert"  alt="Layout of the SAMPLE data structure for each pixel" style="zoom: 12.5%;" />
+<img src="/images/restir_gi/sample.webp" id="should-invert"  alt="Layout of the SAMPLE data structure for each pixel" style="zoom: 12.5%;" />
 
 要进行 ReSTIR GI 计算，首先算法需要拿到一张保存了各像素着色点（称为 visible point）的位置和法线的 G Buffer，随后每一轮算法都包含三步：
 
@@ -27,9 +27,9 @@ date: 2023-08-06 23:19:44
 
 算法的大致流程可以描述为这两张图：
 
-<img src="/images/restir_gi/dataflow.png" id="should-invert"  alt="Dataflow of the whole algorithm" style="zoom: 12.5%;" />
+<img src="/images/restir_gi/dataflow.webp" id="should-invert"  alt="Dataflow of the whole algorithm" style="zoom: 12.5%;" />
 
-<img src="/images/restir_gi/alogrithm.png" id="should-invert"  alt="the process of the algorithm" style="zoom: 12.5%;" />
+<img src="/images/restir_gi/alogrithm.webp" id="should-invert"  alt="the process of the algorithm" style="zoom: 12.5%;" />
 
 ###  初始采样 
 
@@ -41,7 +41,7 @@ date: 2023-08-06 23:19:44
 
 初始采样的伪代码如下：
 
-<img src="/images/restir_gi/initial_sampling.png" id="should-invert"  alt="pseudocode for initial sampling" style="zoom: 12.5%;" />
+<img src="/images/restir_gi/initial_sampling.webp" id="should-invert"  alt="pseudocode for initial sampling" style="zoom: 12.5%;" />
 
 ### 时间重采样
 
@@ -49,7 +49,7 @@ date: 2023-08-06 23:19:44
 
 时间重采样就是简单地取出 temporal reservoir buffer，将它与 initial sample buffer 对应位置的 reservoir 混合，然后放回原位置，伪代码如下：
 
-<img src="/images/restir_gi/temporal_sampling.png" id="should-invert"  alt="pseudocode for temporal sampling" style="zoom: 12.5%;" />
+<img src="/images/restir_gi/temporal_sampling.webp" id="should-invert"  alt="pseudocode for temporal sampling" style="zoom: 12.5%;" />
 
 ### 空间重采样
 
@@ -65,10 +65,10 @@ date: 2023-08-06 23:19:44
   $$
   其中 \\(x_1^\*\\) 表示 visible point，\\(x_2^\*\\) 表示 sample point，示意图见下：
 
-<img src="/images/restir_gi/jacobian_determinant.png" id="should-invert" style="zoom: 12.5%;" />
+<img src="/images/restir_gi/jacobian_determinant.webp" id="should-invert" style="zoom: 12.5%;" />
 
 考虑到以上两点之后的伪代码为
 
-<img src="/images/restir_gi/spatial_resampling.png" id="should-invert"  alt="pseudocode for spatial sampling" style="padding: -5em 40%;" />
+<img src="/images/restir_gi/spatial_resampling.webp" id="should-invert"  alt="pseudocode for spatial sampling" style="padding: -5em 40%;" />
 
 此外，为了避免重复采样导致 bias 累加，ReSTIR GI 在多次空间重采样的时候优先从临近像素的 temporal reservoir buffer 里采样，如果采样数不足才去 spatial reservoir buffer 里采。

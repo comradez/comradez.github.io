@@ -29,7 +29,7 @@ $$
 
 ## 能不能把渲染「无痛」地变可微？
 
-<img alt="Two triangles" id="should-invert" src="/images/differentiable_rendering/0.png"/>
+<img alt="Two triangles" id="should-invert" src="/images/differentiable_rendering/0.webp"/>
 
 渲染本质上是积分问题，以一个简单的抗锯齿为例，如果每个像素只采样一个点，那么得到的结果就会有很多锯齿（高频噪声）。一个解决方案是套一个低通滤波器，也即对每个像素计算采样中心点附近的一个区域内的积分：
 $$
@@ -58,7 +58,7 @@ $$
 
 计算离散的一元函数的积分的微分，可以先将其所有的间断点列出来，然后分别计算连续部分和间断点的微分.
 
-<img alt="Integral" id="should-invert" src="/images/differentiable_rendering/1.png"/>
+<img alt="Integral" id="should-invert" src="/images/differentiable_rendering/1.webp"/>
 
 例如对于上面的积分
 $$
