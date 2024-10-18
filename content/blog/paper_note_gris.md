@@ -51,10 +51,9 @@ $$
 
 那么只要随机变量 \\(Y\\) 的 support 覆盖函数 \\(f\\) 的 support，我们就有 \\(E[f(Y)W_Y] = I\\)
 
-+ 正确性证明
-
-<p>
-   $$
+{{ collapsible(
+   summary="正确性证明",
+   content="$$
    \begin{aligned}
    E[f(Y)W_Y] &= E\left[f(Y) \cdot \frac{1}{\hat p(Y)} \cdot \sum_{i=1}^M w_i\right] \\
    &= E\left[ \sum_{i=1}^M w_i \cdot \frac{f(X_i)}{\hat p(X_i)} \right] \\
@@ -62,9 +61,9 @@ $$
    &= \frac{1}{M} \sum_{i=1}^M E\left[ \frac{f(X_i)}{p(X_i)} \right] \\
    &= \int_\Omega f(x) dx
    \end{aligned}
-   $$
-</p>
-   这样采样仍然保证无偏。
+   $$"
+)}}
+这样采样仍然保证无偏。
 
 ### 问题 - 泛化，各样本分布不同的情况
 
@@ -94,9 +93,9 @@ $$
 
 unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
 
-+ 正确性证明
-<p>
-    $$
+{{ collapsible(
+   summary="正确性证明",
+   content="$$
     \begin{aligned}
     E[f(Y)W_Y] &= E\left[f(Y) \cdot \frac{1}{\hat p(Y)} \cdot \sum_{i=1}^M w_i\right] \\
     &= E\left[ \sum_{i=1}^M w_i \cdot \frac{f(X_i)}{\hat p(X_i)} \right] \\
@@ -107,8 +106,8 @@ unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
     &= \int_\Omega  \sum_{i=1}^M m_i(x) f(x) \text{d} x \\
     &= \int_\Omega f(x) \text{d}x
     \end{aligned}
-    $$
-</p>
+    $$"
+)}}
    注意：
 
    - 求和号和期望的换序来自样本的独立性
@@ -159,10 +158,9 @@ unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
 
    如果 \\(\Omega_i = \Omega\\) 且 \\(T = id\\) 那么 Generalized RIS 退化回 RIS
 
-+ 正确性证明
-
-<p>
-   $$
+{{ collapsible(
+   summary="正确性证明",
+   content="$$
    \begin{aligned}
    E[f(Y)W_Y] &= E\left[f(Y) \cdot \frac{1}{\hat p(Y)} \cdot \sum_{i=1}^M w_i\right] \\
    &= E\left[ \sum_{i=1}^M w_i \cdot \frac{f(X_i)}{\hat p(X_i)} \right] \\
@@ -173,8 +171,8 @@ unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
    &= \int_{\Omega} \sum_{i=1}^M m_i(y) f(y) \text{d} y \\
    &= \int_{\Omega} f(y) \text{d} y
    \end{aligned}
-   $$
-</p>
+   $$"
+)}}
    里面的三个重点：
 
    - 交换求和号与期望是因为各样本的独立性
