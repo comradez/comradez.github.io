@@ -39,7 +39,7 @@ Wiktionary 中记载了 dǎn 这个读音，同时「丼」还被认为是「井
 
 - 按照准确的意译，读「烤鸡肉盖饭」
 
-- 干脆按照原文来，读 Yakitori Donburi
+- 干脆按照原文来，读「やきとりどんぶり」
 
 - 最后还有万能方法：「我要这个」
 
@@ -67,6 +67,6 @@ Wiktionary 中记载了 dǎn 这个读音，同时「丼」还被认为是「井
 
 在这份规范里，「丼」的规范读音被定为 dǎn，大概依照了中日同形字直接取同形字的汉语读音这一规则。
 
-![丼](https://i.niupic.com/images/2022/03/08/9Wae.png)
+![丼](/images/yakitori/howtopronounce.webp)
 
 所以 dǎn 赢了……
