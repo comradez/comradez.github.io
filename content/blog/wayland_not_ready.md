@@ -1,11 +1,14 @@
----
-title: 2202 年了，Wayland 准备好了吗？
-date: 2022-03-26 00:20:14
----
++++
+title = "2202 年了，Wayland 准备好了吗？"
+date = "2022-03-26 00:20:14"
+authors = ["茨月"]
++++
 
 太长不看版：
 
 对于 KDE Plasma & Hi-DPI 用户，没有。
+
+<!-- more -->
 
 # Why Wayland?
 

@@ -1,7 +1,12 @@
----
-title: 使用 wpa_supplicant 命令行连接无线网络
-date: 2022-03-15 15:52:09
----
++++
+title = "使用 wpa_supplicant 命令行连接无线网络"
+date = "2022-03-15 15:52:09"
+authors = ["茨月"]
++++
+
+本文讨论了如何使用 `wpa_supplicant` 命令行控制树莓派连接 Wi-Fi.
+
+<!-- more -->
 
 # 背景
 

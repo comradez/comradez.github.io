@@ -1,9 +1,12 @@
----
-title: MPI 入门笔记
-date: 2022-03-01 01:04:44
----
++++
+title = "MPI 入门笔记"
+date = "2022-03-01 01:04:44"
+authors = ["茨月"]
++++
 
 周二的高性能计算导论课上提到了 MPI，小作业里也用到了，但是代码没太看懂。于是寻找了一份 [MPI 的教程](https://mpitutorial.com/tutorials/mpi-introduction/zh_cn/)，中文翻译质量不错但必要时还是得看英文。
+
+<!-- more -->
 
 ## Basic Facts
 

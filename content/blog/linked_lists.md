@@ -1,9 +1,12 @@
----
-title: 双向链表的正确姿势是？
-date: 2022-02-20 22:58:16
----
++++
+title = "双向链表的正确姿势是？"
+date = "2022-02-20 22:58:16"
+authors = ["茨月"]
++++
 
 学完 [too many linked lists](https://rust-unofficial.github.io/too-many-lists/) 之后，我跃跃欲试地想要实现一个书中 WIP 的 `unsafe` 双向链表。
+
+<!-- more -->
 
 有了 `unsafe` 链表的经验，其实双向链表并不算很困难，很快就写出来了。核心的两个结构定义如下：
 

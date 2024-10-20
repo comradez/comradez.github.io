@@ -1,11 +1,14 @@
----
-title: "Paper Note: Generalized Resampled Importance Sampling - GRIS theory"
-date: 2024-10-15 21:41:09
----
++++
+title = "Paper Note: Generalized Resampled Importance Sampling - GRIS theory"
+date = "2024-10-15 21:41:09"
+authors = ["茨月"]
++++
 
-[这篇文章](https://research.nvidia.com/publication/2022-07_generalized-resampled-importance-sampling-foundations-restir) 的内容主要分为两个部分：第一部分是对 ReSTIR 采样理论的补完，将自己视为 [Importance Resampling for Global Illumination](https://dl.acm.org/doi/10.5555/2383654.2383674) 中 RIS 理论的扩展，提出所谓的 GRIS or Generalized RIS 理论；另一部分则是将这个理论应用在 path 复用上提出 ReSTIR PT
+[这篇文章](https://research.nvidia.com/publication/2022-07_generalized-resampled-importance-sampling-foundations-restir) 的内容主要分为两个部分：第一部分是对 ReSTIR 采样理论的补完，将自己视为 [Importance Resampling for Global Illumination](https://dl.acm.org/doi/10.5555/2383654.2383674) 中 RIS 理论的扩展，提出所谓的 GRIS or Generalized RIS 理论；另一部分则是将这个理论应用在 path 复用上提出 ReSTIR PT。
 
-这篇笔记集中于 GRIS 理论
+这篇笔记集中于 GRIS 理论的讨论。
+
+<!-- more -->
 
 ## RIS 理论基础
 

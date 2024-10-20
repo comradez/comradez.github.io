@@ -1,7 +1,12 @@
----
-title: Radiative Backpropagation 阅读笔记
-date: 2023-02-09 21:22:44
----
++++
+title = "Radiative Backpropagation 阅读笔记"
+date = "2023-02-09 21:22:44"
+authors = ["茨月"]
++++
+
+本文讨论了用于可微渲染的 Radiative Backpropagation。
+
+<!-- more -->
 
 <img src="/images/radiative_backpropagation/pipeline.webp" id="should-invert"  alt="pipeline" style="zoom: 25%;" />
 

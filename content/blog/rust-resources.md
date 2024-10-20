@@ -1,11 +1,14 @@
----
-title: Rust 部分资源整理
-date: 2022-02-21 23:00:15
----
++++
+title = "Rust 部分资源整理"
+date = "2022-02-21 23:00:15"
+authors = ["茨月"]
++++
 
 <del>有人写了一年 Rust 还不会写过程宏，我不说是谁</del>
 
 感觉有必要整理一些 Rust 相关的中文资源，方便自己查阅也可以给他人提供参考。
+
+<!-- more -->
 
 - [中文 The Book](https://rustwiki.org/zh-CN/book/) & [英文原版](https://doc.rust-lang.org/stable/book/)
 

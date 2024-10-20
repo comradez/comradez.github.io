@@ -1,7 +1,11 @@
----
-title: Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting 阅读笔记
-date: 2023-08-06 23:19:44
----
++++
+title = "Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting 阅读笔记"
+date = "2023-08-06 23:19:44"
++++
+
+本文讨论了 ReSTIR 算法的理论基础及实现。
+
+<!-- more -->
 
 ## 写在前面
 

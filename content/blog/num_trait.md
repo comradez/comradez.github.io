@@ -1,7 +1,12 @@
----
-title: trait bound 咬人事件
-date: 2022-02-23 19:48:17
----
++++
+title = "trait bound 咬人事件"
+date = "2022-02-23 19:48:17"
+authors = ["茨月"]
++++
+
+本文讨论了 Rust 中泛型快速幂的实现，以及 higher rank trait bound 在其中的应用。
+
+<!-- more -->
 
 上完现代密码学之后，看了眼往年大作业，发现有一年的大作业是实现 RSA，于是打算趁着有时间先搞了。
 

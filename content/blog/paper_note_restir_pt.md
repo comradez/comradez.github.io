@@ -1,9 +1,12 @@
----
-title: "Paper Note: Generalized Resampled Importance Sampling - ReSTIR PT"
-date: 2024-10-17 15:49:21
----
++++
+title = "Paper Note: Generalized Resampled Importance Sampling - ReSTIR PT"
+date = "2024-10-17 15:49:21"
+authors = ["茨月"]
++++
 
 [书接上回](https://blog.zcy.moe/blog/paper-note-gris/)，ReSTIR PT 即使用 ReSTIR 复用 path。由于不同像素的 path space 并不相同，我们必须找到合适的 path reuse 方式——也即 GRIS 理论中的 shift mapping。
+
+<!-- more -->
 
 ## ReSTIR PT 中 shift mapping 的形式定义
 

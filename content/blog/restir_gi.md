@@ -1,7 +1,12 @@
----
-title: 'ReSTIR GI: Path Resampling for Real-Time Path Tracing 阅读笔记'
-date: 2023-08-06 23:19:44
----
++++
+title = "ReSTIR GI: Path Resampling for Real-Time Path Tracing 阅读笔记"
+date = "2023-08-06 23:19:44"
+authors = ["茨月"]
++++
+
+本文讨论了 ReSTIR GI，即使用 ReSTIR 方法维护 probe 的采样来处理 1 bounce 全局光照的算法。
+
+<!-- more -->
 
 ## 写在前面
 

@@ -1,8 +1,13 @@
----
-title: 可微渲染入门笔记
-date: 2022-11-15 12:06:36
-tags: Render
----
++++
+title = "可微渲染入门笔记"
+date = "2022-11-15 12:06:36"
+tags = "Render"
+authors = ["茨月"]
++++
+
+本文讨论了可微渲染的入门，主体是 SIGGRAPH 2020 的 Differentiable Rendering Course 的阅读笔记。
+
+<!-- more -->
 
 这一笔记来自 SIGGRAPH 2020 的一篇 Course，[_Physics-based differentiable rendering: from theory to implementation_](https://dl.acm.org/doi/abs/10.1145/3388769.3407454). 笔记主要记了一下其中的理论推导部分，反正我目前没做可微渲染，后面具体上渲染方程的部分可以再看。
 
