@@ -108,6 +108,7 @@ float final_z = 1.f - interpolated_z;
 
 虽然与本文及其讨论的内容没有直接关系，reverse Z 是一个很有趣的利用 IEEE 754 的性质来优化算法的例子:
 
-https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html
+[https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html](https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html
+)
 
 [^1]: 具体来说是创造统一且 distract-free 的编程框架，来让学生耗费最少的精力即可开始实现算法。
