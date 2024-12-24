@@ -1,44 +1,42 @@
 +++
-title = "About me"
+title = "我是谁？"
 extra.in_header = true
-
 +++
 
-In spare time, I love photography, video games, and cats.
+闲暇时间里，我喜欢摄影、游戏和猫。
 
-Below is a picture of myself taken with a [Canon EOS 550D](https://en.wikipedia.org/wiki/Canon_EOS_550D), but now I'm using a [Fujifilm X-T5](https://fujifilm-x.com/en-us/products/cameras/x-t5/). I love the triple-dial design of Fujifilm X-T series, which is both asthetically pleasing and offers convenient control for users.
+这是我本科用[佳能 EOS 550D](https://en.wikipedia.org/wiki/Canon_EOS_550D) 时的一张自拍。
 
 <div class="side-by-side-container">
 <img alt="me" src="https://zcy.moe/images/me.jpg" style="width: 65%"/>
 </div>
 
-The Chinese characters on the mirror are 「<ruby>锲<rt>qiè</rt>而<rt>ér</rt>不<rt>bù</rt>舍<rt>shě</rt>，<rt></rt>金<rt>jīn</rt>石<rt>shí</rt>可<rt>kě</rt>镂<rt>lòu</rt></ruby>」, which means "If you persevere with chiseling, even metal and stone can be engraved". Although this phrase is often overused or even abused, it still highlights the importance of perseverance.
+现在我使用的设备是[富士 X-T5](https://fujifilm-x.com/en-us/products/cameras/x-t5/)。我非常喜欢富士的三波轮设计，兼顾美观的同时又方便了用户控制拍摄参数。
 
-#### Favorite games in 2024
 
-Action games: [Sekiro: Shadows Die Twice](https://www.activision.com/games/sekiro/sekiro-shadows-die-twice/), [Black Myth: Wukong](https://heishenhua.com/), [Another Crab's treasure](https://aggrocrab.com/ACT)
-> Yes I have played [Elden Ring](https://eldenring.com), but it's not my favorite, especially [Shadow of the Erdtree](https://www.bandainamcoent.com/games/elden-ring/shadow-of-the-erdtree) :(
+#### 喜欢的游戏 - 2024
 
-Strategy games: [Age of Empires 4](https://www.ageofempires.com/games/age-of-empires-iv/)
+动作类: [只狼：影逝二度](https://www.activision.com/games/sekiro/sekiro-shadows-die-twice/), [黑神话：悟空](https://heishenhua.com/), [蟹蟹寻宝奇遇](https://aggrocrab.com/ACT)
+> 我玩了[艾尔登法环](https://eldenring.com)，但它并没有很让我喜欢，[黄金树之影](https://www.bandainamcoent.com/games/elden-ring/shadow-of-the-erdtree)的一些设计缺陷尤其令我厌倦 :(
 
-Other: [Tiny Glade](https://pouncelight.games/tiny-glade/)
+策略类: [帝国时代4](https://www.ageofempires.com/games/age-of-empires-iv/)
 
-I want to highlight Tiny Glade because one of the creators is Tomasz Stachowiak, the main contributor of [Kajiya renderer](https://github.com/EmbarkStudios/kajiya). Besides the peaceful environment the game provides (which is surprisingly pleasant for anyone to stay), they've also created beautiful global illumination effects which is incredibly efficient as of 2024 that even a GTX 1060 / RX 580 GPU can run smoothly.
+其他: [林间小世界(Tiny Glade)](https://pouncelight.games/tiny-glade/)
 
-#### Favorite music in 2024
+#### 喜欢的音乐 - 2024
 
 [サカナクション](https://sakanaction.jp/), [草東沒有派對](https://www.nopartyforcaodong.com/), [万能青年旅店](https://zh.wikipedia.org/zh-cn/%E4%B8%87%E8%83%BD%E9%9D%92%E5%B9%B4%E6%97%85%E5%BA%97), [スタァライト九九組](https://open.spotify.com/artist/1OOP1resUwhmwUhIFtFfQN)
 
-#### Selected photos
+#### 几张照片
 <div class="side-by-side-container">
-<img alt="A heron flying over the beach." src="https://bucket.zcy.moe/DSCF1972.JPG" style="width: 80%"/>
+<img alt="一只白鹭[?]飞越沙滩。" src="https://bucket.zcy.moe/DSCF1972.JPG" style="width: 80%"/>
 </div>
 <div class="side-by-side-container">
-    <img alt="Transamerica Pyramid in SF." src="https://bucket.zcy.moe/DSCF3415-cropped.jpg" style="width: 40%"/>
-    <img alt="Street view in SF." src="https://bucket.zcy.moe/DSCF4184.JPG" style="width: 40%"/>
+    <img alt="旧金山的泛美金字塔。" src="https://bucket.zcy.moe/DSCF3415-cropped.jpg" style="width: 40%"/>
+    <img alt="旧金山街景。" src="https://bucket.zcy.moe/DSCF4184.JPG" style="width: 40%"/>
 </div>
 <div class="side-by-side-container">
-<img alt="A sea lion sleeping sound." src="https://bucket.zcy.moe/DSCF3664.JPG" style="width: 80%"/>
+<img alt="一只熟睡的海狮。" src="https://bucket.zcy.moe/DSCF3664.JPG" style="width: 80%"/>
 </div>
 
-For my academic homepage, please see [here](https://zcy.moe).
+如果你在寻找我的学术主页，请移步[这里](https://zcy.moe)。

@@ -1,9 +1,7 @@
 +++
-title = "Ideas"
+title = "胡思乱想"
 extra.in_header = true
 +++
-
-记录自己的胡思乱想。
 
 - 2024-10-19
     - 渲染的战争，就是采样的战争！

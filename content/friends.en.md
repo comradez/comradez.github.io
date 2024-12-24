@@ -1,9 +1,9 @@
 +++
-title = "朋友们"
+title = "Friends"
 extra.in_header = true
 +++
 
-按照添加顺序排列。
+Listed in the order they are added.
 
 [nocriz](https://bytew.net)
 

@@ -1,14 +1,14 @@
 +++
-title = "Handy Tools"
+title = "小工具"
 extra.in_header = true
 +++
 
-A collection of services that I'm currently running, which may come in handy for you.
+一些我自建/正在运行的小工具。
 
-- [Online Pastebin](https://p.zcy.moe), deployed from [this repo](https://github.com/SharzyL/pastebin-worker) with Cloudflare Worker + KV. Thanks [Sharzy](https://sharzy.in/) for his work!
+- [在线剪贴板](https://p.zcy.moe), 用[这个 repo](https://github.com/SharzyL/pastebin-worker) 搭建，采用 Cloudflare Worker + KV. 感谢 [Sharzy](https://sharzy.in/) 的工作！
 
-- [Personal Git service](https://git.zcy.moe), deployed from [cgit](https://git.zx2c4.com/cgit/about/). Currently supports http only.
+- [个人 Git 服务器](https://git.zcy.moe), 一份只读的 [cgit](https://git.zx2c4.com/cgit/about/) 部署。
 
-- [Shared Markdown Editor](https://hedge.zcy.moe), really good for sharing ideas!
+- [共享 Markdown 编辑器](https://hedge.zcy.moe)。
 
-- [Online Chatbot](https://chat.zcy.moe). You can bring your own API key or [contact me](mailto:me[at]zcy[dot]moe) to get access key.
+- [在线聊天机器人](https://chat.zcy.moe)，填入自己的 API key——或者如果你觉得我们够熟，请[联系我](mailto:me[at]zcy[dot]moe)来获得访问密钥。
