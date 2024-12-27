@@ -1,5 +1,5 @@
 +++
-title = "Trying to Enable DLSS on Linux in Falcor...... This is What I Tried"
+title = "尝试在 Linux Falcor 上启用 DLSS（并且失败）"
 date = "2024-12-17 18:13:42"
 authors = ["茨月"]
 +++

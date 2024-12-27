@@ -17,6 +17,6 @@ If you see some "Ciyue Zhang", it might be me.
 
 ## About Posts in different languages
 
-Not all posts will be translated.
+My primary language is Chinese Mandarin, and not all posts will be translated. I will try my best to maintain multi-lingual on my **technical** blog posts. Personal scribbles and posts that are _**NOT**_ written by me will be kept as-is. 
 
-I will try my best to maintain multi-lingual on my **technical** blog posts. Personal scribbles and posts that are _**NOT**_ written by me will be kept as-is.
+I am currently actively translating my recent posts. If you are interested in the other posts, go check out the Chinese version of the website and use a translator if needed ;)

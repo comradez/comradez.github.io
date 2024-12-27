@@ -1,5 +1,5 @@
 +++
-title = "A Very Short Story on Coordinate Systems"
+title = "关于 3D 坐标系的一点小故事"
 date = "2024-10-21 22:10:12"
 authors = ["茨月"]
 +++

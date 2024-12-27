@@ -1,5 +1,5 @@
 +++
-title = "Paper Note: Generalized Resampled Importance Sampling - GRIS theory"
+title = "Generalized Resampled Importance Sampling 阅读笔记 - GRIS 理论"
 date = "2024-10-15 21:41:09"
 authors = ["茨月"]
 +++

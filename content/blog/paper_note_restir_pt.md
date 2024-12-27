@@ -1,5 +1,5 @@
 +++
-title = "Paper Note: Generalized Resampled Importance Sampling - ReSTIR PT"
+title = "Generalized Resampled Importance Sampling 阅读笔记 - ReSTIR PT"
 date = "2024-10-17 15:49:21"
 authors = ["茨月"]
 +++
@@ -56,7 +56,7 @@ $$
 
 - 流形探索 manifold exploration
 
-   见 [\[Lehtinen et al. 2013\]](https://mediatech.aalto.fi/publications/graphics/GMLT/), [\[Jakob and Marschner 2012\]](https://www.cs.cornell.edu/projects/manifolds-sg12/)
+   见 [Lehtinen et al. 2013](https://mediatech.aalto.fi/publications/graphics/GMLT/), [Jakob and Marschner 2012](https://www.cs.cornell.edu/projects/manifolds-sg12/)
 
 
 

@@ -3,16 +3,13 @@ title = "我是谁？"
 extra.in_header = true
 +++
 
-闲暇时间里，我喜欢摄影、游戏和猫。
-
-这是我本科用[佳能 EOS 550D](https://en.wikipedia.org/wiki/Canon_EOS_550D) 时的一张自拍。
+闲暇时我喜欢骑行、摄影、游戏，以及玩猫。这是我本科用[佳能 EOS 550D](https://en.wikipedia.org/wiki/Canon_EOS_550D) 时的一张自拍。
 
 <div class="side-by-side-container">
 <img alt="me" src="https://zcy.moe/images/me.jpg" style="width: 65%"/>
 </div>
 
 现在我使用的设备是[富士 X-T5](https://fujifilm-x.com/en-us/products/cameras/x-t5/)。我非常喜欢富士的三波轮设计，兼顾美观的同时又方便了用户控制拍摄参数。
-
 
 #### 喜欢的游戏 - 2024
 

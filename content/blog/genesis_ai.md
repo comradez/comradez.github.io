@@ -1,5 +1,5 @@
 +++
-title = "A short comment of AI-generated Videos, and why I think rendering is still important"
+title = "短评 Genesis AI 视频——为什么渲染仍然无可替代"
 date = "2024-12-18 22:46:22"
 authors = ["茨月"]
 +++

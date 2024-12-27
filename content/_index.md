@@ -1,7 +1,7 @@
 +++
 +++
 
-喜爱图形学的赛博杂学人，在科研于工程的边缘上游走。
+喜爱图形学的赛博杂学人，在科研与工程的边缘上游走。
 
 Archlinux 用户，自建爱好者，曾经很喜欢写🦀，特长是[喵喵叫](https://bucket.zcy.moe/meow.mp3)。
 
@@ -12,12 +12,6 @@ Archlinux 用户，自建爱好者，曾经很喜欢写🦀，特长是[喵喵�
 以「茨月」为网名出现在简中互联网上。
 
 English version of this website is [here](https://blog.zcy.moe/en), or you can use the button in the upper right ;)
-
-## 关于多语言博文
-
-我不保证所有博文都有多语言版本。
-
-我尽力保持***技术内容***的双语同步，但个人呓语以及作者为其他人的文章会被原样展示。
 
 ## 一言
 
