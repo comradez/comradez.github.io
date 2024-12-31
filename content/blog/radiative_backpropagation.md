@@ -8,7 +8,7 @@ authors = ["茨月"]
 
 <!-- more -->
 
-<img src="/images/radiative_backpropagation/pipeline.webp" id="should-invert"  alt="pipeline" style="zoom: 25%;" />
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/pipeline.webp" id="should-invert"  alt="pipeline" style="zoom: 25%;" /></div>
 
 ## 引入
 
@@ -25,9 +25,9 @@ $$
 
 以计算 \\(y = x_0 \times x_1 + x_2\\) 的梯度为例，前向和反向方法的计算流程分别如图所示：
 
-<img src="/images/radiative_backpropagation/forward_mode.webp" id="should-invert"  alt="forward-mode"/>
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/forward_mode.webp" id="should-invert"  alt="forward-mode"/></div>
 
-<img src="/images/radiative_backpropagation/backward_mode.webp" id="should-invert"  alt="backward-mode"/>
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/backward_mode.webp" id="should-invert"  alt="backward-mode"/></div>
 
 反向方法中，最常见的做法就是基于 tracing 的 auto-differentiation，即在正向计算时记录计算图，然后反向传播。然而，这一方法要求前向计算时在计算图上记录大量信息，使其内存消耗极高且计算缓慢。
 

@@ -186,7 +186,9 @@ The unbiased contribution weight remains unchanged, and we still have \\(E[f(Y)W
 
 ### Necessity of MIS with Shift Mapping
 
+<div class="side-by-side-container">
 <img alt="Why MIS is needed" id="should-invert" style="width: 85%" src="/images/paper-note-gris/image.webp"/>
+</div>
 
 A sample in \\(\Omega\\) may come from multiple \\(\Omega_i\\), so MIS is necessary for balancing. Otherwise, the estimator \\(\frac{f(Y)}{p_Y(Y)}\\) in our MC integrator will have an inaccurate \\(p_Y\\), leading to bias.
 

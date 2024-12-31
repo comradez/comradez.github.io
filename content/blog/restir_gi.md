@@ -12,6 +12,10 @@ authors = ["茨月"]
 
 这个是把 ReSTIR 采样器进行推广的工作，使得 ReSTIR 可以用于全局光照。文章整体比较简单，也比较短，也没做出什么理论上的创新（可能就是因为这个没发 SIGGRAPH 而是发了 HPG）。
 
+> 2024 年末更新
+>
+> 我并非意在贬低这项工作。它已经被用在 AAA 游戏上了，而且对满反射 GI 非常高效。但从研究的角度来看，我更倾向于将其视为一种“将这个方法移植到那个方法上”的后续工作。
+
 简单地说就是先得到一张包含每个像素 visible point 的空间位置+局部法线的 G Buffer（光栅化或者 ray tracing 直接光照），然后从每个 visible point 出发随机采样出一个间接光的入射点作为 sample point，然后对 sample point 进行愉快的 ReSTIR。
 
 吊诡的是，ReSTIR GI 采样的目标分布可以非常简单（比如直接设置为\\(\hat p\propto L_o(x_s,-\omega_i)\\)，BRDF 和余弦几何项都不包含）而仍然取得很好的效果。作者解释为简单的目标分布能使一个像素产生的样本对于其他像素而言更加有效。而且由于 sample point 的 \\(L_o\\) 是被缓存的，作者不得不假定当 sample point 连接不同 visible point 时 \\(L_o\\) 是不变的——这一假定在 sample point 位于非 diffuse 介质的情况下是假的，如果场景里 glossy 多会导致 artifact。
@@ -22,7 +26,7 @@ authors = ["茨月"]
 
 一个像素对应的 `SAMPLE` 数据结构的定义如下，每个 buffer 都由 `width * height` 个 `SAMPLE` 组成。
 
-<img src="/images/restir_gi/sample.webp" id="should-invert"  alt="Layout of the SAMPLE data structure for each pixel" style="zoom: 12.5%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/sample.webp" id="should-invert"  alt="Layout of the SAMPLE data structure for each pixel" style="zoom: 12.5%;" /></div>
 
 要进行 ReSTIR GI 计算，首先算法需要拿到一张保存了各像素着色点（称为 visible point）的位置和法线的 G Buffer，随后每一轮算法都包含三步：
 
@@ -32,9 +36,9 @@ authors = ["茨月"]
 
 算法的大致流程可以描述为这两张图：
 
-<img src="/images/restir_gi/dataflow.webp" id="should-invert"  alt="Dataflow of the whole algorithm" style="zoom: 12.5%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/dataflow.webp" id="should-invert"  alt="Dataflow of the whole algorithm" style="zoom: 12.5%;" /></div>
 
-<img src="/images/restir_gi/alogrithm.webp" id="should-invert"  alt="the process of the algorithm" style="zoom: 12.5%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/alogrithm.webp" id="should-invert"  alt="the process of the algorithm" style="zoom: 12.5%;" /></div>
 
 ###  初始采样 
 
@@ -46,7 +50,7 @@ authors = ["茨月"]
 
 初始采样的伪代码如下：
 
-<img src="/images/restir_gi/initial_sampling.webp" id="should-invert"  alt="pseudocode for initial sampling" style="zoom: 12.5%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/initial_sampling.webp" id="should-invert"  alt="pseudocode for initial sampling" style="zoom: 12.5%;" /></div>
 
 ### 时间重采样
 
@@ -54,15 +58,14 @@ authors = ["茨月"]
 
 时间重采样就是简单地取出 temporal reservoir buffer，将它与 initial sample buffer 对应位置的 reservoir 混合，然后放回原位置，伪代码如下：
 
-<img src="/images/restir_gi/temporal_sampling.webp" id="should-invert"  alt="pseudocode for temporal sampling" style="zoom: 12.5%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/temporal_sampling.webp" id="should-invert"  alt="pseudocode for temporal sampling" style="zoom: 12.5%;" /></div>
 
 ### 空间重采样
 
 空间重采样要复杂一些，主要是因为它考虑到了临近像素的几何差异，因此不能直接从 temporal reservoir buffer 中取出相邻像素的 sample point 然后混合，需要额外注意两点：
 
 - 如果两个像素的几何差异太大则直接丢弃，类似 ReSTIR DI.
-
-- 从像素 \\(r\\) 去重采样像素 \\(q\\) 的 sample point 时，因为从两个 visible point 出发生成到同一个 sample point 的采样的概率不同，对应的权重需要除以一个 Jacobian Determinant [这部分来自 [Gradient-domain Path Tracing](https://dl.acm.org/doi/10.1145/2766997)，我没有看懂为什么是这么算的] 来补偿。
+s需要除以一个 Jacobian Determinant [这部分来自 [Gradient-domain Path Tracing](https://dl.acm.org/doi/10.1145/2766997)，我没有看懂为什么是这么算的] 来补偿。
 
   Jacobian Determinant 的计算公式为
   $$
@@ -70,10 +73,10 @@ authors = ["茨月"]
   $$
   其中 \\(x_1^\*\\) 表示 visible point，\\(x_2^\*\\) 表示 sample point，示意图见下：
 
-<img src="/images/restir_gi/jacobian_determinant.webp" id="should-invert" style="zoom: 12.5%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/jacobian_determinant.webp" id="should-invert" style="zoom: 12.5%;" /></div>
 
 考虑到以上两点之后的伪代码为
 
-<img src="/images/restir_gi/spatial_resampling.webp" id="should-invert"  alt="pseudocode for spatial sampling" style="padding: -5em 40%;" />
+<div class="side-by-side-container"><img src="/images/restir_gi/spatial_resampling.webp" id="should-invert"  alt="pseudocode for spatial sampling" style="zoom: 30%;" /></div>
 
 此外，为了避免重复采样导致 bias 累加，ReSTIR GI 在多次空间重采样的时候优先从临近像素的 temporal reservoir buffer 里采样，如果采样数不足才去 spatial reservoir buffer 里采。

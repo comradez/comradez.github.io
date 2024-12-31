@@ -18,7 +18,7 @@ Bounding Volume Hierarchy，中文翻译「层次包围盒」。是 KD-Tree 之�
 
 BVH 的构造思路非常简单：首先，我们对场景中的每个物体都计算出其轴向包围盒（Axis-Aligned Bounding Box, AABB），然后我们自底向上，每次选择两个已有的轴向包围盒合并为一个新的、能够包住选中的两个包围盒的最小轴向包围盒并放到树上作为一个节点，直到得到包住所有物体的全局包围盒为止。
 
-<img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Primitives%20and%20hierarchy.svg" style="width: 60%"/>
+<div class="side-by-side-container"><img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Primitives%20and%20hierarchy.svg" style="width: 60%"/></div>
 
 实现中，我们首先自顶向下，从场景中的全体物体开始向下递归，每次都选择一个维度进行2-划分，再自底向上确定当前的包围盒。
 
@@ -67,10 +67,8 @@ $$
 $$
 再转换成无符号整数，就得到了这一坐标全序的 morton code 表示。morton code 有很好的局部性，以下图的二维 morton code 为例：
 
-<img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Split%20Horiz.svg" style="width: 24%" />
-<img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Split%20Vert.svg" style="width: 24%" />
-<img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Shaded%20Region.svg" style="width: 24%" />
-<img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Split%20Horiz%203.svg" style="width: 24%" />
+<div class="side-by-side-container"><img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Split%20Horiz.svg" style="width: 24%" /><img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Split%20Vert.svg" style="width: 24%" /></div>
+<div class="side-by-side-container"><img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Shaded%20Region.svg" style="width: 24%" /><img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Morton%20Split%20Horiz%203.svg" style="width: 24%" /></div>
 
 - (a) 最高位是 1/0 对应水平中线划分
 - (b) 次高位是 1/0 对应竖直中线划分
@@ -89,7 +87,7 @@ $$
 
 树形结构的 BVH 逻辑清晰但内存不连续，访存性能不佳，因此在建立 BVH 之后还可以将它压缩为内存中的连续数组，通过记录下标的方式代替指针。在这种表示下，每个节点的后继节点就是它的左孩子，只需要额外记录右孩子的下标（如果是叶子节点则记录它表示的物体）。
 
-<img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/BVH%20linearization.svg" style="width: 75%" />
+<div class="side-by-side-container"><img id="should-invert" src="https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/BVH%20linearization.svg" style="width: 75%" /></div>
 
 压缩过程就是[简单的 DFS](https://github.com/mmp/pbrt-v4/blob/6aa009b7b1b650407867c8f84c1f1bbc7601ea93/src/pbrt/cpu/aggregates.cpp#L504-L521)。
 

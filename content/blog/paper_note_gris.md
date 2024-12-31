@@ -188,7 +188,9 @@ unbiased contribution weight 保持不变，我们仍然有 \\(E[f(Y)W_Y] = I\\)
 
 ### 含 Shift Mapping 时 MIS 的必要性
 
+<div class="side-by-side-container">
 <img alt="Why MIS is needed" id="should-invert" style="width: 85%" src="/images/paper-note-gris/image.webp"/>
+</div>
 
 \\(\Omega\\) 里的一个 sample 可能来自多个 \\(\Omega_i\\)，因此必须要 MIS 来进行 balance —— 否则我们 MC 积分器里的估计项 \\(\frac{f(Y)}{p_Y(Y)}\\) 中的 \\(p_Y\\) 会不准确，进而导致偏差
 
