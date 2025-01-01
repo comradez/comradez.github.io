@@ -14,3 +14,6 @@ A collection of services that I'm currently running, which may come in handy for
 - [Online Chatbot](https://chat.zcy.moe). You can bring your own API key or [contact me](mailto:me[at]zcy[dot]moe) to get access key.
 
 - [Password Manager](https://vault.zcy.moe). 100% ***NOT*** guaranteed, use at your own risk!
+
+- [Matrix Server](https://matrix.zcy.moe). Note that this is ***NOT*** a client but a server, so please use it with a client like Element, Fluffy or Cinny.
+    - You can also reach me through [here](@chriszhang8390:matrix.zcy.moe)
