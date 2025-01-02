@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 为什么我不再使用 Anaconda？</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>为什么我不再使用 Anaconda？</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-06-16 21:03:37 +0000">June 16, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了 Anaconda 的好与坏，以及为什么我不再使用它。</p>
+<span id="continue-reading"></span>
+<p>今天终于下定决心扬掉了占用十余个 GiB 的 Anaconda. Anaconda 在我学习和使用 <code>Python</code> 的路径中起到了很大的作用，我也很感谢它的存在。</p>
+<p>但是，我现在放弃了 Anaconda，并且希望学习计算机专业的读者也不要使用它。原因有三个：</p>
+<h2 id="du-li-yu-xi-tong-de-bian-yi-qi-dong-tai-ku">独立于系统的编译器/动态库</h2>
+<p>Linux 系统中自带的 Python 都是 CPython，由 C/C++ 编译器编译而来。因此，如果使用系统自带的编译器编译 <a href="https://pybind11.readthedocs.io/en/stable/">pybind11</a> 工程，那么得到的模块可以直接被系统 Python 识别。</p>
+<p>Anaconda 的 Python 则不然：为了保证行为的一致性和使用方便，Anaconda 会采用预构建的二进制文件和对应版本的动态库，独立于系统的编译器和动态库之外。因此，Anaconda 的虚拟环境中的 Python 和系统编译器 &amp; 动态库的互操作性很差。这在我参与的一个用到了 pybind11（我们需要将 C++ 接口导出到 Python）的工程中带来了不小的问题。</p>
+<p>不可否认的是，这种 「另立中央」 的方案使得 Anaconda 可以开箱即用，但是其代价也非常巨大。</p>
+<h2 id="wu-ran-path">污染 PATH</h2>
+<p>如上文所述，Anaconda 自己携带了二进制文件和动态库，而且它携带的二进制文件远不止于 Python 自己，包括 OpenSSL, mpic{c|xx} 等一系列工具它都有包含。这些工具为 Anaconda 维护属于自己的运行环境提供了很大的方便，但是当 conda 将它的 bin 添加到 PATH 后，它将会污染系统的 PATH，盖住系统 openssl 等很多关键的文件，导致<strong>极端难以调试</strong>的神秘 bug.</p>
+<h2 id="kong-jian-zhan-yong-ji-da">空间占用极大</h2>
+<p>其实原因也在上文里了。Anaconda 为了维护自己的环境，需要安装各种神奇的包和工具。在我删掉 Anaconda 之前，它占用了我 11.4GiB 空间。</p>
+<h2 id="na-yong-shen-me-ni">那用什么呢？</h2>
+<p>我现在正在使用 <a href="https://python-poetry.org/">poetry</a>。如果需要手动多版本依赖，可以考虑 <a href="https://github.com/pyenv/pyenv">pyenv</a> 配合 <a href="https://github.com/pyenv/pyenv-virtualenv">pyenv-virtualenv</a> 插件。</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

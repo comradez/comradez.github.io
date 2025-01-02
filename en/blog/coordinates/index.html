@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>Chris Zhang&#x27;s Blog | A Very Short Story on Coordinate Systems</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe/en">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>A Very Short Story on Coordinate Systems</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-10-21 22:10:12 +0000">October 21, 2024</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>A short story about left-handed/right-handed coordinate systems... and more.</p>
+<span id="continue-reading"></span>
+<blockquote>
+<p>Come, let us go down and confuse their language so they will not understand each other - Genesis 11:7</p>
+</blockquote>
+<h2 id="the-cause">The Cause</h2>
+<p>This semester, I am a TA for Introduction to Computer Graphics. Today, I was working on the code framework for assignment 3, "Rasterizing Your First Triangle". For some reasons <sup class="footnote-reference"><a href="#1">1</a></sup>, we do not use any graphics API but instead implement software rasterization ourselves.</p>
+<p>The process of implementing software rasterization includes Model, View, and Projection transformations, along with their corresponding matrices. In the slides, we provided the orthographic projection transformation matrix, which includes a translate and a scale:</p>
+<p>
+$$
+M_{\text{ortho}} = \begin{pmatrix}
+\frac{2}{r-l} & 0 & 0 & 0 \\
+0 & \frac{2}{t-b} & 0 & 0 \\
+0 & 0 & \frac{2}{n-f} & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix} \begin{pmatrix}
+1 & 0 & 0 & -\frac{r+l}{2} \\
+0 & 1 & 0 & -\frac{t+b}{2} \\
+0 & 0 & 1 & -\frac{n+f}{2} \\
+0 & 0 & 0 & 1
+\end{pmatrix} = \begin{pmatrix}
+\frac{2}{r-l} & 0 & 0 & -\frac{r+l}{r-l} \\
+0 & \frac{2}{t-b} & 0 & -\frac{t+b}{t-b} \\
+0 & 0 & \frac{2}{n-f} & -\frac{n+f}{n-f} \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+$$
+</p>
+<p>where \(n\) and \(f\) are the distances to the near and far planes, and \(l\), \(r\), \(b\), and \(t\) represent the left, right, bottom, and top dimensions of the cuboid. It is important to note that, because the common camera model faces the \(-Z\) direction, \(n &gt; f\) and both are negative values—this fact does not align with our intuition that "the smaller the depth, the closer it is," leading to a series of complications.</p>
+<p>We use a right-handed coordinate system, shown below:</p>
+<div class="side-by-side-container">
+<img alt="Right Hand Coordinate System" style="width: 35s%" src="/images/coordinates/rhs.svg"/>
+</div>
+<h2 id="the-problem">The Problem</h2>
+<p>Prof mentioned in the Z-Buffer section that "for simplicity, we assume that \(z\) values are all positive, and the smaller the value, the closer it is to the camera." In <a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDepthRange.xhtml">OpenGL</a>, <a href="https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html">DirectX</a>, and <a href="https://docs.vulkan.org/guide/latest/depth.html#primitive-clipping">Vulkan</a> APIs, the depth values between \([0,1]\) also indicate that the smaller the value, the closer it is to the camera—so the question arises:</p>
+<ul>
+<li>Firstly, the \(z\) values in NDC should fall within \([-1,1]\) instead of \([0,1]\);</li>
+<li>Secondly, when specifying \(n, f\), the larger the value, the closer it is to the camera. Why does it become the smaller the value, the closer it is here? What is happening?</li>
+</ul>
+<p>I and <a href="https://zheng95z.github.io/">another TA</a>—who is also my good senior—debated for thirty minutes, discussing whether in our framework \(z\) being smaller means closer or \(z\) being larger means closer, and how to transform \(z\) to be all positive. My view is that \(z\) being larger means closer to the camera is correct because I obtained the correct triangle occlusion results by performing Z-Buffering this way; while Zheng's view is that \(z\) being smaller means closer to the camera is correct because all major Graphics APIs are like this, and I might have made a mistake somewhere.</p>
+<h2 id="the-investigation">The Investigation</h2>
+<p>First, we studied the OpenGL coordinate system—being the most familiar and closest to us, OpenGL has always used a right-handed system, consistent with our framework... but is that really the case?</p>
+<div class="collapsible">
+  <details>
+    <summary>The Answer</summary>
+    <div class="inner"><p>
+        The `Right-handed system` card in <a href="https://learnopengl.com/Getting-started/Coordinate-Systems">this section</a> of LearnOpenGL mentions that OpenGL uses a right-handed system in world coordinates, but <strong><i>uses a left-handed system in NDC space</i></strong>.
+    </p></div>
+  </details>
+</div>
+<p>Secondly, we referred to <a href="https://www.realtimerendering.com/">Real Time Rendering 4th Edition</a> and found that the Projection Matrix defined there is slightly different from ours...</p>
+<p>{{ collapsible(
+summary="What's the difference?"
+content="$$
+M_{\text{ortho}} = \begin{pmatrix}
+\frac{2}{r-l} &amp; 0 &amp; 0 &amp; -\frac{r+l}{r-l} \
+0 &amp; \frac{2}{t-b} &amp; 0 &amp; -\frac{t+b}{t-b} \
+0 &amp; 0 &amp; \frac{2}{f-n} &amp; -\frac{f+n}{f-n} \
+0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}
+$$
+where the far and near planes on the (z) component are inverted, equivalent to a mirroring about the (xOy) plane!</p>
+<p>Finally, after sketching once more, we reached the following conclusions:</p>
+<ul>
+<li>In the right-handed coordinate system (which is our framework), the \(z\) values in NDC are indeed within \([-1,1]\), and it is correct that the larger the value, the closer it is to the camera.</li>
+<li>The reason why in OpenGL the smaller the \(z\) value, the closer it is to the camera, is because it performs a silent flip in the projection matrix and then linearly transforms \([-1,1]\) to \([0,1]\) by adding 1 and dividing by 2.</li>
+<li>DirectX uses a left-handed coordinate system from world space to NDC, so it is not affected by this issue.</li>
+<li>Vulkan uses a right-handed coordinate system from world space to NDC, but to maintain the intuition of \(z\) values, it sacrifices the intuition of the framebuffer—Vulkan uses the top-left corner as the origin, with the y-axis pointing downwards.</li>
+</ul>
+<h2 id="the-solution">The Solution</h2>
+<p>To ensure consistency with the lecture and avoid creating additional trouble for the students, we use</p>
+<pre data-lang="C++" style="background-color:#2b303b;color:#c0c5ce;" class="language-C++ "><code class="language-C++" data-lang="C++"><span style="color:#b48ead;">float</span><span> final_z = </span><span style="color:#d08770;">1.</span><span style="color:#b48ead;">f </span><span>- interpolated_z;
+</span></code></pre>
+<p>To transform the \(z\) values to the range \([0,2]\) and ensure that nearer values are smaller and farther values are larger.</p>
+<h2 id="the-experience">The Experience</h2>
+<p>The god of rendering punished the humans building the graphical Tower of Babel by making them choose different coordinate spaces in different APIs, leaving everyone frustrated and apprehensive when dealing with others' code.</p>
+<p>Even highly experienced graphics veterans find coordinate systems tricky, let alone students. Wish me luck with the section Q&amp;A.</p>
+<h2 id="some-interesting-sidenotes">Some interesting sidenotes</h2>
+<p>Although not directly related to the content and discussion of this article, reverse Z is an interesting example of using the properties of IEEE 754 to optimize algorithms:</p>
+<p><a href="https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html">https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html</a></p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>Specifically, it is about creating a unified and distraction-free programming framework that allows students to start implementing algorithms with minimal effort.</p>
+</div>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

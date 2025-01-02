@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>Chris Zhang&#x27;s Blog | Connect Wi-Fi in CLI via wpa_supplicant</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe/en">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Connect Wi-Fi in CLI via wpa_supplicant</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-03-15 15:52:09 +0000">March 15, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>This post discusses how to use the <code>wpa_supplicant</code> command line to control a Raspberry Pi connecting to Wi-Fi.</p>
+<span id="continue-reading"></span><h1 id="background">Background</h1>
+<p>A few days ago, I dug out my Raspberry Pi 4B (4G RAM version), which had been gathering dust for over two years, to set up an MC server for fun. The system from two years ago was outdated, and I couldn’t remember the username and password, so I decided to reinstall the system.</p>
+<p>Initially, I installed Raspberry Pi OS (formerly Raspbian), the official Debian-based distribution. However, I quickly discovered that the dependency management of this distribution was downright bizarre—when I tried to use <code>ntpdate</code> to sync the time, I found that <code>ntp</code> was missing. When I attempted <code>sudo apt install ntp</code>, it tried to remove my entire desktop environment. Trying to install <code>neofetch</code> (a pure shell script) required removing the pre-installed <code>git</code>... After these two beatings, the young Ciyue couldn’t take it anymore and decided to switch the system to Archlinux on ARM.</p>
+<p>Archlinux itself doesn’t include any desktop environment, so connecting to a wireless network must be done via the command line.</p>
+<h1 id="process">Process</h1>
+<h2 id="wpa-supplicant">WPA_SUPPLICANT</h2>
+<p>When in doubt, consult the Arch Wiki. I found <a href="https://wiki.archlinux.org/title/Network_configuration/Wireless">this page</a>. Since the campus network uses WPA-EAP (PEAP), I checked the corresponding entry and found the <a href="https://wiki.archlinux.org/title/Wpa_supplicant">wpa_supplicant usage page</a>.</p>
+<p>First, check the name of the interface:</p>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">ip</span><span> a
+</span></code></pre>
+<p>The wireless network card on the Raspberry Pi 4B is called <code>wlan0</code>.</p>
+<p><code>wpa_supplicant</code> usually runs as a daemon in the background and connects to the wireless network using the configuration in the config file. The default configuration file path is <code>/etc/wpa_supplicant/wpa_supplicant.conf</code>.</p>
+<p>So, first, edit this file and write the following:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ctrl_interface=/run/wpa_supplicant
+</span><span>update_config=1
+</span></code></pre>
+<p>Next, if it’s just a simple WPA-PSK (i.e., WPA personal wireless network that doesn’t require additional server authentication), you can follow the tutorial on the page to use <code>wpa_cli</code> to interactively fill in the SSID and Passphrase, or use <code>wpa_passphrase</code> to generate the configuration. However, the problem is that our campus network uses the more complex WPA-EAP (i.e., WPA enterprise), and the specific configuration method isn’t mentioned on the page.</p>
+<p>First, I checked the man page, then the official website, until I found <a href="https://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf">this</a>, specifically the network block section.</p>
+<p>You can fill in the network block like this:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>network={
+</span><span>    SSID=&quot;&lt;The network SSID&gt;&quot;
+</span><span>    key_mgmt=WPA-EAP
+</span><span>    eap=PEAP
+</span><span>    phase2=&quot;auth=MSCHAPV2&quot;
+</span><span>    identity=&quot;&lt;username used for login&gt;&quot;
+</span><span>    password=&quot;&lt;password&gt;&quot;
+</span><span>}
+</span></code></pre>
+<p>Note one thing: If your network provider, like the wise Tsinghua University Information Technology Center, uses WPA-EAP PEAP but doesn’t use CA certificates, <strong>do not fill in</strong> the <code>ca_cert</code> field at all, rather than leaving it as an empty string.</p>
+<p>After filling this out, start <code>wpa_supplicant</code> as a daemon:</p>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">sudo</span><span> wpa_supplicant</span><span style="color:#bf616a;"> -B -i</span><span> wlan0</span><span style="color:#bf616a;"> -c</span><span> /etc/wpa_supplicant/wpa_supplicant.conf
+</span></code></pre>
+<h2 id="dhcpcd-to-obtain-an-ip">DHCPCD to Obtain an IP</h2>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">sudo</span><span> dhcpcd wlan0
+</span></code></pre>
+<p>If there are no issues, it should show that an IP has been obtained. Using <code>ifconfig</code>, you should see an IP address under <code>wlan0</code>.</p>
+<h1 id="automation">Automation</h1>
+<p>The dormitory loses power every night, so it’s best to automatically connect to the network on startup. Consulting the aforementioned Arch Wiki page, I found that systemd already includes the corresponding scripts, so you just need to enable them:</p>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">sudo</span><span> systemctl enable wpa_supplicant@wlan0.service
+</span><span style="color:#bf616a;">sudo</span><span> systemctl enable dhcpcd@wlan0
+</span></code></pre>
+<p>Alternatively, you can avoid starting the <code>wpa_supplicant</code> service and instead add a <a href="https://wiki.archlinux.org/title/Dhcpcd#10-wpa_supplicant">hook</a> to the <code>dhcpcd</code> service.</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

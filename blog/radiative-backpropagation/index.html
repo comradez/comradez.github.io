@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | Radiative Backpropagation 阅读笔记</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Radiative Backpropagation 阅读笔记</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2023-02-09 21:22:44 +0000">February 9, 2023</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了用于可微渲染的 Radiative Backpropagation。</p>
+<span id="continue-reading"></span><div class="side-by-side-container"><img src="/images/radiative_backpropagation/pipeline.webp" id="should-invert"  alt="pipeline" style="zoom: 25%;" /></div>
+<h2 id="yin-ru">引入</h2>
+<p>将场景参数形式化为 \(\mathbf{x}\)，渲染函数形式化为 \(f\)，计算 \(\mathbf{y} = f(\mathbf{x})\) 的过程就是正向渲染的过程。</p>
+<p>可微渲染试图计算
+$$
+\mathbf{J}_f := \frac{\partial f(\mathbf{x})}{\mathbf x}
+$$
+由于 \(\mathbf{x}, \mathbf{y}\) 的空间都很高维，直接计算 \(\mathbf{J}_f\) 不可行，因此现有方法主要分为以下两种：</p>
+<ul>
+<li>前向 (forward-mode) 方法，计算微小扰动 \(\mathbf{\delta_x}\) 对 \(\mathbf{y}\) 的影响 \(\mathbf{\delta_y} = \mathbf{J}_f\mathbf{\delta_x}\)</li>
+<li>反向 (reverse-mode) 方法，计算使 \(\mathbf{y}\) 产生变化 \(\mathbf{\delta_y}\)，\(\mathbf{x}\) 需要做出的微小扰动 \(\mathbf{\delta_x} = \mathbf{J}_f^T\mathbf{\delta_y}\)</li>
+</ul>
+<p>以计算 \(y = x_0 \times x_1 + x_2\) 的梯度为例，前向和反向方法的计算流程分别如图所示：</p>
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/forward_mode.webp" id="should-invert"  alt="forward-mode"/></div>
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/backward_mode.webp" id="should-invert"  alt="backward-mode"/></div>
+<p>反向方法中，最常见的做法就是基于 tracing 的 auto-differentiation，即在正向计算时记录计算图，然后反向传播。然而，这一方法要求前向计算时在计算图上记录大量信息，使其内存消耗极高且计算缓慢。</p>
+<p>Radiative Backpropagation 的提出就提供了一种内存和时间开销都较小的反向方法计算梯度，它不需要在前向计算时记录计算图，而是先预计算部分内容，并在前向渲染完成后再进行反向传播。</p>
+<h2 id="li-lun">理论</h2>
+<h3 id="jia-she">假设</h3>
+<p>推导时进行了以下假设：</p>
+<ul>
+<li>不考虑体效应 (volumetric effects)</li>
+<li>不考虑剪影 (silhouette) 边界引起的梯度</li>
+</ul>
+<h3 id="xuan-ran-de-san-ge-ji-ben-deng-shi">渲染的三个基本等式</h3>
+<h4 id="ce-liang-measurement-deng-shi">测量 (Measurement) 等式</h4>
+<p>记图像中每个像素为 \(I_1, I_2, \cdots, I_n\)，第 \(k\) 个像素的的测量值为 \(W_k\) 和 \(L_i\) 在空间 \(\mathcal{A} \times S^2\)的内积，即
+$$
+I_k = \left\langle W_k, L_i\right\rangle
+= \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
+$$
+其中 \(W_k\) 是 \(I_k\) 的重要性函数，\(L_i\) 是入射辐照度，\(\mathcal{A}\) 表示所有点，\(S^2\) 表示半球面。</p>
+<h4 id="chuan-shu-transport-deng-shi">传输 (Transport) 等式</h4>
+<p>对于未受遮挡的光线，其入射辐照度与射出点的出射辐照度相等，即
+$$
+L_i(\mathbf{p},\mathbf{\omega}) = L_o(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
+$$
+其中 \(\mathbf{r}(\mathbf{p},\mathbf{\omega})\) 表示沿着光线 \((\mathbf{p},\mathbf{\omega})\) 能找到的最近的与平面的交点，也就是这条光线的射出点。</p>
+<p>注意到，不考虑遮挡这一假设在这里起了作用。</p>
+<h4 id="san-she-scattering-deng-shi">散射 (Scattering) 等式</h4>
+<p>对于一个点，它的出射辐照度与入射辐照度的关系可以表示为
+$$
+L_o(\mathbf{p},\mathbf{\omega}) = L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}L_i(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$
+其中 \(L_e(\mathbf{p},\mathbf{\omega})\) 为自发光，\(f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\) 为 BSDF，此等式即我们常说的「渲染方程」。</p>
+<h3 id="san-ge-deng-shi-de-wei-fen-xing-shi">三个等式的微分形式</h3>
+<p>为了方便，记偏微分算子 \(\frac{\partial}{\partial \mathbf{x}}\) 为 \(\partial_\mathbf{x}\)</p>
+<h4 id="ce-liang-deng-shi">测量等式</h4>
+<p>$$
+\partial_{\mathbf{x}}I_k = \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
+$$</p>
+<p>注意到此处没有 \(W_k\) 的梯度，这也是因为我们不考虑遮挡，因此重要性是不变的</p>
+<h4 id="chuan-shu-deng-shi">传输等式</h4>
+<p>$$
+\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega}) = \partial_\mathbf{x}L_o(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
+$$</p>
+<h4 id="san-she-deng-shi">散射等式</h4>
+<p>$$
+\partial_\mathbf{x}L_o(\mathbf{p},\mathbf{\omega})
+= \partial_\mathbf{x}L_{e}(\mathbf{p},\mathbf{\omega}) + \int_{S^2}[\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'}) + L_i(\mathbf{p},\mathbf{\omega'})\partial_\mathbf{x}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})]\text{d}\mathbf{\omega'}^{\perp}
+$$</p>
+<p>等式右侧出现了三个含有 \(\partial_{\mathbf{x}}\) 的项：</p>
+<ul>
+<li>
+<p>\(\partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega})\)</p>
+<p>如果场景参数 \(\mathbf{x}\) 发生扰动时光源的亮度发生了变化，它会「发射」微分辐照度 (differential radiance)</p>
+</li>
+<li>
+<p>\(\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\)</p>
+<p>微分辐照度也会像一般辐照度一样被「散射」</p>
+</li>
+<li>
+<p>\(L_i(\mathbf{p},\mathbf{\omega'})\partial_\mathbf{x}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\)</p>
+<p>如果场景参数 \(\mathbf{x}\) 发生扰动材质发生了变化，这个 BSDF 也会 「发射」的微分辐照度</p>
+</li>
+</ul>
+<h3 id="you-hua-wei-fen-de-ji-suan">优化微分的计算</h3>
+<p>给定优化目标，我们记损失函数为 \(g\)，渲染函数为 \(f\)，需要计算的就是
+$$
+\partial_{\mathbf{x}}g(f(\mathbf{x})) = \mathbf{J}_{g \circ f}(\mathbf{x}) = \mathbf{J}_g(f(\mathbf{x}))\mathbf{J}_f(\mathbf{x})
+$$
+我们将它分为两步计算：</p>
+<ul>
+<li>
+<p>首先计算 \(\mathbf{\delta_y} = \mathbf{J}^T_g(\mathbf{y})\)，这个可以手搓也可以自动微分</p>
+</li>
+<li>
+<p>然后用 radiative backpropagation 计算 \(\mathbf{\delta_x} = \mathbf{J}^T_f\mathbf{\delta_y}\)</p>
+</li>
+</ul>
+<h3 id="mathbf-j-t-f-mathbf-delta-y-de-ji-suan">\(\mathbf{J}^T_f\mathbf{\delta_y}\) 的计算</h3>
+<p>将 \(\mathbf{J}_f\) 写成列向量的形式为</p>
+<p>$$
+\mathbf{J}_{f} = [\partial_{\mathbf{x}}I_0, \cdots, \partial_{\mathbf{x}}I_n]
+$$</p>
+<p>因此</p>
+<p>$$
+\mathbf{J}^T_f\mathbf{\delta_y} = \sum_{k=1}^n\mathbf{\delta}_{\mathbf{y},k}\partial_{\mathbf{x}}I_k
+= \int_{\mathcal{A}}\int_{S^2}\left[\sum_{k=1}^n\mathbf{\delta}_{\mathbf{y},k}W_k(\mathbf{p},\mathbf{\omega})\right]\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
+$$</p>
+<p>定义「释放伴随辐照度」</p>
+<p>$$
+A_e(\mathbf{p},\mathbf{\omega}) := \sum_{k=1}^n\mathbf{\delta}_{\mathbf{y},k}W_k(\mathbf{p},\mathbf{\omega})
+$$
+在计算出 \(\mathbf{\delta_y}\) 之后 \(A_e\) 就是可平凡计算的了。</p>
+<p>那么我们参考测量等式，可以将其记为</p>
+<p>$$
+\mathbf{J}^T_f\mathbf{\delta_y} = \langle A_e, \partial_{\mathbf{x}}L_i \rangle
+$$</p>
+<p>再记</p>
+<p>$$
+\mathbf{Q}(\mathbf{p},\mathbf{\omega}) := \partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}L_i(\mathbf{p},\mathbf{\omega'})\partial_{\mathbf{x}}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$</p>
+<p>另外定义两个算子，散射算子 \(\mathcal{K}\) 和传播算子 \(\mathcal{G}\) 为</p>
+<p>$$
+(\mathcal{K}h)(\mathbf{p},\mathbf{\omega}) := \int_{S^2}h(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}
+$$</p>
+<p>$$
+(\mathcal{G}h)(\mathbf{p},\mathbf{\omega}) := h(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
+$$</p>
+<p>那么根据以上三个定义可以得到两个等式，</p>
+<p>$$
+\partial_{\mathbf{x}}L_i = \mathcal{G}\partial_{\mathbf{x}}L_o
+$$
+$$
+\partial_{\mathbf{x}}L_o = \mathcal{K}\partial_{\mathbf{x}}L_i + \mathbf{Q}
+$$</p>
+<p>分别对应传输等式和散射等式。根据 Veach 1997 年的一篇文章，我们可以直接得到一些结论，如</p>
+<p>$$
+\partial_{\mathbf{x}}L_o = \mathcal{KG}\partial_{\mathbf{x}}L_o + \mathbf Q
+= (I - \mathcal{KG})^{-1}\mathbf{Q} = \sum_{i=0}^{\infty}(\mathcal{KG})^i\mathbf Q
+$$</p>
+<p>记 \(\mathcal S := (I - \mathcal{KG})^{-1}\)，那么有 \(\mathcal {G, K, GS}\) 均为自伴随 (self-adjoint) 线性算子</p>
+<blockquote>
+<p>若线性算子 \(\mathcal O\) 满足 \(\forall v_1, v_2\) 均有 \(\langle \mathcal Ov_1, v_2\rangle = \langle v_1,\mathcal{O}v_2\rangle\)，则称它为自伴随的</p>
+</blockquote>
+<p>因此</p>
+<p>$$
+\mathbf{J}^T_f\mathbf{\delta_y} = \langle A_e, \partial_{\mathbf{x}}L_i \rangle = \langle A_e, \mathcal{GS}\mathbf{Q} \rangle = \langle \mathcal{GS}A_e, \mathbf{Q} \rangle
+$$</p>
+<p>对 \(A_e\) 做 \(\mathcal{GS}\) 算子结果不变，本质上表明，其实我们可以「从另一侧开始」散射和传播辐照度，结果不变。而因为 \(A_e\) 是标量函数而 \(\mathbf Q\) 是维度和 \(\mathbf{x}\) 相同的矢量函数（根本无法计算），应用自相关性质之后它变得容易计算得多。</p>
+<p>在有了 \(A_e\) 之后再定义类似的「入射伴随辐照度、出射伴随辐照度」 \(A_i, A_o\)，满足</p>
+<p>$$
+A_i = \mathcal{G}A_o
+$$
+$$
+A_o = \mathcal{K}A_i + A_e
+$$</p>
+<p>这样我们就有了同样满足渲染基本等式的伴随辐照度 \(A_e, A_o, A_i\)，将反向传播变成了「另一次前向渲染」。</p>
+<h2 id="wei-dai-ma">伪代码</h2>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">grad</span><span>(</span><span style="color:#bf616a;">x</span><span>):
+</span><span>    </span><span style="color:#65737e;"># 前向渲染
+</span><span>    y = </span><span style="color:#bf616a;">f</span><span>(x)
+</span><span>    </span><span style="color:#65737e;"># 计算 y 的微分
+</span><span>    delta_y = </span><span style="color:#bf616a;">J_g</span><span>(y)
+</span><span>    </span><span style="color:#65737e;"># 用 radiative backprop 计算 x 的微分
+</span><span>    </span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">radiative_backprop</span><span>(x, delta_y)
+</span><span>
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">radiative_backprop</span><span>(</span><span style="color:#bf616a;">x</span><span>, </span><span style="color:#bf616a;">delta_y</span><span>):
+</span><span>    delta_x = </span><span style="color:#d08770;">0
+</span><span>    </span><span style="color:#b48ead;">for </span><span style="color:#bf616a;">_ </span><span style="color:#b48ead;">in </span><span style="color:#96b5b4;">range</span><span>(num_samples):
+</span><span>        </span><span style="color:#65737e;"># 重要性采样一条光线
+</span><span>        p, omega, weight = sensor.</span><span style="color:#bf616a;">sample_ray</span><span>()
+</span><span>        </span><span style="color:#65737e;"># 计算释放伴随辐照度
+</span><span>        weight *= </span><span style="color:#bf616a;">A_e</span><span>(delta_y, p, omega) / num_samples
+</span><span>        </span><span style="color:#65737e;"># 在场景中传播伴随辐照度
+</span><span>        delta_x += </span><span style="color:#bf616a;">radiative_backprop_sample</span><span>(x, p, omega, weight)
+</span><span>    </span><span style="color:#b48ead;">return </span><span>delta_x
+</span><span>
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">radiative_backprop_sample</span><span>(</span><span style="color:#bf616a;">x</span><span>, </span><span style="color:#bf616a;">p</span><span>, </span><span style="color:#bf616a;">omega</span><span>, </span><span style="color:#bf616a;">weight</span><span>):
+</span><span>    </span><span style="color:#65737e;"># 反向找到交点
+</span><span>    p_prime = </span><span style="color:#bf616a;">r</span><span>(p, omega)
+</span><span>    </span><span style="color:#65737e;"># 如果这个点有释放辐照度（光源），那么把这部分对微分的贡献加上
+</span><span>    delta_x = </span><span style="color:#bf616a;">adjoint</span><span>([[ </span><span style="color:#bf616a;">L_e</span><span>(p_prime, -omega) ]], weight)
+</span><span>    </span><span style="color:#65737e;"># 从 BSDF 上采样一条光线
+</span><span>    omega_prime, bsdf_value, bsdf_pdf = </span><span style="color:#bf616a;">sample</span><span>(</span><span style="color:#bf616a;">f_s</span><span>(p_prime, -omega, ·))
+</span><span>    </span><span style="color:#65737e;"># 如果这个 BSDF 对微分有贡献，则加上
+</span><span>    delta_x += </span><span style="color:#bf616a;">adjoint</span><span>([[ </span><span style="color:#bf616a;">f_s</span><span>(p_prime, -omega, omega_prime) ]],
+</span><span>                       weight * </span><span style="color:#bf616a;">L_i</span><span>(p, omega_prime) / bsdf_pdf)
+</span><span>    
+</span><span>    </span><span style="color:#65737e;"># 递归
+</span><span>    </span><span style="color:#b48ead;">return </span><span>delta_x + </span><span style="color:#bf616a;">radiative_backprop_sample</span><span>(x, p_prime, omega_prime, 
+</span><span>                                               weight * bsdf_value / bsdf_pdf)
+</span></code></pre>
+<p>上面出现了两个 <code>adjoint([[ q(z) ]], delta)</code>，它的语义是将梯度 \(\mathbf{\delta}\) 传播至 \(q\)（通过计算 \(\mathbf{J}_q^T(\mathbf{x},\mathbf{z})\mathbf{\delta}\)），然后返回关于 \(\mathbf{x}\) 的梯度。</p>
+<h2 id="you-hua">优化</h2>
+<h3 id="shi-yong-you-pian-ti-du-gu-ji-jia-su">使用有偏梯度估计加速</h3>
+<p>把 \(\mathbf{Q}\) 的定义从</p>
+<p>$$
+\mathbf{Q}(\mathbf{p},\mathbf{\omega}) := \partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}L_i(\mathbf{p},\mathbf{\omega'})\partial_{\mathbf{x}}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$</p>
+<p>改为</p>
+<p>$$
+\mathbf{Q}_{\text{approx}}(\mathbf{p},\mathbf{\omega}) := \partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}\partial_{\mathbf{x}}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$</p>
+<p>即直接去掉入射辐照度（将它变为1），这样做的好处是 radiative backprop 时不必递归计算入射辐照度。</p>
+<p><strong>神奇的是</strong>，它不仅算得快了，还收敛得快了。</p>
+<h3 id="fu-yong-zhong-jian-jie-guo-jia-su">复用中间结果加速</h3>
+<p>作者注意到 radiative backprop 的过程中，许多中间结果和前向渲染是相同的（例如 BSDF 采样结果、MIS 权重等），因此我们可以直接把 backprop 和下一次前向渲染一起做了，只采样一次。</p>
+<p>这样的本质是用上一次迭代的 \(\mathbf{y}\) 的梯度去传播这次 \(\mathbf{x}\) 的梯度，在梯度变换平稳的情况下这样做是可以的。</p>
+<p>此时的伪代码是</p>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">grad_optimized</span><span>(</span><span style="color:#bf616a;">x</span><span>):
+</span><span>    y = </span><span style="color:#bf616a;">f</span><span>(x)
+</span><span>    </span><span style="color:#b48ead;">while </span><span>not converged:
+</span><span>        delta_y = </span><span style="color:#bf616a;">J_g</span><span>(y)
+</span><span>        </span><span style="color:#65737e;"># radiative backprop 的时候会把下一个 y 也一起渲染出来
+</span><span>        y, delta_x = </span><span style="color:#bf616a;">radiative_backprop</span><span>(x, delta_y)
+</span><span>        </span><span style="color:#65737e;"># 传播梯度 ...
+</span></code></pre>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

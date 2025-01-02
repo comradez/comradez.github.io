@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>Chris Zhang&#x27;s Blog | Introduction Note: MPI</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe/en">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Introduction Note: MPI</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-03-01 01:04:44 +0000">March 1, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>In Tuesday’s Introduction to High-Performance Computing class, MPI was mentioned, and it was also used in a small assignment. However, I didn’t fully understand the code. So, I found an <a href="https://mpitutorial.com/tutorials/mpi-introduction/zh_cn/">MPI tutorial</a>. The Chinese translation is of good quality, but it’s still necessary to refer to the English version when needed.</p>
+<span id="continue-reading"></span><h2 id="basic-facts">Basic Facts</h2>
+<ul>
+<li>
+<p>MPI stands for Message Passing Interface.</p>
+</li>
+<li>
+<p>MPI is a standard, and there are many implementations.</p>
+<ul>
+<li>These include but are not limited to OpenMPI (used on the conv cluster) and MPICH (used in the tutorial).</li>
+</ul>
+</li>
+<li>
+<p>MPI provides parallel function libraries for a series of programming languages, including Fortran77, C, Fortran90, and C++.</p>
+</li>
+<li>
+<p>MPI is process-level parallelism, where memory is not shared between processes, unlike thread-level parallelism.</p>
+</li>
+</ul>
+<h2 id="quick-usage-guide">Quick Usage Guide</h2>
+<h3 id="basic-requirements">Basic Requirements</h3>
+<ul>
+<li>
+<p>The MPI program should call the <code>MPI_Init(int* argc, char*** argv)</code> function at the entry point. In practice, both parameters can be set to <code>NULL</code>.</p>
+</li>
+<li>
+<p>The MPI program should call the <code>MPI_Finalize()</code> function before exiting.</p>
+</li>
+</ul>
+<h3 id="point-to-point-communication-between-processes">Point-to-Point Communication Between Processes</h3>
+<ul>
+<li>
+<p>Use <code>MPI_Comm_size(MPI_COMM_WORLD, &amp;world_size)</code> to get the total number of processes, which is stored in <code>world_size</code>.</p>
+</li>
+<li>
+<p>Use <code>MPI_Comm_rank(MPI_COMM_WORLD, &amp;world_rank)</code> to get the process’s own rank, which is stored in <code>world_rank</code>.</p>
+</li>
+<li>
+<p>Use <code>MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)</code> to send data from one process to another.</p>
+<ul>
+<li><code>buf</code> is the send buffer.</li>
+<li><code>count</code> is the number of data items to send.</li>
+<li><code>datatype</code> is the data type, an internal MPI enumeration that corresponds to native C types.</li>
+<li><code>dest</code> is the rank of the destination process.</li>
+<li><code>tag</code> is the message tag; only messages with the corresponding tag will be received.</li>
+<li><code>comm</code> is the communicator.</li>
+</ul>
+</li>
+<li>
+<p>Use <code>MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)</code> to receive data from another process.</p>
+<ul>
+<li><code>buf</code> is the receive buffer.</li>
+<li><code>count</code> is the maximum number of data items to receive.
+<ul>
+<li>It can receive up to this number of items; exceeding it will cause an error.</li>
+</ul>
+</li>
+<li><code>datatype</code> is the data type.</li>
+<li><code>source</code> is the rank of the source process.
+<ul>
+<li><code>MPI_ANY_SOURCE</code> can be used to receive messages from any source.</li>
+</ul>
+</li>
+<li><code>tag</code> is the message tag; only messages with the corresponding tag will be received.
+<ul>
+<li><code>MPI_ANY_TAG</code> can be used to receive messages with any tag.</li>
+</ul>
+</li>
+<li><code>comm</code> is the communicator.</li>
+<li><code>status</code> is a pointer to an <code>MPI_Status</code> structure, which stores additional information about the received message.
+<ul>
+<li><code>MPI_STATUS_IGNORE</code> can be used to discard this information.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>MPI_Send</code> and <code>MPI_Recv</code> are blocking; they will not proceed until the send/receive operation is complete.</p>
+</li>
+<li>
+<p>To send custom types:</p>
+<ul>
+<li>Cast the buffer to <code>void *</code>.</li>
+<li>Set <code>count</code> to the number of items multiplied by <code>sizeof(MyType)</code>.</li>
+<li>Set <code>datatype</code> to <code>MPI_BYTE</code>.</li>
+</ul>
+</li>
+<li>
+<p>The <code>MPI_Status</code> structure records the following:</p>
+<ul>
+<li>The rank of the sending process.</li>
+<li>The message tag.</li>
+<li>The length of the message (the number of elements can be determined after specifying the type).</li>
+</ul>
+</li>
+<li>
+<p>Use <code>MPI_Get_count(MPI_Status* status, MPI_Datatype datatype, int* count)</code> to get the actual number of elements in the message.</p>
+</li>
+<li>
+<p>Use <code>MPI_Probe(int source, int tag, MPI_Comm comm, MPI_Status* status)</code> to obtain <code>MPI_Status</code> without receiving the message.</p>
+<ul>
+<li>If the exact number of elements to receive is unknown, you can first use <code>MPI_Probe</code> to get <code>status</code>, use <code>MPI_Get_count</code> to calculate the number of elements, and then use <code>MPI_Recv</code>. At this point, you can use <code>MPI_STATUS_IGNORE</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="multi-process-synchronization">Multi-Process Synchronization</h3>
+<ul>
+<li>
+<p>Use <code>MPI_Barrier(MPI_Comm communicator)</code> to synchronize processes.</p>
+<ul>
+<li>All processes must reach this point before proceeding; otherwise, the program will hang.</li>
+</ul>
+</li>
+<li>
+<p>Use <code>MPI_Bcast(const void *buf, int count, MPI_Datatype datatype, int root, MPI_Comm comm)</code> to broadcast/receive broadcast data.</p>
+<ul>
+<li>If the process’s rank is <code>root</code>, it sends <code>buf</code>; otherwise, it receives.</li>
+<li><code>MPI_Bcast</code> uses a tree-based broadcast algorithm for efficient broadcasting.
+<ul>
+<li>Simple tests show that on a single machine with multiple cores (i.e., no network communication), the efficiency of <code>MPI_Bcast</code> is approximately $\log N$ times that of a naive linear implementation, i.e., 2 threads perform the same, 4 threads perform 2x, 8 threads perform 3x...</li>
+<li>Does its broadcasting behavior depend on the network topology? In other words, for heterogeneous clusters, will it find a "better" broadcast path?</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Use <code>MPI_Scatter(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, int root, MPI_Comm communicator)</code> to split data in a buffer and send segments to other processes.</p>
+<ul>
+<li><code>send_data</code> is the send buffer.</li>
+<li><code>send_count</code> is the number of elements to send.</li>
+<li><code>send_datatype</code> is the type of elements to send.</li>
+<li><code>recv_data</code> is the receive buffer.</li>
+<li><code>recv_count</code> is the number of elements to receive.
+<ul>
+<li>Generally, it should be a divisor of <code>send_count</code>.</li>
+</ul>
+</li>
+<li><code>recv_datatype</code> is the type of elements to receive.
+<ul>
+<li>It’s usually the same as the send type.</li>
+</ul>
+</li>
+<li><code>root</code> is the sending process.</li>
+<li><code>communicator</code> is the communicator.</li>
+</ul>
+</li>
+</ul>
+<div class="side-by-side-container"><img alt="Bcast vs Scatter" id="should-invert" src="/images/mpi-reference/broadcastvsscatter.webp"></div>
+<ul>
+<li>Use <code>MPI_Gather(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, int root, MPI_Comm communicator)</code> to gather data from all processes into a large buffer in the root process, the opposite of <code>MPI_Scatter</code>. Since the function signature is the same, the parameters are not repeated here.</li>
+</ul>
+<div class="side-by-side-container"><img alt="Gather" id="should-invert" src="/images/mpi-reference/gather.webp"/></div>
+<ul>
+<li>
+<p>A common workflow is as follows:</p>
+<ul>
+<li>Process 0 is the root process, and the others are worker processes.</li>
+<li>The root prepares the data and scatters it to the worker processes, which perform the operations.</li>
+<li>Use <code>Barrier</code> to ensure all worker operations are complete.</li>
+<li>The root gathers all the data back.</li>
+<li>This feels similar to Map, XD.</li>
+</ul>
+</li>
+<li>
+<p>Use <code>MPI_Allgather(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count, MPI_Datatype recv_datatype, MPI_Comm communicator)</code> to perform a gather followed by a broadcast, so that all processes have the same copy of the data in their buffers. The function signature is the same as <code>MPI_Gather</code>, except there is no <code>root</code> (it’s no longer needed), so it’s not repeated here.</p>
+</li>
+</ul>
+<div class="side-by-side-container"><img alt="Allgather" id="should-invert" src="/images/mpi-reference/allgather.webp"/></div>
+<ul>
+<li>Use <code>MPI_Reduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm communicator)</code> to perform a reduce operation on data from multiple processes.
+<ul>
+<li><code>send_data</code> is the send buffer for each process’s data to be reduced.</li>
+<li><code>recv_data</code> is the receive buffer in the root process for the reduced result.</li>
+<li><code>count</code> is the number of elements in the buffer.</li>
+<li><code>datatype</code> is the element type.</li>
+<li><code>op</code> is the predefined reduce operation in MPI, including max/min, sum/product, bitwise AND/OR, and the rank of the max/min value.</li>
+<li><code>root</code> is the root process that receives the reduced result.</li>
+<li><code>communicator</code> is the communicator.</li>
+</ul>
+</li>
+</ul>
+<div class="side-by-side-container"><img alt="count = 1 的 reduce" id="should-invert" src="/images/mpi-reference/mpi_reduce_1.webp"/></div>
+<div class="side-by-side-container"><img alt="count = 2 的 reduce" id="should-invert" src="/images/mpi-reference/mpi_reduce_2.webp"/></div>
+<ul>
+<li><code>MPI_Allreduce</code> is to <code>MPI_reduce</code> what <code>Allgather</code> is to <code>gather</code>. It sends the reduced data to all processes, so the signature is <code>MPI_Allreduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator)</code>, with no <code>root</code>, and the rest remains the same.</li>
+</ul>
+<div class="side-by-side-container"><img alt="Allreduce" id="should-invert" src="/images/mpi-reference/mpi_allreduce_1.webp"/></div>
+<h3 id="communicators-and-groups">Communicators and Groups</h3>
+<ul>
+<li>
+<p>A "group" can be considered a collection of processes.</p>
+</li>
+<li>
+<p>A communicator corresponds to a group and is used for communication between processes in the group.</p>
+<ul>
+<li><code>MPI_COMM_WORLD</code> is the global communicator that includes all processes.</li>
+<li>Use <code>MPI_Comm_Rank(MPI_Comm comm, int *rank)</code> to get the rank of the process within the communicator.</li>
+<li>Use <code>MPI_Comm_Size(MPI_Comm comm, int *size)</code> to get the number of processes in the communicator.</li>
+</ul>
+</li>
+<li>
+<p>Use <code>MPI_Comm_split(MPI_Comm comm, int color, int key, MPI_Comm* newcomm)</code> to split the old communicator and create a new one.</p>
+<ul>
+<li><code>comm</code> is the old communicator.</li>
+<li>Processes with the same <code>color</code> will be grouped into the same new communicator.</li>
+<li>The order of <code>rank</code> will be used to determine the new rank within the group.</li>
+<li><code>new_comm</code> is the newly created communicator.</li>
+</ul>
+</li>
+</ul>
+<p>For example, run the following code with 16 processes (only the core part is retained):</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">int</span><span> world_rank, world_size;
+</span><span style="color:#bf616a;">MPI_Comm_rank</span><span>(MPI_COMM_WORLD, &amp;world_rank);
+</span><span style="color:#bf616a;">MPI_Comm_size</span><span>(MPI_COMM_WORLD, &amp;world_size);
+</span><span>
+</span><span style="color:#b48ead;">int</span><span> color = world_rank / </span><span style="color:#d08770;">4</span><span>;
+</span><span>
+</span><span>MPI_Comm row_comm;
+</span><span style="color:#bf616a;">MPI_Comm_split</span><span>(MPI_COMM_WORLD, color, world_rank, &amp;row_comm);
+</span><span>
+</span><span style="color:#b48ead;">int</span><span> row_rank, row_size;
+</span><span style="color:#bf616a;">MPI_Comm_rank</span><span>(row_comm, &amp;row_rank);
+</span><span style="color:#bf616a;">MPI_Comm_size</span><span>(row_comm, &amp;row_size);
+</span><span>
+</span><span style="color:#bf616a;">printf</span><span>(&quot;</span><span style="color:#a3be8c;">World rank &amp; size: </span><span style="color:#d08770;">%d</span><span style="color:#a3be8c;"> / </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\t</span><span>&quot;, world_rank, world_size);
+</span><span style="color:#bf616a;">printf</span><span>(&quot;</span><span style="color:#a3be8c;">Row rank &amp; size: </span><span style="color:#d08770;">%d</span><span style="color:#a3be8c;"> / </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, row_rank, row_size);
+</span></code></pre>
+<p>Originally, the process with <code>(world_rank, 16)</code> will become <code>(world_rank / 4, 16)</code> in the new communicator.</p>
+<div class="side-by-side-container"><img alt="MPI_Comm_split" id="should-invert" src="/images/mpi-reference/comm_split.webp"/></div>
+<p>If <code>world_rank / 4</code> is changed to <code>world_rank % 4</code>, the division will change from horizontal to vertical, with a similar principle.</p>
+<ul>
+<li>
+<p>Use <code>MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm)</code> and <code>MPI_Comm_create_group(MPI_Comm comm, MPI_Group group, int tag, MPI_Comm *newcomm)</code> to create a new communicator from a group.</p>
+<ul>
+<li>I didn’t fully understand the difference.</li>
+</ul>
+</li>
+<li>
+<p><code>MPI_Group</code> can perform set operations like intersection and union.</p>
+</li>
+</ul>
+<p>Honestly, this part of the tutorial is too brief, and I didn’t fully understand it.</p>
+<p>According to students who took the course last year, when using MPI in class, you generally don’t need to create communicators by splitting groups; you can just use <code>MPI_COMM_WORLD</code> directly. So, I won’t delve deeper here.</p>
+<h3 id="miscellaneous">Miscellaneous</h3>
+<ul>
+<li>Use <code>MPI_Wtime()</code> for timing.
+<ul>
+<li>It returns the number of seconds since 1970-1-1, i.e., the UNIX timestamp.</li>
+</ul>
+</li>
+</ul>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

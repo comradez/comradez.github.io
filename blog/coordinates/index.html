@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 关于 3D 坐标系的一点小故事</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>关于 3D 坐标系的一点小故事</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-10-21 22:10:12 +0000">October 21, 2024</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>一个关于左手/右手坐标系的小故事……以及其他。</p>
+<span id="continue-reading"></span>
+<blockquote>
+<p>Come, let us go down and confuse their language so they will not understand each other - Genesis 11:7</p>
+</blockquote>
+<h2 id="shi-qing-de-qi-yin">事情的起因</h2>
+<p>这个学期我在做 Introduction to Computer Graphics 的 TA，今天在负责出 assignment 3 的代码框架，是基础的「光栅化你的第一个三角形」。因为一些原因 <sup class="footnote-reference"><a href="#1">1</a></sup>，我们不采用任何 graphics API 而是自己实现软光栅。</p>
+<p>实现软光栅的过程中包含了 Model, View, Projection 变换，以及其对应的矩阵。在 Slides 里我们给出了正交投影变换的矩阵，包含一个 translate 和一个 scale:</p>
+<p>
+$$
+M_{\text{ortho}} = \begin{pmatrix}
+\frac{2}{r-l} & 0 & 0 & 0 \\
+0 & \frac{2}{t-b} & 0 & 0 \\
+0 & 0 & \frac{2}{n-f} & 0 \\
+0 & 0 & 0 & 1
+\end{pmatrix} \begin{pmatrix}
+1 & 0 & 0 & -\frac{r+l}{2} \\
+0 & 1 & 0 & -\frac{t+b}{2} \\
+0 & 0 & 1 & -\frac{n+f}{2} \\
+0 & 0 & 0 & 1
+\end{pmatrix} = \begin{pmatrix}
+\frac{2}{r-l} & 0 & 0 & -\frac{r+l}{r-l} \\
+0 & \frac{2}{t-b} & 0 & -\frac{t+b}{t-b} \\
+0 & 0 & \frac{2}{n-f} & -\frac{n+f}{n-f} \\
+0 & 0 & 0 & 1
+\end{pmatrix}
+$$
+</p>
+<p>其中 \(n, f\) 是 near plane 和 far plane 的距离, \(l, r, b, t\) 分别表示 left, right, bottom, top, 标明这个长方体的其他维度。值得注意的是，因为通用的相机模型中相机的朝向是 \(-Z\)，因此这里 \(n &gt; f\) 且均为负值——这一事实并不符合我们对深度「越小离得越近」的直觉，也就有了接下来的一系列麻烦。</p>
+<p>我们采用右手坐标系，如下图所示</p>
+<div class="side-by-side-container">
+<img alt="Right Hand Coordinate System" style="width: 35s%" src="/images/coordinates/rhs.svg"/>
+</div>
+<h2 id="wen-ti-chu-xian">问题出现</h2>
+<p>Prof 在 Z-Buffer 一节中提到了「简明起见，我们认为 \(z\) 值均为正的，而且越小表示距离相机越近」。在 <a href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDepthRange.xhtml">OpenGL</a>, <a href="https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html">DirectX</a> 和 <a href="https://docs.vulkan.org/guide/latest/depth.html#primitive-clipping">Vulkan</a> 等 API 中，介于 \([0,1]\) 之间的 depth 也是越小距离相机越近——那么问题来了：</p>
+<ul>
+<li>首先，NDC 上的 \(z\) 值应当落在 \([-1,1]\) 上而不是 \([0,1]\) 上；</li>
+<li>其次，在指定 \(n, f\) 的时候还是值越大离相机越近，为何此处变成了越小离相机越近？这里发生了什么？</li>
+</ul>
+<p>我和<a href="https://zheng95z.github.io/">另一位TA</a>——同时也是我的好前辈——大战了三十分钟，讨论在我们的框架中到底是 \(z\) 小为近还是 \(z\) 大为近，以及如何把 \(z\) 变换到全正。我的观点是，\(z\) 越大越靠近相机是正确的，因为我这样进行 Z-Buffering 得到了三角形的正确遮挡结果；而曾峥的观点是，\(z\) 越小越靠近相机是正确的，因为各大 Graphics API 均是如此，我可能有什么地方写错了。</p>
+<h2 id="wen-ti-qiu-jie">问题求解</h2>
+<p>首先，我们研究了 OpenGL 的坐标系——作为我们最亲切最熟悉的坐标系统，OpenGL 一直使用右手系，和我们的框架相一致……但，是这样吗？</p>
+<div class="collapsible">
+  <details>
+    <summary>答案</summary>
+    <div class="inner"><p>
+        LearnOpenGL 中的<a href="https://learnopengl.com/Getting-started/Coordinate-Systems">这一节</a> Right-handed system 的卡片里提到，OpenGL 在世界坐标下采用右手系，而<strong><i>在 NDC 空间下采用左手系</i></strong>.
+    </p></div>
+  </details>
+</div>
+<p>其次，我们参考了 <a href="https://www.realtimerendering.com/">Real Time Rendering 4th Edition</a>，发现其中的 Projection Matrix 和我们的定义略有不同……</p>
+<div class="collapsible">
+  <details>
+    <summary>不同在哪？</summary>
+    <div class="inner">$$
+M_{\text{ortho}} = \begin{pmatrix}
+\frac{2}{r-l} &amp; 0 &amp; 0 &amp; -\frac{r+l}{r-l} \\
+0 &amp; \frac{2}{t-b} &amp; 0 &amp; -\frac{t+b}{t-b} \\
+0 &amp; 0 &amp; \frac{2}{f-n} &amp; -\frac{f+n}{f-n} \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}
+$$
+其中 \(z\) 分量上的远近平面颠倒，相当于关于 \(xOy\) 平面做了一次镜像！</div>
+  </details>
+</div>
+<p>最后，在再一次画了草图之后，我们得到了以下结论：</p>
+<ul>
+<li>在右手坐标系（也就是我们的框架）中，NDC 中的 \(z\) 值确实在 \([-1,1]\) 上，而且越大越靠近相机是正确的。</li>
+<li>OpenGL 之所以 \(z\) 值越小越靠近相机，是因为它在 projection matrix 中进行了一次无声的 flip，而且将 \([-1,1]\) 先加 1 再除以 2，线性变换到了 \([0,1]\) 上。</li>
+<li>DirectX 从世界空间到 NDC 一直都是左手坐标系，因此不受该问题影响。</li>
+<li>Vulkan 从世界空间到 NDC 一直都是右手坐标系，但为了保证 \(z\) 值的直觉牺牲了 framebuffer 的直觉——Vulkan 以左上角为原点，y 轴向下。</li>
+</ul>
+<h2 id="zui-zhong-de-jie-jue-fang-an">最终的解决方案</h2>
+<p>为了保证与 Lecture 相一致，不给学生创造更多的麻烦，我们取</p>
+<pre data-lang="C++" style="background-color:#2b303b;color:#c0c5ce;" class="language-C++ "><code class="language-C++" data-lang="C++"><span style="color:#b48ead;">float</span><span> final_z = </span><span style="color:#d08770;">1.</span><span style="color:#b48ead;">f </span><span>- interpolated_z;
+</span></code></pre>
+<p>来将 \(z\) 值变换到 \([0,2]\) 上并保证近小远大。</p>
+<h2 id="gan-wu">感悟</h2>
+<p>绘制之神对建设图形巴别塔的人类降下神罚，使得他们在不同的 API 中选择不同的坐标空间，让每个人都焦头烂额，并在面对他人代码时战战兢兢。</p>
+<p>即使是极度富有经验的图形学老手也会对坐标系统感到棘手，遑论学生。祝我 section 答疑好运。</p>
+<h2 id="kuo-zhan">扩展</h2>
+<p>虽然与本文及其讨论的内容没有直接关系，reverse Z 是一个很有趣的利用 IEEE 754 的性质来优化算法的例子:</p>
+<p><a href="https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html">https://tomhultonharrop.com/mathematics/graphics/2023/08/06/reverse-z.html</a></p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>具体来说是创造统一且 distract-free 的编程框架，来让学生耗费最少的精力即可开始实现算法。</p>
+</div>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

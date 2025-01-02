@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 使用 wpa_supplicant 命令行连接无线网络</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>使用 wpa_supplicant 命令行连接无线网络</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-03-15 15:52:09 +0000">March 15, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了如何使用 <code>wpa_supplicant</code> 命令行控制树莓派连接 Wi-Fi.</p>
+<span id="continue-reading"></span><h1 id="bei-jing">背景</h1>
+<p>几天前，我找出了吃灰两年有余的 Raspberry Pi 4B（4G RAM 版本）打算搭个 MC 服务器玩，两年前的系统早就陈旧不堪了，而且我也不记得当时的用户名密码了，索性重装系统。</p>
+<p>一开始装了 Raspberry Pi OS（也就是原来的 Raspbian），基于 Debian 的官方发行版。但我很快发现这个发行版的依赖管理简直魔幻——试图 ntpdate 对时，发现缺少 ntp；而尝试 <code>sudo apt install ntp</code> 时，则发现它试图把我的整个桌面环境都一起扬了。想安装一个 neofetch（纯 sh 脚本）竟然要移除预装的 git……经历了这两次毒打之后，年轻的茨月不堪重负，决定把系统换成 Archlinux on ARM。</p>
+<p>Archlinux 本身不包含任何桌面环境，因此必须通过命令行连接无线网络。</p>
+<h1 id="liu-cheng">流程</h1>
+<h2 id="wpa-supplicant">WPA_SUPPLICANT</h2>
+<p>遇事不决，先查 Arch Wiki，可以找到<a href="https://wiki.archlinux.org/title/Network_configuration/Wireless">这个页面</a>。因为校园网是 WPA-EAP(PEAP)，查阅对应的条目可以找到<a href="https://wiki.archlinux.org/title/Wpa_supplicant">wpa_supplicant的使用页面</a>。</p>
+<p>首先查看 interface 的名称：</p>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">ip</span><span> a
+</span></code></pre>
+<p>树莓派 4B 的无线网卡叫 <code>wlan0</code>。</p>
+<p>wpa_supplicant 一般会以 daemon 的形式在后台常驻，并使用 config 文件里的配置连接无线网。默认的配置文件路径为 <code>/etc/wpa_supplicant/wpa_supplicant.conf</code>。</p>
+<p>因此可以首先编辑这个文件，把这些东西写入：</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ctrl_interface=/run/wpa_supplicant
+</span><span>update_config=1
+</span></code></pre>
+<p>接下来，如果只是简单的 WPA-PSK（即无需额外服务器进行验证的 WPA 个人无线网），则可以跟随页面上的教程使用 wpa_cli 交互式填写 SSID 和 Passphrase，或者用 wpa_passphrase 生成配置。但问题在于，我们的校园网是更复杂的 WPA-EAP（也即 WPA 企业），具体的配置方法在页面上并没提及。</p>
+<p>首先查 man，然后查官网，直到查到了<a href="https://w1.fi/cgit/hostap/plain/wpa_supplicant/wpa_supplicant.conf">这里</a>，找到其中 network block 一部分。</p>
+<p>大概在 network block 里这样填写即可：</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>network={
+</span><span>    SSID=&quot;&lt;The network SSID&gt;&quot;
+</span><span>    key_mgmt=WPA-EAP
+</span><span>    eap=PEAP
+</span><span>    phase2=&quot;auth=MSCHAPV2&quot;
+</span><span>    identity=&quot;&lt;username used for login&gt;&quot;
+</span><span>    password=&quot;&lt;password&gt;&quot;
+</span><span>}
+</span></code></pre>
+<p>注意一个问题：如果你的网络提供商像英明的清华大学信息化中心一样采用 WPA-EAP peap 但不采用 CA 证书，<code>ca_cert</code> 字段<strong>直接不填写</strong>，而不是填写空字符串。</p>
+<p>填写完成之后，启动 wpa_supplicant 作为 daemon：</p>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">sudo</span><span> wpa_supplicant</span><span style="color:#bf616a;"> -B -i</span><span> wlan0</span><span style="color:#bf616a;"> -c</span><span> /etc/wpa_supplicant/wpa_supplicant.conf
+</span></code></pre>
+<h2 id="dhcpcd-huo-qu-ip">DHCPCD 获取 ip</h2>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">sudo</span><span> dhcpcd wlan0
+</span></code></pre>
+<p>如果没有问题，则应当显示获取了 ip。用 <code>ifconfig</code> 可以看到 wlan0 下出现了 ip。</p>
+<h1 id="zi-dong-hua">自动化</h1>
+<p>每天晚上寝室都会断电，因此能在开机时自动连网最好。同样查阅上文所述的 Arch Wiki 页面，发现 systemd 已经自带了对应的脚本，只需要 enable 即可：</p>
+<pre data-lang="sh" style="background-color:#2b303b;color:#c0c5ce;" class="language-sh "><code class="language-sh" data-lang="sh"><span style="color:#bf616a;">sudo</span><span> systemctl enable wpa_supplicant@wlan0.service
+</span><span style="color:#bf616a;">sudo</span><span> systemctl enable dhcpcd@wlan0
+</span></code></pre>
+<p>也可以不启动 wpa_supplicant 的服务，而是给 dhcpcd 的服务加上<a href="https://wiki.archlinux.org/title/Dhcpcd#10-wpa_supplicant">钩子</a>。</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

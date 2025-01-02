@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 到底怎么迭代一个Rust Array?</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>到底怎么迭代一个Rust Array?</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2021-09-10 16:09:02 +0000">September 10, 2021</span>&nbsp;·&nbsp;
+</div>
+    
+
+    <div class="space"></div>
+    <p><em>This is one of the legacy posts</em></p>
+<hr />
+<h1 id="dao-di-zen-me-die-dai-yi-ge-array">到底怎么迭代一个Array？</h1>
+<p>前两天晚上摸鱼的时候看到同学发来的微信消息，当时没过脑子，只想了一句“数组也可以<code>into_iter</code>吧”就完了。</p>
+<p><img src="https://files.catbox.moe/vt9w1m.jpg" alt="" /></p>
+<p>摸完之后自己试了一下，发现这样还是不可以：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">let</span><span> a = [</span><span style="color:#d08770;">1</span><span>, </span><span style="color:#d08770;">2</span><span>, </span><span style="color:#d08770;">3</span><span>, </span><span style="color:#d08770;">4</span><span>];
+</span><span style="color:#b48ead;">let</span><span> s = a.</span><span style="color:#96b5b4;">into_iter</span><span>().</span><span style="color:#96b5b4;">reduce</span><span>(|</span><span style="color:#bf616a;">sum</span><span>, </span><span style="color:#bf616a;">i</span><span>| sum + i);
+</span><span>println!(&quot;</span><span style="color:#d08770;">{}</span><span>&quot;, s);
+</span></code></pre>
+<p>编译器要求<code>reduce</code>中的<code>lambda</code>返回类型是<code>&amp;i32</code>而不是<code>i32</code>。这就奇了怪了：<code>into_iter</code>不是获得所有权的迭代吗？为什么要求引用呢？</p>
+<p>于是去查文档，在<a href="https://doc.rust-lang.org/std/primitive.array.html#editions">这里</a>查到了这个：</p>
+<blockquote>
+<p>Prior to Rust 1.53, arrays did not implement <code>IntoIterator</code> by value, so the method call <code>array.into_iter()</code> auto-referenced into a slice iterator. Right now, the old behavior is preserved in the 2015 and 2018 editions of Rust for compatibility, ignoring <code>IntoIterator</code> by value. In the future, the behavior on the 2015 and 2018 edition might be made consistent to the behavior of later editions.</p>
+<p>Starting in the 2021 edition, <code>array.into_iter()</code> will use <code>IntoIterator</code> normally to iterate by value, and <code>iter()</code> should be used to iterate by reference like previous editions.</p>
+</blockquote>
+<p>换言之，在Array没有实现<code>IntoIterator</code>的情况下，对Array做<code>.into_iter()</code>会被自动变成切片的迭代器。在Rust 1.53版本及之后且Rust Edition为2021（暂时，以后可能对2015和2018 Edition统一行为）时，才会采用新行为，默认对值迭代。</p>
+<p>来到<a href="https://play.rust-lang.org">playground</a>尝试一波：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> a = [</span><span style="color:#d08770;">1</span><span>, </span><span style="color:#d08770;">2</span><span>, </span><span style="color:#d08770;">3</span><span>, </span><span style="color:#d08770;">4</span><span>];
+</span><span>    println!(&quot;</span><span style="color:#d08770;">{}</span><span>&quot;, a.</span><span style="color:#96b5b4;">into_iter</span><span>().</span><span style="color:#96b5b4;">reduce</span><span>(|</span><span style="color:#bf616a;">sum</span><span>, </span><span style="color:#bf616a;">i</span><span>| sum + i).</span><span style="color:#96b5b4;">unwrap</span><span>());
+</span><span>}
+</span></code></pre>
+<p>以上代码在<code>Stable version 1.55.0</code>+<code>2018 Edition</code>下编译不通过，提示如下：</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>   Compiling playground v0.0.1 (/playground)
+</span><span>error[E0308]: mismatched types
+</span><span> --&gt; src/main.rs:3:50
+</span><span>  |
+</span><span>3 |     println!(&quot;{}&quot;, a.into_iter().reduce(|sum, i| sum + i).unwrap());
+</span><span>  |                                                  ^^^^^^^
+</span><span>  |                                                  |
+</span><span>  |                                                  expected `&amp;{integer}`, found integer
+</span><span>  |                                                  help: consider borrowing here: `&amp;(sum + i)`
+</span><span>
+</span><span>For more information about this error, try `rustc --explain E0308`.
+</span><span>error: could not compile `playground` due to previous error
+</span></code></pre>
+<p>能看到，这里仍然要求返回值是<code>&amp;{integer}</code></p>
+<p>将工具链改为<code>Nightly version 1.56.0-nightly</code>（我尝试的版本是<code>50171c</code>）+<code>2021 Edition</code>下则编译通过，打印<code>10</code>。</p>
+<p><strong>那么这里应该怎么写呢？</strong></p>
+<p>rust提供了一个类似<code>reduce</code>的函数<code>fold</code>，都是对容器元素从前到后逐个操作，但不同的是<code>fold</code>可以指定初值（和类型），而<code>reduce</code>没有初值。</p>
+<p>这就意味着<code>fold</code>中的lambda要求是<code>Fn(T, &amp;i32) -&gt; T</code>，其中<code>T</code>是初值的类型，只要填入一个0就可以完美完成；而<code>reduce</code>中的lambda必须是<code>Fn(&amp;i32, &amp;i32) -&gt; &amp;i32</code>（显然，中间结果的地址没什么意义，所以没办法这么写）。</p>
+<p>所以最后的解决方案远比切换到最新的版本和最新的nightly build简单得多：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">main</span><span>() {
+</span><span>    </span><span style="color:#b48ead;">let</span><span> a = [</span><span style="color:#d08770;">1</span><span>, </span><span style="color:#d08770;">2</span><span>, </span><span style="color:#d08770;">3</span><span>, </span><span style="color:#d08770;">4</span><span>];
+</span><span>    println!(&quot;</span><span style="color:#d08770;">{}</span><span>&quot;, a.</span><span style="color:#96b5b4;">into_iter</span><span>().</span><span style="color:#96b5b4;">fold</span><span>(</span><span style="color:#d08770;">0</span><span>, |</span><span style="color:#bf616a;">sum</span><span>, </span><span style="color:#bf616a;">ptr</span><span>| sum + *ptr).</span><span style="color:#96b5b4;">unwrap</span><span>());
+</span><span>}
+</span></code></pre>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

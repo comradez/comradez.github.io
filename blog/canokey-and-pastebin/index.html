@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | Canokey 初体验 &amp;&amp; 命令行的私密信息传递</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Canokey 初体验 &amp;&amp; 命令行的私密信息传递</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-11-05 22:07:40 +0000">November 5, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了 Canokey 的配置以及使用。</p>
+<span id="continue-reading"></span>
+<p>2202 年双十一，我终于买了 Canokey，<del>然后到手玩了一晚上</del>。</p>
+<h1 id="canokey-pei-zhi">Canokey 配置</h1>
+<p>关于 Canokey 如何配置，已经有比较多的博客讲过这一点了，我在这里仅仅做简略的记录。如果寻求配置教程，可以考虑下文「参考链接」一节的各个教程。</p>
+<h2 id="gpg-pei-zhi">GPG 配置</h2>
+<p>我之前的 GPG key 只有一个主密钥，配置也比较烂，索性直接 revoke 掉换新的。</p>
+<p>首先在 <a href="https://tails.boum.org/">Tails 官方网站</a>下载 Tails 的镜像，并且丢进 Ventoy 然后 boot.</p>
+<blockquote>
+<p>使用 Tails 是因为它是一个专门为隐私保护特化的发行版，默认禁用了 Tor 以外的网络连接，预装 <code>gpg</code>, <code>paperkey</code>, <code>ccid</code> 等用于密钥生成、导出、智能卡写卡等的实用工具，而且每次抹除所有数据。</p>
+</blockquote>
+<p>我用不到网络功能，所以在 Additional Settings 里面把网络连接全部关闭；同时因为我要在一个 luks U 盘分区上保存我的主密钥，我还启用了 root password.</p>
+<h3 id="yi-xia-liu-cheng-zai-tails-zhong-wan-cheng">以下流程在 Tails 中完成</h3>
+<p>首先生成 GPG key</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">gpg --expert --full-gen-key
+</span></code></pre>
+<p>类型选 (11) ECC (Set your own capabilities)</p>
+<p>启用功能设置为认证 (Certify)</p>
+<p>曲线选择 Curve 25519</p>
+<p>有效期限设置为 0(key does not expire)</p>
+<p>随后</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">gpg --quick-add-key </span><span>&lt;fingerprint&gt; cv25519 encr 2y
+</span><span style="color:#bf616a;">gpg --quick-add-key </span><span>&lt;fingerprint&gt; ed25519 sign 2y
+</span><span style="color:#bf616a;">gpg --quick-add-key </span><span>&lt;fingerprint&gt; ed25519 auth 2y
+</span></code></pre>
+<p>添加三把子密钥，然后将公钥、公钥 revoke 证书、主私钥和三把子私钥分别导出：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">gpg -ao</span><span> pub-key.pub</span><span style="color:#bf616a;"> --export </span><span>&lt;fingerprint&gt;  </span><span style="color:#65737e;"># 导出公钥
+</span><span style="color:#bf616a;">gpg -ao</span><span> main-key.asc</span><span style="color:#bf616a;"> --export-private-key </span><span>&lt;fingerprint&gt;!  </span><span style="color:#65737e;"># 导出主私钥，注意加 ! 以保证只导出主密钥而不导出子密钥
+</span><span>gpg</span><span style="color:#bf616a;"> -ao</span><span> encr-key.asc</span><span style="color:#bf616a;"> --export-private-key </span><span>&lt;fingerprint&gt;!  </span><span style="color:#65737e;"># 导出加密子私钥
+</span><span>gpg</span><span style="color:#bf616a;"> -ao</span><span> sign-key.asc</span><span style="color:#bf616a;"> --export-private-key </span><span>&lt;fingerprint&gt;!  </span><span style="color:#65737e;"># 导出签名子私钥
+</span><span>gpg</span><span style="color:#bf616a;"> -ao</span><span> auth-key.asc</span><span style="color:#bf616a;"> --export-private-key </span><span>&lt;fingerprint&gt;!  </span><span style="color:#65737e;"># 导出验证子私钥
+</span><span style="color:#65737e;"># revoke 证书在生成主密钥后会自动生成，在输出的路径下寻找即可
+</span></code></pre>
+<p>然后 mount 我的 luks U 盘分区：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">sudo</span><span> cryptsetup luksOpen /dev/sdb myusb
+</span><span style="color:#bf616a;">mkdir</span><span> myusb
+</span><span style="color:#bf616a;">sudo</span><span> mount /dev/mapper/myusb myusb
+</span></code></pre>
+<p>过程中会需要输入 root 密码和分区的加密口令，完成后将主私钥和 revoke 证书一起存放进去，然后 umount 并拔出：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">sudo</span><span> umount myusb
+</span><span style="color:#bf616a;">sudo</span><span> cryptsetup close myusb
+</span></code></pre>
+<p>然后 mount 我的另一块 U 盘，保存子私钥、revoke 证书和公钥。</p>
+<p>随后将密钥导入 Canokey：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">gpg --edit-key </span><span>&lt;fingerprint&gt;
+</span></code></pre>
+<p>记得每个 key 选择正确的 slot，而且因为要用两个 key，所以第一个 key 操作完成后不要保存，直接 Ctrl-C 退出 gpg，插入第二把 key 导入完再保存，默认的 PIN 和 AdminPIN 分别为 <code>123456</code> 和 <code>12345678</code>，建议修改。这个时候也可以设置持卡人姓名等信息。</p>
+<p>完成之后 reboot.</p>
+<h3 id="yi-xia-liu-cheng-zai-zheng-chang-gong-zuo-huan-jing-zhong-wan-cheng">以下流程在正常工作环境中完成</h3>
+<p>首先从 U 盘中拷贝出公钥，上传到 <a href="https://keys.openpgp.org">keyserver</a> 并且导入 gpg：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">gpg --import</span><span> pub-key.pub
+</span></code></pre>
+<p>然后插入 key，将其中的私钥 fetch 到本地</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">gpg --edit-card
+</span><span>(</span><span style="color:#bf616a;">一大堆输出</span><span>)
+</span><span style="color:#bf616a;">gpg/card</span><span>&gt; fetch
+</span></code></pre>
+<p>理论上此时就可以愉快玩耍了，我们可以简单地测试一下：</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#96b5b4;">echo </span><span>&quot;</span><span style="color:#a3be8c;">茨月❤RaRa</span><span>&quot; | </span><span style="color:#bf616a;">gpg -r </span><span>&quot;</span><span style="color:#a3be8c;">Chris Zhang</span><span>&quot;</span><span style="color:#bf616a;"> -e </span><span>| </span><span style="color:#bf616a;">gpg -d 
+</span></code></pre>
+<p>输入 PIN 之后触摸 Canokey，看到输出与 echo 内容一致即可。</p>
+<h2 id="u2f-fido-pei-zhi">U2F/FIDO 配置</h2>
+<p>这个配置主要用于部分网站 &amp; OpenSSH key 的生成。</p>
+<p>首先安装 <code>libfido2</code>，提供 <code>fido2-token</code> 工具。</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">fido2-token -L
+</span></code></pre>
+<p>查看自己 Canokey 的设备，然后</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">fido2-token -S </span><span>&lt;device&gt;
+</span></code></pre>
+<p>设置 PIN. <del>其实你现在不设置的话在网上添加的时候也会让你设置的</del></p>
+<p>OpenSSH 8.2 及之后支持了 <code>ecdsa-sk</code> 和 <code>ed25519-sk</code> 这两种支持 FIDO2 的 SSH 密钥生成，插入 Canokey 后输入</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">ssh-keygen -t</span><span> ed25519-sk</span><span style="color:#bf616a;"> -c </span><span>&quot;</span><span style="color:#a3be8c;">Your Email</span><span>&quot;
+</span></code></pre>
+<p>即可，相比一般的 ssh-keygen 流程仅仅多了一步 PIN 输入和 key 触摸。</p>
+<h1 id="na-ming-ling-xing-de-si-mi-xin-xi-chuan-di-shi-zen-me-hui-shi">那命令行的私密信息传递是怎么回事？</h1>
+<p>之前为了自己在设备间传送配置文件方便，我写了一个在线剪贴板，包括<a href="https://github.com/comradez/paste-server">一个 Actix-Web 后端</a>、<a href="https://github.com/comradez/paste-frontend">一个 Yew 网页前端</a>和<a href="https://github.com/comradez/paste-client">一个 clap 命令行前端</a>。</p>
+<p>目前网页前端部署在了 <a href="https://paste.zcy.moe">https://paste.zcy.moe</a>, 后端 API 在 <a href="https://api.zcy.moe">https://api.zcy.moe</a>, 可以试着玩一玩 :)</p>
+<p>这样一来，私密信息的传输可以简化为</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#96b5b4;">echo </span><span>&lt;Your Message&gt; | </span><span style="color:#bf616a;">gpg -ar </span><span>&lt;Your Recepient&gt; -e | </span><span style="color:#bf616a;">pb</span><span> send
+</span></code></pre>
+<p>接收则是</p>
+<pre data-lang="bash" style="background-color:#2b303b;color:#c0c5ce;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#bf616a;">pb</span><span> get &lt;Token&gt; | </span><span style="color:#bf616a;">gpg -d
+</span></code></pre>
+<p><del>实际上这套工具长期没人用，但是只有自己用也是挺方便的</del></p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

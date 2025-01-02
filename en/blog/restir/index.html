@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>Chris Zhang&#x27;s Blog | Paper Note: Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe/en">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Paper Note: Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2023-08-06 23:19:44 +0000">August 6, 2023</span>&nbsp;·&nbsp;
+</div>
+    
+
+    <div class="space"></div>
+    <p>This article discusses the theoretical foundation and implementation of the <strong>ReSTIR</strong> algorithm.</p>
+<span id="continue-reading"></span><h2 id="preface">Preface</h2>
+<p>The renowned <strong>ReSTIR</strong> sampler achieves highly efficient sampling using a very simple data structure.</p>
+<p>The core idea is to use <strong>Weighted Reservoir Sampling (WRS)</strong> for <strong>Resampled Importance Sampling (RIS)</strong>, and then leverage the properties of WRS to add low-overhead temporal and spatial sampling reuse.</p>
+<p>Subsequently, the article analyzes the situations and reasons that lead to bias and provides an unbiased version of the algorithm.</p>
+<blockquote>
+<p>Update as of Dec. 2024</p>
+<p>This blog was written when I just finished the paper reading and did not have a very good understanding of the algorithm. It is quite superfluent by my today's view, and I <em>may</em> give it a rewrite in the future.</p>
+</blockquote>
+<h2 id="problem-statement">Problem Statement</h2>
+<p>The rendering equation is essentially an integral. For example, the radiance emitted from point \(y\) in direction \(\vec{\omega}\) is:
+$$
+L(y,\omega) = \int_A \rho(y, \vec{yx}\leftrightarrow \vec{\omega}) \cdot L_e(x\to y)\cdot G(x\leftrightarrow y)V(x\leftrightarrow y)\text{d}A_x
+$$
+where \(\rho\) is the BRDF, \(L_e\) is the outgoing radiance from the previous point \(x\), \(V\) is visibility, and \(G\) is the geometric term (i.e., the cosine of the angle with the normal). Simplified, it can be written as:
+$$
+L= \int_Af(x)\text{d}x, f(x) =\rho(x)L_e(x)G(x)V(x)
+$$
+The rendering process involves discretely sampling and estimating this integral.</p>
+<h2 id="importance-sampling-is">Importance Sampling (IS)</h2>
+<p>Starting from a PDF \(p\) that approximates \(f\), sample \(N\) samples \(x_1, x_2, \cdots, x_n\) with weights \(p\):
+$$
+\langle L \rangle^N_{\text{is}} = \frac{1}{N}\sum_{i=1}^N\frac{f(x_i)}{p(x_i)}
+$$
+As long as \(f\) is non-zero and \(p\) is always positive, IS is unbiased; the closer \(p\) is to \(f\), the lower the variance.</p>
+<p>The problem with IS is that although some components of \(f\) (e.g., \(L_e, \rho\)) have known PDFs, it is difficult to find a PDF that closely approximates \(f\) itself.</p>
+<h2 id="multiple-importance-sampling-mis">Multiple Importance Sampling (MIS)</h2>
+<p>MIS addresses the difficulty of fitting the integrand in IS by using different strategies and weighted combinations. It uses easily fitted weights like \(L_e\) and \(\rho\) and then mixes the sampling results with weights:
+$$
+\langle L\rangle_{\text{mis}}^{M,N} = \sum_{s=1}^M\frac{1}{N_s}\sum_{i=1}^{N_s}w_s(x_i)\frac{f(x_i)}{p_s(x_i)}
+$$
+where \(M\) is the number of sampling strategies (i.e., the number of PDFs) and \(N_s\) is the number of samples for each strategy. As long as the weights \(w_s\) sum to 1 across strategies, MIS remains unbiased.</p>
+<p>In practice, the weights are often set as the product of the number of samples and the probability density:
+$$
+w_s(x) = \frac{N_sp_s(x)}{\sum_jN_jp_j(x)}
+$$</p>
+<h2 id="resampled-importance-sampling-ris">Resampled Importance Sampling (RIS)</h2>
+<p>Unlike MIS, RIS does not use linear weighted combinations to fit the integrand.</p>
+<p>Assume the ideal distribution is \(\hat p\) (e.g., \(\hat p\propto\rho\cdot L_e\cdot G\)). RIS starts with a potentially poor distribution \(p\) (e.g., \(p \propto L_e\)) and samples \(M\) samples \(x_1, x_2, \cdots x_M\). Then, it resamples from these \(M\) samples with weights \(\text{w}\):
+$$
+\text{w}(x) = \frac{\hat{p}(x)}{p(x)}
+$$
+The resampled sample is named \(y\), and the estimate is:
+$$
+\langle L\rangle_{\text{ris}}^{1,M} = \frac{f(y)}{\hat p(y)}\cdot\left(\frac{1}{M}\sum_{j=1}^M\text{w}(x_j)\right)
+$$
+Repeating this process \(N\) times and averaging yields the RIS estimate:
+$$
+\langle L\rangle_{\text{ris}}^{N,M} = \frac{1}{N}\sum_{i=1}^{N}\left(\frac{f(y_i)}{\hat p(y_i)}\cdot\left(\frac{1}{M}\sum_{j=1}^M\text{w}(x_{ij})\right)\right)
+$$
+This form resembles IS, but since \(y_i\) is not directly sampled from \(\hat p\) but resampled from \(p\), a compensation term involving \(\text{w}\) is added to each \(f(y_i)\) to ensure unbiasedness.</p>
+<p>As \(M \to \infty\), the distribution of \(y\) approaches \(\hat p\); however, for finite \(M\), the quality of \(p\) is also crucial for sampling effectiveness.</p>
+<p>The pseudocode for a single RIS iteration is:</p>
+<img src="/images/restir/ris.webp" id="should-invert"  alt="Pseudocode for RIS" style="zoom: 25%;" />
+<h2 id="weighted-reservoir-sampling-wrs">Weighted Reservoir Sampling (WRS)</h2>
+<p>Given a stream of \(M\) values, each with weight \(w_i\), WRS selects \(N\) samples in a single pass based on their weights (\(M\) is unknown at the start and is updated incrementally).</p>
+<p>Here, we simplify \(N\) to 1, selecting only one sample.</p>
+<p>The pseudocode for WRS is as follows, where a reservoir structure is defined, essentially dynamically maintaining the "currently selected sample." Each time a new value is obtained from the stream, it is randomly decided whether to replace the current sample:</p>
+<img src="/images/restir/wrs.webp" id="should-invert"  alt="Pseudocode for WRS" style="zoom: 25%;" />
+<h2 id="stream-ris-combining-wrs-and-ris">Stream RIS (Combining WRS and RIS)</h2>
+<p>By optimizing the \(M\) samples of RIS using WRS, the number of samples can be increased while reducing memory usage.</p>
+<img src="/images/restir/stream-ris.webp" id="should-invert"  alt="Pseudocode for stream RIS" style="zoom: 25%;" />
+<p>Using stream RIS alone for sampling, the pre-denoised results are already significantly better than LightBVH under the same computational power and time, and the time required for the same quality is shorter.</p>
+<p>Note that a new field \(W\) is introduced to the reservoir, which corresponds to the part of the RIS estimate:
+$$
+\langle L\rangle_{\text{ris}}^{1,M} = \frac{f(y)}{\hat p(y)}\cdot\left(\frac{1}{M}\sum_{j=1}^M\text{w}(x_j)\right)
+$$
+excluding \(f(y)\).</p>
+<h2 id="temporal-and-spatial-reuse">Temporal and Spatial Reuse</h2>
+<h3 id="spatial-reuse">Spatial Reuse</h3>
+<p>Ignoring the occlusion term \(V\), we often assume that neighboring pixels have similar \(\hat p \propto \rho\cdot L_e\cdot G\). Therefore, we hope to reuse samples from neighboring pixels for the current pixel—this usually implies additional storage, but with WRS, we can directly merge two or more reservoirs without extra storage:</p>
+<img src="/images/restir/combining_reservoirs.webp" id="should-invert"  alt="Pseudocode for reservoir combination" style="zoom: 25%;" />
+<p>The sampling result is equivalent to directly sampling the merged sequence.</p>
+<p>If RIS itself samples \(M\) times and reuses \(k\) neighbors' results, the computational complexity is \(O(k+M)\), but the pixel sees \(k\cdot M\) samples; if spatial reuse is repeated \(n\) times, the complexity becomes \(O(nk+M)\) for \(k^n\cdot M\) samples.</p>
+<h3 id="temporal-reuse">Temporal Reuse</h3>
+<p>In animations, the reservoir from the previous frame is used to initialize the reservoir for the current frame.</p>
+<p>This gives us a sampling method that combines WRS and RIS with temporal and spatial reuse.</p>
+<img src="/images/restir/restir_biased.webp" id="should-invert"  alt="Pseudocode for ReSTIR (but biased)" style="zoom: 25%;" />
+<h2 id="bias-analysis">Bias Analysis</h2>
+<p>Spatial reuse introduces bias into ReSTIR's sampling results. Rewriting the RIS formula:
+$$
+\langle L\rangle_{\text{ris}}^{1,M} = \frac{f(y)}{\hat p(y)}\cdot\left(\frac{1}{M}\sum_{j=1}^M\text{w}(x_j)\right) = f(y) \cdot W(\mathbf{x},z)
+$$
+where
+$$
+W(\mathbf{x},z) = \frac{1}{\hat p(x_z)}\left(\frac{1}{M}\sum_{j=1}^M\text{w}(x_j)\right)
+$$
+To align with the IS form, i.e., \(\frac{f(y)}{p(y)}\), we must ensure that the expectation of \(W(\mathbf{x},z)\) equals \(\frac{1}{p(y)}\) to maintain unbiasedness. The following analysis shows that for a given \(y\), traversing all combinations \((\mathbf{x},z)\) where \(x_z = y\), the average of \(W(\mathbf{x},z)\) is:
+$$
+E_{x_z=y}[W(\mathbf{x},z)] \leq \frac{1}{p(y)}
+$$
+Equality holds only if all PDFs of the samples \(\mathbf{x}\) (note: originally we assumed \(\mathbf{x} \sim p\), but after spatial reuse, we can no longer guarantee that samples from neighboring pixels come from the same distribution, so there may be many distributions) are non-zero at \(y\).</p>
+<div class="collapsible">
+  <details>
+    <summary>Detailed Derivation</summary>
+    <div class="inner"><p>
+First, generalize RIS. Assume that the samples in \(\mathbf x\) are drawn from different distributions, with the \(i\)-th sample \(x_i \sim p_i\). Then:
+$$
+p(\mathbf x) = \prod_{i=1}^M p_i(x_i)
+$$
+Modify the resampling weights accordingly (i.e., replace \(p\) with \(p_i\)):
+$$
+p(z | \mathbf x) = \frac{w_z(x_z)}{\sum_iw_i(x_i)}, \text{where }w_i(x) = \frac{\hat p(x_i)}{p_i(x_i)}
+$$
+The joint PDF of \(\mathbf x, z\) is:
+$$
+p(\mathbf x, z) = p(z|\mathbf x)\cdot p(\mathbf x) = \left[\prod_{i=1}^Mp_i(x_i)\right]\cdot \frac{w_z(x_z)}{\sum_iw_i(x_i)}
+$$
+For a given \(y\), there are many possible \(\mathbf x, z\) combinations (e.g., \(x_1 = y, z = 1\) or \(x_M = y, z=M\)). For convenience, we first define the set \(Z(y)\):
+<p>$$
+Z(y) = {i | 1\leq i\leq M \land p_i(y)\gt 0}
+$$
+i.e., "the set of indices where (y) can appear in this position."
+Fixing index (i), the remaining (M-1) positions can be freely chosen, ensuring that (\mathbf x, z) is a combination that samples (y). Thus, (p(y)) is the sum of all (M-1) integrals:
+$$
+p(y) = \sum_{i\in Z(y)}\int\cdots\int p(\mathbf{x}^{i\to y}, i)\text{d}x_1\cdots\text{d}x_M
+$$
+For (W(\mathbf x, z)), the mean when the sampling result is fixed to (y) is:
+$$
+\begin{aligned}
+E_{x_z=y} &amp;= \frac{\int\cdots\int W(\mathbf{x}^{i\to y}, i)p(\mathbf{x}^{i\to y}, i)\text{d}x_1\cdots\text{d}x_M}{\int\cdots\int p(\mathbf{x}^{i\to y}, i)\text{d}x_1\cdots\text{d}x_M} \
+\end{aligned}
+$$
+A simple derivation (really simple XD, most terms cancel out) yields:
+$$
+E_{x_z=y} = \frac{1}{p(y)} \frac{|Z(y)|}{M} \leq \frac{1}{p(y)}
+$$
+Thus, unbiasedness is guaranteed only if (|Z(y)| = M), i.e., all PDFs are non-zero at (y). Otherwise, the result will be biased downward.
+Specifically, the ReSTIR algorithm discards occluded samples (effectively setting their PDF to 0), but samples occluded in neighboring pixels may not be occluded in the current pixel, leading to bias and darkening of the image.
+</p></div></p>
+  </details>
+</div>
+<h2 id="bias-elimination">Bias Elimination</h2>
+<p>By replacing the weight \(1/M\) in \(W(\mathbf x, z)\) with a variable \(m(x_z)\), the expectation becomes:
+$
+E_{x_z=y} = \frac{1}{p(y)}\sum_{i\in Z(y)}m(x_i)
+$
+Unbiasedness is then equivalent to \(\sum_{i\in Z(y)}m(x_i) = 1\).</p>
+<ul>
+<li>
+<p>This can be achieved by simply setting \(m(x_z)\) to \(\frac{1}{|Z(x_z)|}\), but the result is very noisy.</p>
+</li>
+<li>
+<p>A better approach is to use an MIS-like estimation for \(m\), e.g.:
+$
+m(x_z) = \frac{p_z(x_z)}{\sum_{i=1}^Mp_i(x_z)}
+$</p>
+</li>
+</ul>
+<p>In practice, the authors use \(\hat p_{q_i}(x_i)\) to approximate the true PDF: as long as the true PDF is non-zero, it will also be non-zero. Below is the pseudocode for an unbiased reservoir combination algorithm using average weights (i.e., method 1 above).</p>
+<img src="/images/restir/combining_reservoirs_unbiased.webp" id="should-invert"  alt="Pseudocode for unbiased reservoir combination" style="zoom: 25%;" />
+<h2 id="implementation-details">Implementation Details</h2>
+<p>The authors implemented the ReSTIR sampler in Falcor, with the following parameters:</p>
+<ul>
+<li>RIS initial sampling \(M = 32\), distribution \(p \propto L_e\)
+<ul>
+<li>If an environment map is present, 25% of the samples are importance sampled from it.</li>
+</ul>
+</li>
+<li>Target PDF is \(\hat p \propto\ \rho \cdot L_e \cdot G\)
+<ul>
+<li>All BRDFs are treated as two-layer media with a Lambertian base and GGX top layer.</li>
+</ul>
+</li>
+<li>Selecting fixed-position neighbors can lead to artifacts, so 5 (3 for unbiased) pixels are randomly sampled from a 30px radius as neighbors.
+<ul>
+<li>In the biased algorithm, neighbors with large geometric differences introduce significant bias, so the camera angle and depth are computed during sampling, and neighbors with large differences are rejected.</li>
+</ul>
+</li>
+<li>To achieve interactive frame rates, unbiased uses \(N = 1\), biased uses \(N = 4\), and offline rendering can use larger values.</li>
+</ul>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

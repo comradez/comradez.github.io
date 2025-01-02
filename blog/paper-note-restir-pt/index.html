@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | Generalized Resampled Importance Sampling 阅读笔记 - ReSTIR PT</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Generalized Resampled Importance Sampling 阅读笔记 - ReSTIR PT</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-10-17 15:49:21 +0000">October 17, 2024</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p><a href="https://blog.zcy.moe/blog/paper-note-gris/">书接上回</a>，ReSTIR PT 即使用 ReSTIR 复用 path。由于不同像素的 path space 并不相同，我们必须找到合适的 path reuse 方式——也即 GRIS 理论中的 shift mapping。</p>
+<span id="continue-reading"></span><h2 id="restir-pt-zhong-shift-mapping-de-xing-shi-ding-yi">ReSTIR PT 中 shift mapping 的形式定义</h2>
+<p>对于像素 \(k\) 和像素 \(j\)， \(T: \Omega_k \to \Omega_j\) 是 k 的路径空间到 j 的路径空间上的映射：</p>
+<p>
+$$
+T\left(\left[ 
+    \textbf{x}_0, \textbf{x}_1, \textbf{x}_2, \textbf{x}_3, ... \right]\right)
+ = \left[ \textbf{y}_0, \textbf{y}_1, \textbf{y}_2, \textbf{y}_3, ... \right]
+$$
+</p>
+<p>注意到 \(\mathbf y_0\) 是相机，\(\mathbf y_1\) 是 primary RT 交出来的，我们要 map 的就是 \(\mathbf{y}_n, n \geq 2\)</p>
+<ul>
+<li>
+<p>Shift Mapping 是 \(\Omega_k\) 子集到 \(\Omega_j\) 子集的双射——如果 \(T_{k\to j}(\overline {\mathbf x}) = \overline{\mathbf y}\) 那么 \(T_{j\to k}(\overline {\mathbf y}) = \overline{\mathbf x}\)</p>
+</li>
+<li>
+<p>同时，我们在设计时希望让 map 后的路径尽量与 map 前的路径相似，即 \(f_k(T_k(\mathbf{\overline x})) \approx f_j(\overline {\mathbf x})\) 且 \(\left| \frac{\partial T_k}{\partial \overline{\mathbf x}} \right| \approx 1\)</p>
+</li>
+</ul>
+<h2 id="ke-yong-de-shift-mapping-ce-lue">可用的 shift mapping 策略</h2>
+<ul>
+<li>
+<p>顶点复用 Vertex copy / Reconnection</p>
+<p>直接复用原 path 的顶点，\(y_{i+1} = x_{i+1}\)（从 i+1 开始后面的整条路径全部复用）</p>
+<ul>
+<li>仅适用于 \(x_i, x_{i+1}, y_{i+1}\) 都落在粗糙表面上的情况</li>
+</ul>
+</li>
+<li>
+<p>半程向量复用 Half-vector copy</p>
+<p>把 base path 的半程向量转换到局部切空间，复用到 offset path 再转回去 trace \(y_{i+1}\)</p>
+<ul>
+<li>可以处理 reflection</li>
+</ul>
+</li>
+<li>
+<p>方向复用 Direction copy</p>
+<p>把 base path 上的出射角度复用到 offset path</p>
+<ul>
+<li>一般用于采样 envmap</li>
+</ul>
+</li>
+<li>
+<p>随机数复用 Random Replay</p>
+<p>复用 base path 在当前 bounce 的随机数来采样 \(y_{i+1}\)</p>
+<ul>
+<li>
+<p>比较贵</p>
+</li>
+<li>
+<p>时常和半程向量 / 方向复用的表现类似</p>
+</li>
+</ul>
+</li>
+<li>
+<p>流形探索 manifold exploration</p>
+<p>见 <a href="https://mediatech.aalto.fi/publications/graphics/GMLT/">Lehtinen et al. 2013</a>, <a href="https://www.cs.cornell.edu/projects/manifolds-sg12/">Jakob and Marschner 2012</a></p>
+</li>
+</ul>
+<ul>
+<li>
+<p>ReSTIR GI 的策略</p>
+<p><del>虽然当时的人类并没有 GRIS 理论但是事后诸葛亮地说</del>直接在 probe 上记录 outgoing radiance 来进行 single bounce GI 的采样，实质上就是无条件的 \(y_2 = x_2\) reconnection shift</p>
+</li>
+<li>
+<p>ReSTIR PT 的策略</p>
+<p>混合 random replay 和 reconnection <a href="https://profs.etsmtl.ca/agruson/publication/2019_gradientstar/">[Hua et al. 2019]</a>，在适合 reconnect 的时候复用顶点，否则复用随机数</p>
+<p>本文后半部分的核心贡献就是提出了一个有效的确定复用条件的 heuristic</p>
+</li>
+</ul>
+<h2 id="shen-me-shi-hou-fu-yong-ding-dian">什么时候复用顶点？</h2>
+<p>作者提出了两个新的判断条件，用于决定顶点何时不能复用</p>
+<h3 id="ju-chi-tiao-jian">距离条件</h3>
+<p>观察到在渲染方程</p>
+<p>
+$$
+L_o(\mathbf{x}, \omega_o) = L_e(\mathbf{x}, \omega_o) + \int_{\Omega} f_r(\mathbf{x}, \omega_i, \omega_o) L_i(\mathbf{x}, \omega_i) G(\mathbf{x}, \mathbf{x'}) V(\mathbf{x}, \mathbf{x'}) \text{d}\omega_i
+$$
+</p>
+<p>中，几何项</p>
+<p>
+$$
+G(\mathbf{x}, \mathbf{x'}) = \frac{ \cos \theta_x \cos \theta_{x'} }{ |\mathbf{x} - \mathbf{x'}|^2 }
+$$
+</p>
+<p>包含一个平方反比的顶点距离——在两个顶点距离特别近的时候会导致一个很大的权重，进而带来方差。因此，距离条件定义为当</p>
+<p>
+$$
+\|\mathbf{x}_i - \mathbf{x}_{i+1} \| \geq d_{\max}
+$$
+</p>
+<p>满足时才可以复用，也即「若 \(\mathbf{x}_{i+1}\) 与 \(\mathbf{x}_i\) 的距离小于阈值，则不能复用顶点」</p>
+<h3 id="lobe-tiao-jian">Lobe 条件</h3>
+<p>在检查表面 roughness 的时候，我们会遇到多个 lobe 的 BSDF（如一个 diffuse 上面加一层清漆）。在检查时一次只选择一个 lobe，当 \(x_i, x_{i+1}, y_{i+1}\) 的 roughness 都足够大的时候才能 reconnect。因为要每次选一个 lobe，因此要在路径上额外记录每个 path vertex 的 lobe ID.</p>
+<blockquote>
+<p>最终使用的 hybrid mapping 就是在满足以上两个条件时进行 reconnection shift 而在不满足时进行 random replay。</p>
+</blockquote>
+<h2 id="shift-mapping-de-jacobian-ju-zhen">Shift Mapping 的 Jacobian 矩阵</h2>
+<p>定义 \(\mathbf x_i \to \mathbf x_{i+1}\) 的单位向量为 \(\omega_i^\mathcal X\)，这一步光传输的随机数是 \(\overline{\mathbf u}_i^\mathcal X\)，那么</p>
+<h3 id="li-ti-jiao-shi-jiao">立体角视角</h3>
+<ul>
+<li>顶点复用的 Jacobian</li>
+</ul>
+<p>
+$$
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right| = \left|\frac{\cos \theta_2^y}{\cos \theta_2^x}\right| \cdot \frac{\|\mathbf x_{i+1} - \mathbf x_i\|^2}{\|\mathbf x_{i+1} - \mathbf y_i\|^2}
+$$
+</p>
+<p>其中 \(\theta_2^\circ\) 是 \(\omega_i^\circ\) 和它对应的 surface normal 的夹角.</p>
+<ul>
+<li>随机数复用的 Jacobian</li>
+</ul>
+<p>
+$$
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right| = \left|\frac{\partial \omega_i^y}{\partial \overline{\mathbf u}_i^y}\right| \left|\frac{\partial \overline{\mathbf u}_i^y}{\partial \overline{\mathbf u}_i^x}\right|\left|\frac{\partial \overline{\mathbf u}_i^x}{\partial \omega_i^x}\right| = \frac{p_{\omega_i^x}(\mathbf x_{i+1})}{p_{\omega_i^y}(\mathbf y_{i+1})}
+$$
+</p>
+<p>即对应立体角采样的概率密度之比.</p>
+<h3 id="primary-sample-space-shi-jiao">Primary Sample Space 视角</h3>
+<ul>
+<li>
+<p>随机数复用 Jacobian 永远是 1.</p>
+</li>
+<li>
+<p>顶点复用的 Jacobian</p>
+</li>
+</ul>
+<p>
+$$
+\left|\frac{\partial \overline{\mathbf u}_i^y}{\partial \overline{\mathbf u}_i^x}\right| = 
+\left|\frac{\partial \overline{\mathbf u}_i^y}{\partial \omega_i^y}\right|
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right|
+\left|\frac{\partial \omega_i^x}{\partial \overline{\mathbf u}_i^x}\right| =
+\frac{p_{\omega_i^y}(\mathbf y_{i+1})}{p_{\omega_i^x}(\mathbf x_{i+1})} \cdot
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right|
+$$
+</p>
+<p>注意到因为每一步复用的决策是局部的，全局 Jacobian 就是所有局部 Jacobian 的乘积.</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

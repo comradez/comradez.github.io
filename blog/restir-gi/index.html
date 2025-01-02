@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | ReSTIR GI: Path Resampling for Real-Time Path Tracing 阅读笔记</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>ReSTIR GI: Path Resampling for Real-Time Path Tracing 阅读笔记</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2023-08-06 23:19:44 +0000">August 6, 2023</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了 ReSTIR GI，即使用 ReSTIR 方法维护 probe 的采样来处理 1 bounce 全局光照的算法。</p>
+<span id="continue-reading"></span><h2 id="xie-zai-qian-mian">写在前面</h2>
+<p>这个是把 ReSTIR 采样器进行推广的工作，使得 ReSTIR 可以用于全局光照。文章整体比较简单，也比较短，也没做出什么理论上的创新（可能就是因为这个没发 SIGGRAPH 而是发了 HPG）。</p>
+<blockquote>
+<p>2024 年末更新</p>
+<p>我并非意在贬低这项工作。它已经被用在 AAA 游戏上了，而且对满反射 GI 非常高效。但从研究的角度来看，我更倾向于将其视为一种“将这个方法移植到那个方法上”的后续工作。</p>
+</blockquote>
+<p>简单地说就是先得到一张包含每个像素 visible point 的空间位置+局部法线的 G Buffer（光栅化或者 ray tracing 直接光照），然后从每个 visible point 出发随机采样出一个间接光的入射点作为 sample point，然后对 sample point 进行愉快的 ReSTIR。</p>
+<p>吊诡的是，ReSTIR GI 采样的目标分布可以非常简单（比如直接设置为\(\hat p\propto L_o(x_s,-\omega_i)\)，BRDF 和余弦几何项都不包含）而仍然取得很好的效果。作者解释为简单的目标分布能使一个像素产生的样本对于其他像素而言更加有效。而且由于 sample point 的 \(L_o\) 是被缓存的，作者不得不假定当 sample point 连接不同 visible point 时 \(L_o\) 是不变的——这一假定在 sample point 位于非 diffuse 介质的情况下是假的，如果场景里 glossy 多会导致 artifact。</p>
+<h2 id="suan-fa-liu-cheng">算法流程</h2>
+<p>与 ReSTIR DI 不同，ReSTIR GI 需要维护三个图像大小的 Buffer，分别用于存储当前轮随机采样得到的 initial sample buffer，上一轮留下的 temporal reservoir buffer 和用于存储邻居像素采样信息的 spatial reservoir buffer。</p>
+<p>一个像素对应的 <code>SAMPLE</code> 数据结构的定义如下，每个 buffer 都由 <code>width * height</code> 个 <code>SAMPLE</code> 组成。</p>
+<div class="side-by-side-container"><img src="/images/restir_gi/sample.webp" id="should-invert"  alt="Layout of the SAMPLE data structure for each pixel" style="zoom: 12.5%;" /></div>
+<p>要进行 ReSTIR GI 计算，首先算法需要拿到一张保存了各像素着色点（称为 visible point）的位置和法线的 G Buffer，随后每一轮算法都包含三步：</p>
+<ul>
+<li>初始采样</li>
+<li>时间重采样</li>
+<li>空间重采样</li>
+</ul>
+<p>算法的大致流程可以描述为这两张图：</p>
+<div class="side-by-side-container"><img src="/images/restir_gi/dataflow.webp" id="should-invert"  alt="Dataflow of the whole algorithm" style="zoom: 12.5%;" /></div>
+<div class="side-by-side-container"><img src="/images/restir_gi/alogrithm.webp" id="should-invert"  alt="the process of the algorithm" style="zoom: 12.5%;" /></div>
+<h3 id="chu-shi-cai-yang">初始采样</h3>
+<p>从每个 visible point 出发，以初始分布 \(p_q\) 采样方向 \(\omega_i\)。\(p_q\) 可以是一个非常垃圾的分布，BRDF、余弦加权甚至平均采样都可以。从 visible point \(x_v\) 出发向 \(\omega_i\) 方向追踪，得到交点 \(x_s\) 作为像素 \(q\) 的 sample point。</p>
+<p>随后，算法估计从 \(x_s\) 出发 \(-\omega_i\) 方向（即到 \(x_v\) ）的出射辐照度 \(L_o\) 作为 \(x_v\) 受到的间接光照。如果 \(L_o\) 用直接光照计算，算法得到的就是 1 bounce GI；如果 \(L_o\) 用 \(n\) bounce 的 PT w. NEE 计算，那么算法得到的就是 \(n+1\) bounce GI。注意到这里 \(L_o\) 只保存了一个值而没有保存方向，因此后面 \(x_s\) 连接其他像素的 \(x_v\) 时也会用这个值——也就是默认了不同方向的 \(L_o\) 相同。</p>
+<p>初始采样的结果会放入 initial sample buffer。</p>
+<p>初始采样的伪代码如下：</p>
+<div class="side-by-side-container"><img src="/images/restir_gi/initial_sampling.webp" id="should-invert"  alt="pseudocode for initial sampling" style="zoom: 12.5%;" /></div>
+<h3 id="shi-jian-zhong-cai-yang">时间重采样</h3>
+<p>要进行重采样首先要确定目标分布\(\hat p\)，它可以是理想的 \(\hat p\propto L_o(x_s,\omega_i)f(\omega_o,\omega_i)\langle\cos\theta_i\rangle\)（类似 ReSTIR DI），也可以是简单的 \(\hat p\propto L_o(x_s,\omega_i)\)。</p>
+<p>时间重采样就是简单地取出 temporal reservoir buffer，将它与 initial sample buffer 对应位置的 reservoir 混合，然后放回原位置，伪代码如下：</p>
+<div class="side-by-side-container"><img src="/images/restir_gi/temporal_sampling.webp" id="should-invert"  alt="pseudocode for temporal sampling" style="zoom: 12.5%;" /></div>
+<h3 id="kong-jian-zhong-cai-yang">空间重采样</h3>
+<p>空间重采样要复杂一些，主要是因为它考虑到了临近像素的几何差异，因此不能直接从 temporal reservoir buffer 中取出相邻像素的 sample point 然后混合，需要额外注意两点：</p>
+<ul>
+<li>
+<p>如果两个像素的几何差异太大则直接丢弃，类似 ReSTIR DI.
+s需要除以一个 Jacobian Determinant [这部分来自 <a href="https://dl.acm.org/doi/10.1145/2766997">Gradient-domain Path Tracing</a>，我没有看懂为什么是这么算的] 来补偿。</p>
+<p>Jacobian Determinant 的计算公式为
+$$
+|J_{q\to r}| = \frac{\cos\phi_2^r}{\cos\phi_2^q}\cdot\frac{|x_1^q-x_2^q|}{|x_1^r - x_2^q|}
+$$
+其中 \(x_1^*\) 表示 visible point，\(x_2^*\) 表示 sample point，示意图见下：</p>
+</li>
+</ul>
+<div class="side-by-side-container"><img src="/images/restir_gi/jacobian_determinant.webp" id="should-invert" style="zoom: 12.5%;" /></div>
+<p>考虑到以上两点之后的伪代码为</p>
+<div class="side-by-side-container"><img src="/images/restir_gi/spatial_resampling.webp" id="should-invert"  alt="pseudocode for spatial sampling" style="zoom: 30%;" /></div>
+<p>此外，为了避免重复采样导致 bias 累加，ReSTIR GI 在多次空间重采样的时候优先从临近像素的 temporal reservoir buffer 里采样，如果采样数不足才去 spatial reservoir buffer 里采。</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

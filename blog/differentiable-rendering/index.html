@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 可微渲染入门笔记</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>可微渲染入门笔记</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-11-15 12:06:36 +0000">November 15, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了可微渲染的入门，主体是 SIGGRAPH 2020 的 Differentiable Rendering Course 的阅读笔记。</p>
+<span id="continue-reading"></span>
+<p>这一笔记来自 SIGGRAPH 2020 的一篇 Course，<a href="https://dl.acm.org/doi/abs/10.1145/3388769.3407454"><em>Physics-based differentiable rendering: from theory to implementation</em></a>. 笔记主要记了一下其中的理论推导部分，反正我目前没做可微渲染，后面具体上渲染方程的部分可以再看。</p>
+<p>关于渲染的自动微分还可以看李子懋老师 2021 年的一篇 SIGGRAPH 文章 <a href="https://people.csail.mit.edu/sbangaru/projects/teg-2021/"><em>Systematically Differentiating Parametric Discontinuities</em></a>，作者实现了一个用于 autodiff 的 Python DSL <del>为什么大家都这么喜欢 Python</del>，可能对于 Luisa IR 的 autodiff 有帮助。</p>
+<h2 id="shen-me-shi-ke-wei-xuan-ran">什么是可微渲染</h2>
+<p>给定所有参数 \(\mathbb\pi\), 渲染得到图像 \(I(\mathbf\pi)\), 与真实图像的 Loss 函数为 \(L\), 那么可微渲染的目标就是计算 \(\nabla_{\mathbf\pi}L(I(\mathbf\pi))\)，从而使用基于梯度的方法优化渲染结果来实现逆向渲染。</p>
+<p>对于 \(\mathbf{\pi}\) 中的任何一个参数 \(\pi\)，我们都有
+$$
+\frac{\partial}{\partial\pi}L(I(\mathbf\pi)) = \sum_i\frac{\partial L}{\partial I_i(\mathbf{\pi})}\frac{\partial I_i(\mathbf{\pi})}{\partial\pi}
+$$
+前者是简单的，譬如对最基本的 MSE Loss，有
+$$
+L = \left(I(\mathbf\pi) - \hat I(\mathbf\pi)\right)^2
+$$</p>
+<p>$$
+\frac{\partial L}{\partial I(\mathbf{\pi})} = 2\left(I(\mathbf\pi) - \hat I(\mathbf\pi)\right)
+$$</p>
+<p>问题在于计算后者 \(\frac{\partial I_i(\mathbf{\pi})}{\partial\pi}\)</p>
+<h2 id="neng-bu-neng-ba-xuan-ran-wu-tong-di-bian-ke-wei">能不能把渲染「无痛」地变可微？</h2>
+<img alt="Two triangles" id="should-invert" src="/images/differentiable_rendering/0.webp"/>
+<p>渲染本质上是积分问题，以一个简单的抗锯齿为例，如果每个像素只采样一个点，那么得到的结果就会有很多锯齿（高频噪声）。一个解决方案是套一个低通滤波器，也即对每个像素计算采样中心点附近的一个区域内的积分：
+$$
+I_i(\mathbf\pi) = \iint k(x,y)m(x_i+x, y_i+y; \mathbf\pi)\text{d}x\text{d}y = \iint f(x, y; \mathbf\pi)\text{d}x\text{d}y
+$$
+其中 \(k\) 是卷积核，\(m\) 是连续的像空间，\(I\) 是离散的图片。实际渲染中，渲染器一般采用以下方法（即我们熟悉的「多重采样抗锯齿 MSAA」）来数值近似这个积分：
+$$
+\iint f(x, y; \mathbf\pi)\text{d}x\text{d}y \approx \frac{1}{N}\sum_{j=1}^N f(x_j, y_j; \pi)
+$$
+这个数值积分可以解决积分的计算，但是<strong>不能解决</strong>积分的微分问题：
+$$
+\frac{\partial}{\partial \pi_v}\iint f(x, y; \mathbf\pi)\text{d}x\text{d}y \not\approx \frac{1}{N}\sum_{j=1}^N \frac{\partial}{\partial \pi_v}f(x_j, y_j; \mathbf\pi) = 0
+$$</p>
+<blockquote>
+<p>为什么离散采样的微分一定是 0？</p>
+<p>\(f(x_j, y_j; \mathbf\pi)\) 的值就是「这个点打到的物体的颜色」，如果 \(\pi_v\) 改变后它打到的三角形不变，那么梯度必然是 0；如果正好跨过边界那么梯度理论上是无穷大——但是离散采样采到边界的概率是 0，因此可以不用管这一项。</p>
+</blockquote>
+<p>因为微分本质上是考察局部变化，而离散的采样对局部变化不敏感，因此对离散采样的数值积分直接微分是不可行的。考察一个更简单的例子：
+$$
+\frac{\partial}{\partial p}\int_0^1(x &lt; p\ ?\ 1:0) \text{d}x
+$$
+离散采样一定是 0，而实际结果是 1（因为后面这个积分就是 \(p\)）.</p>
+<h2 id="ru-he-shi-xian-zhe-ge-ji-fen-de-wei-fen">如何实现这个积分的微分？</h2>
+<p>计算离散的一元函数的积分的微分，可以先将其所有的间断点列出来，然后分别计算连续部分和间断点的微分.</p>
+<img alt="Integral" id="should-invert" src="/images/differentiable_rendering/1.webp"/>
+<p>例如对于上面的积分
+$$
+\frac{\partial}{\partial p}\int_0^1(x &lt; p\ ?\ 1:0) \text{d}x = \frac{\partial}{\partial p}\int_0^p 1\text{d}x + \frac{\partial}{\partial p}\int_p^1 0\text{d}x
+$$
+然后再分别计算就可以了，一般地则有
+$$
+\frac{\partial}{\partial\pi}\int_{a(\pi)}^{b(\pi)}f(x;\mathbf\pi)\text{d}x=\int_{a(\pi)}^{b(\pi)}\frac{\partial}{\partial\pi}f(x;\mathbf\pi)\text{d}x + \left[\frac{\partial b(\pi)}{\partial\pi}f(b(\pi); \mathbf\pi) - \frac{\partial a(\pi)}{\partial\pi}f(a(\pi); \mathbf\pi)\right]
+$$
+前者为内部项，后者为边界上的补偿</p>
+<h2 id="tui-yan-dao-gao-wei">推广到高维……</h2>
+<p>令 \(f\) 是定义在 \(n\) 维流形 \(\Omega(\pi)\) 上的函数，\(\Gamma(\pi) \subset \Omega(\pi)\) 是一个 \(n-1\) 维流形，包含 \(\Omega(\pi)\) 的外部边界 \(\partial\Omega(\pi)\) 和 \(\Omega(\pi)\) 内部的不同区域间的边界，那么对 \(f\) 在 \(\Omega(\pi)\) 上积分的微分可以表示为：
+$$
+\frac{\partial}{\partial\pi}\left(\int_\Omega f\text{d}\Omega\right) = \int_\Omega\dot f \text{d}\Omega + \int_\Gamma\left\langle\mathbf{n}, \dot x\right\rangle \Delta f\text{d}\Gamma
+$$
+其中
+$$
+\dot f = \frac{\partial f}{\partial\pi}
+$$
+$$
+\dot x = \frac{\partial x}{\partial\pi} \
+$$
+$$
+\Delta f(x) = \lim_{\epsilon\to0^-}f(x+\epsilon \mathbf n) - \lim_{\epsilon\to0^+}f(x+\epsilon \mathbf n)
+$$
+此处的 \(\dot x\) 表示随着参数 \(\pi\) 的移动 ，边界的移动方向，而上述积分的两部分可以分别数值积分近似：
+$$
+\int_\Omega\dot f \text{d}\Omega \approx \frac{1}{N_i}\sum_{j=1}^{N_i}\dot f(x_j)
+$$
+$$
+\int_\Gamma\left\langle\mathbf{n}, \dot x\right\rangle \Delta f\text{d}\Gamma \approx \frac{1}{N_b}\sum_{j=1}^{N_b}\left\langle\mathbf{n}, \dot x\right\rangle\Delta f(x_j)
+$$
+因此我们解决了可微渲染的理论问题……</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

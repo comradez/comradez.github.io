@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+      <title>茨月的博客</title>
+      <link>https://blog.zcy.moe</link>
+      <description></description>
+      <generator>Zola</generator>
+      <language>zh-cn</language>
+      <atom:link href="https://blog.zcy.moe/feed.xml" rel="self" type="application/rss+xml"/>
+      <lastBuildDate>Wed, 18 Dec 2024 22:46:22 +0000</lastBuildDate>
+      <item>
+          <title>短评 Genesis AI 视频——为什么渲染仍然无可替代</title>
+          <pubDate>Wed, 18 Dec 2024 22:46:22 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/genesis-ai/</link>
+          <guid>https://blog.zcy.moe/blog/genesis-ai/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/genesis-ai/">&lt;p&gt;刚刚朋友给我发了一个叫 &lt;a href=&quot;https:&#x2F;&#x2F;genesis-embodied-ai.github.io&#x2F;&quot;&gt;Genesis&lt;&#x2F;a&gt; 的集成了 AI 的物理引擎让我点评。借着这个机会在 AI 视频和渲染的话题上稍微发挥两句。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>尝试在 Linux Falcor 上启用 DLSS（并且失败）</title>
+          <pubDate>Tue, 17 Dec 2024 18:13:42 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/dlss-on-linux-with-falcor/</link>
+          <guid>https://blog.zcy.moe/blog/dlss-on-linux-with-falcor/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/dlss-on-linux-with-falcor/">&lt;p&gt;一个研究生尝试在 Linux 的 Falcor 上强行启用 DLSS，这是他的系统产生的变化……&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>安同开源社区有关 Linux 基金会及其职员不当行为的谴责</title>
+          <pubDate>Thu, 24 Oct 2024 12:00:00 +0000</pubDate>
+          <author>白铭骢</author>
+          <link>https://blog.zcy.moe/blog/statement-of-comdemnation-from-anthon/</link>
+          <guid>https://blog.zcy.moe/blog/statement-of-comdemnation-from-anthon/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/statement-of-comdemnation-from-anthon/">&lt;p&gt;本文转载自 &lt;a href=&quot;https:&#x2F;&#x2F;aosc.io&#x2F;news&#x2F;detail&#x2F;2024-10-24-condemnation-of-the-linux-foundation-and-its-employees.zh-cn.md&quot;&gt;AOSC 社区&lt;&#x2F;a&gt;。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>关于 3D 坐标系的一点小故事</title>
+          <pubDate>Mon, 21 Oct 2024 22:10:12 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/coordinates/</link>
+          <guid>https://blog.zcy.moe/blog/coordinates/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/coordinates/">&lt;p&gt;一个关于左手&#x2F;右手坐标系的小故事……以及其他。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>Generalized Resampled Importance Sampling 阅读笔记 - ReSTIR PT</title>
+          <pubDate>Thu, 17 Oct 2024 15:49:21 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/paper-note-restir-pt/</link>
+          <guid>https://blog.zcy.moe/blog/paper-note-restir-pt/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/paper-note-restir-pt/">&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;blog.zcy.moe&#x2F;blog&#x2F;paper-note-gris&#x2F;&quot;&gt;书接上回&lt;&#x2F;a&gt;，ReSTIR PT 即使用 ReSTIR 复用 path。由于不同像素的 path space 并不相同，我们必须找到合适的 path reuse 方式——也即 GRIS 理论中的 shift mapping。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>Generalized Resampled Importance Sampling 阅读笔记 - GRIS 理论</title>
+          <pubDate>Tue, 15 Oct 2024 21:41:09 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/paper-note-gris/</link>
+          <guid>https://blog.zcy.moe/blog/paper-note-gris/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/paper-note-gris/">&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;research.nvidia.com&#x2F;publication&#x2F;2022-07_generalized-resampled-importance-sampling-foundations-restir&quot;&gt;这篇文章&lt;&#x2F;a&gt; 的内容主要分为两个部分：第一部分是对 ReSTIR 采样理论的补完，将自己视为 &lt;a href=&quot;https:&#x2F;&#x2F;dl.acm.org&#x2F;doi&#x2F;10.5555&#x2F;2383654.2383674&quot;&gt;Importance Resampling for Global Illumination&lt;&#x2F;a&gt; 中 RIS 理论的扩展，提出所谓的 GRIS or Generalized RIS 理论；另一部分则是将这个理论应用在 path 复用上提出 ReSTIR PT。&lt;&#x2F;p&gt;
+&lt;p&gt;这篇笔记集中于 GRIS 理论的讨论。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>ReSTIR GI: Path Resampling for Real-Time Path Tracing 阅读笔记</title>
+          <pubDate>Sun, 06 Aug 2023 23:19:44 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/restir-gi/</link>
+          <guid>https://blog.zcy.moe/blog/restir-gi/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/restir-gi/">&lt;p&gt;本文讨论了 ReSTIR GI，即使用 ReSTIR 方法维护 probe 的采样来处理 1 bounce 全局光照的算法。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>Spatiotemporal reservoir resampling for real-time ray tracing with dynamic direct lighting 阅读笔记</title>
+          <pubDate>Sun, 06 Aug 2023 23:19:44 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/restir/</link>
+          <guid>https://blog.zcy.moe/blog/restir/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/restir/">&lt;p&gt;本文讨论了 ReSTIR 算法的理论基础及实现。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>Radiative Backpropagation 阅读笔记</title>
+          <pubDate>Thu, 09 Feb 2023 21:22:44 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/radiative-backpropagation/</link>
+          <guid>https://blog.zcy.moe/blog/radiative-backpropagation/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/radiative-backpropagation/">&lt;p&gt;本文讨论了用于可微渲染的 Radiative Backpropagation。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>渲染拾遗：BVH</title>
+          <pubDate>Mon, 21 Nov 2022 22:52:49 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/bvh/</link>
+          <guid>https://blog.zcy.moe/blog/bvh/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/bvh/">&lt;p&gt;本文讨论了光线追踪中常用的加速结构 BVH 的设计、构造与优化，内容较为基础，没有包含比较新的前沿算法。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>可微渲染入门笔记</title>
+          <pubDate>Tue, 15 Nov 2022 12:06:36 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/differentiable-rendering/</link>
+          <guid>https://blog.zcy.moe/blog/differentiable-rendering/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/differentiable-rendering/">&lt;p&gt;本文讨论了可微渲染的入门，主体是 SIGGRAPH 2020 的 Differentiable Rendering Course 的阅读笔记。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>Canokey 初体验 &amp;&amp; 命令行的私密信息传递</title>
+          <pubDate>Sat, 05 Nov 2022 22:07:40 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/canokey-and-pastebin/</link>
+          <guid>https://blog.zcy.moe/blog/canokey-and-pastebin/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/canokey-and-pastebin/">&lt;p&gt;本文讨论了 Canokey 的配置以及使用。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>为什么我不再使用 Anaconda？</title>
+          <pubDate>Thu, 16 Jun 2022 21:03:37 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/why-no-longer-anaconda/</link>
+          <guid>https://blog.zcy.moe/blog/why-no-longer-anaconda/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/why-no-longer-anaconda/">&lt;p&gt;本文讨论了 Anaconda 的好与坏，以及为什么我不再使用它。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>字节飞书面试总结</title>
+          <pubDate>Wed, 20 Apr 2022 13:59:55 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/interview/</link>
+          <guid>https://blog.zcy.moe/blog/interview/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/interview/">&lt;p&gt;2022 年夏季在字节跳动飞书组实习的面试内容。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>2022 年了，Wayland 准备好了吗？</title>
+          <pubDate>Sat, 26 Mar 2022 00:20:14 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/wayland-not-ready/</link>
+          <guid>https://blog.zcy.moe/blog/wayland-not-ready/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/wayland-not-ready/">&lt;p&gt;太长不看版：&lt;&#x2F;p&gt;
+&lt;p&gt;对于 KDE Plasma &amp;amp; Hi-DPI 用户，没有。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>使用 wpa_supplicant 命令行连接无线网络</title>
+          <pubDate>Tue, 15 Mar 2022 15:52:09 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/connect-wifi-via-cli/</link>
+          <guid>https://blog.zcy.moe/blog/connect-wifi-via-cli/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/connect-wifi-via-cli/">&lt;p&gt;本文讨论了如何使用 &lt;code&gt;wpa_supplicant&lt;&#x2F;code&gt; 命令行控制树莓派连接 Wi-Fi.&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>「烧鸟丼」应该怎么念？</title>
+          <pubDate>Tue, 08 Mar 2022 20:22:18 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/yakitori/</link>
+          <guid>https://blog.zcy.moe/blog/yakitori/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/yakitori/">&lt;p&gt;太长不看：规范读音是 dǎn，我更愿意念 jǐng，比较受欢迎的读音是 Don&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>信息洪流下，战争仍是战争</title>
+          <pubDate>Sun, 06 Mar 2022 21:23:01 +0000</pubDate>
+          <author>溘埃风余上征</author>
+          <link>https://blog.zcy.moe/blog/war-is-war/</link>
+          <guid>https://blog.zcy.moe/blog/war-is-war/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/war-is-war/">&lt;p&gt;写在前面：&lt;&#x2F;p&gt;
+&lt;p&gt;这篇文章是我的朋友上征给清新时报供的一篇稿。如同去年，这篇文章又没能在清新时报上发出来，而是被发在了&lt;a href=&quot;https:&#x2F;&#x2F;mp.weixin.qq.com&#x2F;s?__biz=MzI4MjYzMDA0Nw==&amp;amp;mid=2247483889&amp;amp;idx=1&amp;amp;sn=bdce881711c1560ec70459cccca821b9&amp;amp;chksm=eb964301dce1ca178690ba000b7f4b2baeb886c4377e8f3f00e1e0ab4f6e6dca6ef30e1f3bbc&quot;&gt;清新时报小号&lt;&#x2F;a&gt;上。&lt;&#x2F;p&gt;
+&lt;p&gt;在征得了原作者同意后，我将这篇文章原文发表在自己的博客上：&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>清晨一小时：紫荆公寓火情纪实[备份]</title>
+          <pubDate>Thu, 03 Mar 2022 10:55:53 +0000</pubDate>
+          <author>邱雨诺</author>
+          <link>https://blog.zcy.moe/blog/fire/</link>
+          <guid>https://blog.zcy.moe/blog/fire/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/fire/">&lt;p&gt;本文转自 &lt;a href=&quot;https:&#x2F;&#x2F;web.archive.org&#x2F;web&#x2F;20220303020124&#x2F;https:&#x2F;&#x2F;app.yinxiang.com&#x2F;fx&#x2F;3992e9b2-0943-49ed-8084-907f41f7ee48&quot;&gt;web archive&lt;&#x2F;a&gt;，原作者在原文中已注明，为适合 Markdown 排版，对格式进行了一些调整，但没有调整内容。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>MPI 入门笔记</title>
+          <pubDate>Tue, 01 Mar 2022 01:04:44 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/mpi-reference/</link>
+          <guid>https://blog.zcy.moe/blog/mpi-reference/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/mpi-reference/">&lt;p&gt;周二的高性能计算导论课上提到了 MPI，小作业里也用到了，但是代码没太看懂。于是寻找了一份 &lt;a href=&quot;https:&#x2F;&#x2F;mpitutorial.com&#x2F;tutorials&#x2F;mpi-introduction&#x2F;zh_cn&#x2F;&quot;&gt;MPI 的教程&lt;&#x2F;a&gt;，中文翻译质量不错但必要时还是得看英文。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>无题</title>
+          <pubDate>Sat, 26 Feb 2022 00:06:03 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/fuck-shandong/</link>
+          <guid>https://blog.zcy.moe/blog/fuck-shandong/</guid>
+          
+      </item>
+      <item>
+          <title>trait bound 咬人事件</title>
+          <pubDate>Wed, 23 Feb 2022 19:48:17 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/num-trait/</link>
+          <guid>https://blog.zcy.moe/blog/num-trait/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/num-trait/">&lt;p&gt;本文讨论了 Rust 中泛型快速幂的实现，以及 higher rank trait bound 在其中的应用。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>Rust 部分资源整理</title>
+          <pubDate>Mon, 21 Feb 2022 23:00:15 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/rust-resources/</link>
+          <guid>https://blog.zcy.moe/blog/rust-resources/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/rust-resources/">&lt;p&gt;&lt;del&gt;有人写了一年 Rust 还不会写过程宏，我不说是谁&lt;&#x2F;del&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;感觉有必要整理一些 Rust 相关的中文资源，方便自己查阅也可以给他人提供参考。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>双向链表的正确姿势是？</title>
+          <pubDate>Sun, 20 Feb 2022 22:58:16 +0000</pubDate>
+          <author>茨月</author>
+          <link>https://blog.zcy.moe/blog/linked-lists/</link>
+          <guid>https://blog.zcy.moe/blog/linked-lists/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/linked-lists/">&lt;p&gt;学完 &lt;a href=&quot;https:&#x2F;&#x2F;rust-unofficial.github.io&#x2F;too-many-lists&#x2F;&quot;&gt;too many linked lists&lt;&#x2F;a&gt; 之后，我跃跃欲试地想要实现一个书中 WIP 的 &lt;code&gt;unsafe&lt;&#x2F;code&gt; 双向链表。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>到底怎么迭代一个Rust Array?</title>
+          <pubDate>Fri, 10 Sep 2021 16:09:02 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/rust-array-iteration/</link>
+          <guid>https://blog.zcy.moe/blog/rust-array-iteration/</guid>
+          
+      </item>
+      <item>
+          <title>关于奥运的一点暴论</title>
+          <pubDate>Mon, 26 Jul 2021 23:52:49 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/olympics/</link>
+          <guid>https://blog.zcy.moe/blog/olympics/</guid>
+          
+      </item>
+      <item>
+          <title>无题</title>
+          <pubDate>Tue, 06 Jul 2021 23:52:16 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/gender-ban/</link>
+          <guid>https://blog.zcy.moe/blog/gender-ban/</guid>
+          
+      </item>
+      <item>
+          <title>人工智能导论自救</title>
+          <pubDate>Sun, 06 Jun 2021 14:45:18 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/intro-ai-review/</link>
+          <guid>https://blog.zcy.moe/blog/intro-ai-review/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/intro-ai-review/">&lt;p&gt;&lt;em&gt;This is one of the legacy posts&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;首先是喜闻乐见的吊图环节&lt;&#x2F;p&gt;
+&lt;img src=&quot;https:&#x2F;&#x2F;z3.ax1x.com&#x2F;2021&#x2F;06&#x2F;09&#x2F;2cYKBD.jpg&quot; alt=&quot;2cYKBD.jpg&quot; style=&quot;zoom: 50%;&quot; &#x2F;&gt;
+</description>
+      </item>
+      <item>
+          <title>2021年，我们继续聊一聊“该不该过女生节”</title>
+          <pubDate>Sun, 07 Mar 2021 21:15:29 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/anti-girls-day/</link>
+          <guid>https://blog.zcy.moe/blog/anti-girls-day/</guid>
+          
+      </item>
+      <item>
+          <title>北京夜雨随感</title>
+          <pubDate>Sun, 28 Feb 2021 22:25:37 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/peking-rain/</link>
+          <guid>https://blog.zcy.moe/blog/peking-rain/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/peking-rain/">&lt;p&gt;&lt;em&gt;This is one of the legacy posts&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;今天是2021年2月28日，是2月的最后一天。&lt;&#x2F;p&gt;
+&lt;p&gt;北京下雨了。&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>《恋爱绮谈~不存在的夏天》游玩感想</title>
+          <pubDate>Tue, 16 Feb 2021 22:47:39 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://blog.zcy.moe/blog/lian-ai-qi-tan/</link>
+          <guid>https://blog.zcy.moe/blog/lian-ai-qi-tan/</guid>
+          <description xml:base="https://blog.zcy.moe/blog/lian-ai-qi-tan/">&lt;p&gt;&lt;em&gt;This is one of the legacy posts&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;p&gt;之前看过好兄弟在空间写过一次推荐，正好打算抽时间打一部gal，听说这部gal演出优秀，剧情引入入胜、流程也不很长，就steam正价入了。&lt;&#x2F;p&gt;
+</description>
+      </item>
+    </channel>
+</rss>

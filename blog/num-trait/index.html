@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | trait bound 咬人事件</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>trait bound 咬人事件</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-02-23 19:48:17 +0000">February 23, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文讨论了 Rust 中泛型快速幂的实现，以及 higher rank trait bound 在其中的应用。</p>
+<span id="continue-reading"></span>
+<p>上完现代密码学之后，看了眼往年大作业，发现有一年的大作业是实现 RSA，于是打算趁着有时间先搞了。</p>
+<p>实现 RSA 首先要实现在 $2 ^ {1023}$ 和 $2^{1024}$ 之间采样素数。这么大的地方不管是线性筛还是 $O(\sqrt{n})$ 的判定都过于耗时了，因此我们用 Miller-Rabin 法检测。实现这个则首先需要实现快速幂。</p>
+<p>第一版快速幂很快写完了：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">quick_pow</span><span>(</span><span style="color:#bf616a;">base</span><span>: BigUint, </span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">exp</span><span>: BigUint, </span><span style="color:#bf616a;">prime</span><span>: Option&lt;BigUint&gt;) -&gt; BigUint {
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> temp_val = </span><span style="color:#b48ead;">if let </span><span>Some(prime) = &amp;prime {
+</span><span>        base % prime
+</span><span>    } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>        base
+</span><span>    };
+</span><span>    </span><span style="color:#b48ead;">let mut</span><span> return_val = </span><span style="color:#d08770;">1_</span><span style="color:#b48ead;">u32</span><span>.</span><span style="color:#96b5b4;">into</span><span>();
+</span><span>    </span><span style="color:#b48ead;">let</span><span> one: BigUint = </span><span style="color:#d08770;">1_</span><span style="color:#b48ead;">u32</span><span>.</span><span style="color:#96b5b4;">into</span><span>();
+</span><span>    </span><span style="color:#b48ead;">let</span><span> two: BigUint = </span><span style="color:#d08770;">2_</span><span style="color:#b48ead;">u32</span><span>.</span><span style="color:#96b5b4;">into</span><span>();
+</span><span>    </span><span style="color:#b48ead;">while</span><span> exp &gt;= one {
+</span><span>        </span><span style="color:#b48ead;">if let </span><span>Some(prime) = &amp;prime {
+</span><span>            temp_val %= prime;
+</span><span>        }
+</span><span>        </span><span style="color:#b48ead;">if </span><span>&amp;exp % &amp;two == one {
+</span><span>            return_val *= &amp;temp_val;
+</span><span>        } 
+</span><span>        temp_val = &amp;temp_val * &amp;temp_val;
+</span><span>        exp /= &amp;two;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">if let </span><span>Some(prime) = &amp;prime {
+</span><span>        return_val % prime
+</span><span>    } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>        return_val
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<p>完事之后呢，有感觉应该写一个泛型的，于是把函数体留着，开始盘算要加哪些 trait bound。</p>
+<p>算了好久，发现生命周期总是不对，然后被同学提醒需要用 <a href="https://nomicon.purewhite.io/hrtb.html">HRTB</a>。这个东西的语义大概是，「对于任意一个生命周期<code>'a</code>，以下 trait bound 都能满足」。</p>
+<p>用完 HRTB 之后，这个 trait bound 已经复杂到惨不忍睹了，大概长这样：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">quick_pow</span><span>&lt;T&gt;(</span><span style="color:#bf616a;">base</span><span>: T, </span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">exp</span><span>: T, </span><span style="color:#bf616a;">prime</span><span>: Option&lt;T&gt;) -&gt; T
+</span><span>    </span><span style="color:#b48ead;">where
+</span><span>        </span><span style="color:#b48ead;">for</span><span>&lt;</span><span style="color:#b48ead;">&#39;b</span><span>&gt; &amp;</span><span style="color:#b48ead;">&#39;b</span><span> T: Mul&lt;&amp;</span><span style="color:#b48ead;">&#39;b</span><span> T, Output = T&gt; + Rem&lt;&amp;</span><span style="color:#b48ead;">&#39;b</span><span> T, Output = T&gt;,
+</span><span>        T: From&lt;</span><span style="color:#b48ead;">u32</span><span>&gt; + Mul&lt;Output = T&gt; + </span><span style="color:#b48ead;">for</span><span>&lt;&amp;</span><span style="color:#b48ead;">&#39;b</span><span>&gt; Mul&lt;&amp;</span><span style="color:#b48ead;">&#39;b</span><span> T, Output = T&gt; + Ord + </span><span style="color:#b48ead;">for</span><span>&lt;</span><span style="color:#b48ead;">&#39;b</span><span>&gt; Rem&lt;&amp;</span><span style="color:#b48ead;">&#39;bT</span><span>, Output = T&gt; + </span><span style="color:#b48ead;">for</span><span>&lt;</span><span style="color:#b48ead;">&#39;b</span><span>&gt; Div&lt;&amp;</span><span style="color:#b48ead;">&#39;b</span><span> T, Output = T&gt;
+</span><span>{
+</span><span>    </span><span style="color:#65737e;">// body omitted
+</span><span>}
+</span></code></pre>
+<p>看着就要吐了。</p>
+<p>在我吐槽了好久之后，我发现了今天的主角：<code>num-traits</code>，它考虑到了实现泛型四则运算的复杂与困难，因此预先为我们实现好了一系列组合 trait: <code>NumOps</code>, <code>NumRef</code> 和 <code>RefNum</code>:</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub trait </span><span>NumOps&lt;Rhs = Self, Output = Self&gt;:
+</span><span>    Add&lt;Rhs, Output = Output&gt;
+</span><span>    + Sub&lt;Rhs, Output = Output&gt;
+</span><span>    + Mul&lt;Rhs, Output = Output&gt;
+</span><span>    + Div&lt;Rhs, Output = Output&gt;
+</span><span>    + Rem&lt;Rhs, Output = Output&gt;
+</span><span>{
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">pub trait </span><span>NumRef: Num + for&lt;&#39;r&gt; NumOps&lt;&amp;&#39;r Self&gt; {}
+</span><span>
+</span><span style="color:#b48ead;">pub trait </span><span>RefNum&lt;Base&gt;: NumOps&lt;Base, Base&gt; + for&lt;&#39;r&gt; NumOps&lt;&amp;&#39;r Base, Base&gt; {}
+</span></code></pre>
+<p>简单地说：</p>
+<ul>
+<li>
+<p>如果要实现 <code>T op T = T</code>，用 <code>NumOps</code></p>
+</li>
+<li>
+<p>如果要实现 <code>T op &amp;T = T</code>，用 <code>NumRef</code></p>
+</li>
+<li>
+<p>都需要可以直接 <code>RefNum&lt;T&gt;</code></p>
+</li>
+<li>
+<p>如果还需要 <code>&amp;T op &amp;T = T</code>，则需要额外添加 <code>where for&lt;'a&gt; &amp;'a T: RefNum&lt;T&gt;</code></p>
+</li>
+</ul>
+<p>所以说最后函数签名变成了：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">quick_pow</span><span>&lt;T: RefNum&lt;T&gt; + From&lt;</span><span style="color:#b48ead;">u32</span><span>&gt; + Ord&gt;(</span><span style="color:#bf616a;">base</span><span>: T, </span><span style="color:#b48ead;">mut </span><span style="color:#bf616a;">exp</span><span>: T, </span><span style="color:#bf616a;">prime</span><span>: Option&lt;T&gt;) -&gt; T
+</span><span>    </span><span style="color:#b48ead;">where for</span><span>&lt;</span><span style="color:#b48ead;">&#39;a</span><span>&gt; &amp;</span><span style="color:#b48ead;">&#39;a</span><span> T: RefNum&lt;T&gt;
+</span><span>{
+</span><span>    </span><span style="color:#65737e;">// body omitted
+</span><span>}
+</span></code></pre>
+<p>赞美社区。</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

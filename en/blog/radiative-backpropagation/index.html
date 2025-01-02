@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>Chris Zhang&#x27;s Blog | Paper Note: Radiative Backpropagation</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe/en">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Paper Note: Radiative Backpropagation</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2023-02-09 21:22:44 +0000">February 9, 2023</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>This article discusses <strong>Radiative Backpropagation</strong> for differentiable rendering.</p>
+<span id="continue-reading"></span><div class="side-by-side-container"><img src="/images/radiative_backpropagation/pipeline.webp" id="should-invert"  alt="pipeline" style="zoom: 25%;" /></div>
+<h2 id="introduction">Introduction</h2>
+<p>Formalize the scene parameters as \(\mathbf{x}\) and the rendering function as \(f\). The process of computing \(\mathbf{y} = f(\mathbf{x})\) is the forward rendering process.</p>
+<p>Differentiable rendering aims to compute:
+$$
+\mathbf{J}_f := \frac{\partial f(\mathbf{x})}{\mathbf x}
+$$
+Since the spaces of \(\mathbf{x}\) and \(\mathbf{y}\) are high-dimensional, directly computing \(\mathbf{J}_f\) is infeasible. Therefore, existing methods are mainly divided into two categories:</p>
+<ul>
+<li><strong>Forward-mode</strong> methods: Compute the effect of a small perturbation \(\mathbf{\delta_x}\) on \(\mathbf{y}\) as \(\mathbf{\delta_y} = \mathbf{J}_f\mathbf{\delta_x}\).</li>
+<li><strong>Reverse-mode</strong> methods: Compute the small perturbation \(\mathbf{\delta_x}\) in \(\mathbf{x}\) required to produce a change \(\mathbf{\delta_y}\) in \(\mathbf{y}\) as \(\mathbf{\delta_x} = \mathbf{J}_f^T\mathbf{\delta_y}\).</li>
+</ul>
+<p>For example, to compute the gradient of \(y = x_0 \times x_1 + x_2\), the forward and reverse methods are illustrated below:</p>
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/forward_mode.webp" id="should-invert"  alt="forward-mode"/></div>
+<div class="side-by-side-container"><img src="/images/radiative_backpropagation/backward_mode.webp" id="should-invert"  alt="backward-mode"/></div>
+<p>In reverse-mode methods, the most common approach is <strong>auto-differentiation</strong> based on tracing, where the computational graph is recorded during forward computation and then backpropagated. However, this method requires recording a large amount of information on the computational graph during forward computation, resulting in high memory consumption and slow computation.</p>
+<p><strong>Radiative Backpropagation</strong> provides a reverse-mode method with lower memory and time overhead. It does not require recording the computational graph during forward computation but instead precomputes certain elements and performs backpropagation after forward rendering.</p>
+<h2 id="theory">Theory</h2>
+<h3 id="assumptions">Assumptions</h3>
+<p>The derivation makes the following assumptions:</p>
+<ul>
+<li>Volumetric effects are not considered.</li>
+<li>Gradients caused by silhouette boundaries are not considered.</li>
+</ul>
+<h3 id="three-fundamental-equations-of-rendering">Three Fundamental Equations of Rendering</h3>
+<h4 id="measurement-equation">Measurement Equation</h4>
+<p>Let each pixel in the image be \(I_1, I_2, \cdots, I_n\). The measurement value of the \(k\)-th pixel is the inner product of \(W_k\) and \(L_i\) in the space \(\mathcal{A} \times S^2\), i.e.:
+$$
+I_k = \left\langle W_k, L_i\right\rangle
+= \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
+$$
+where \(W_k\) is the importance function of \(I_k\), \(L_i\) is the incident radiance, \(\mathcal{A}\) represents all points, and \(S^2\) represents the hemisphere.</p>
+<h4 id="transport-equation">Transport Equation</h4>
+<p>For unoccluded rays, the incident radiance equals the outgoing radiance at the exit point, i.e.:
+$$
+L_i(\mathbf{p},\mathbf{\omega}) = L_o(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
+$$
+where \(\mathbf{r}(\mathbf{p},\mathbf{\omega})\) represents the nearest intersection point along the ray \((\mathbf{p},\mathbf{\omega})\), i.e., the exit point of this ray.</p>
+<p>Note that the assumption of no occlusion plays a role here.</p>
+<h4 id="scattering-equation">Scattering Equation</h4>
+<p>For a point, the relationship between its outgoing radiance and incident radiance can be expressed as:
+$$
+L_o(\mathbf{p},\mathbf{\omega}) = L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}L_i(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$
+where \(L_e(\mathbf{p},\mathbf{\omega})\) is the emitted radiance, and \(f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\) is the BSDF. This equation is commonly known as the "rendering equation."</p>
+<h3 id="differential-forms-of-the-three-equations">Differential Forms of the Three Equations</h3>
+<p>For convenience, let the partial differential operator \(\frac{\partial}{\partial \mathbf{x}}\) be denoted as \(\partial_\mathbf{x}\).</p>
+<h4 id="measurement-equation-1">Measurement Equation</h4>
+<p>$$
+\partial_{\mathbf{x}}I_k = \int_{\mathcal{A}}\int_{S^2}W_k(\mathbf{p},\mathbf{\omega})\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
+$$</p>
+<p>Note that there is no gradient of \(W_k\) here, as we assume no occlusion, so the importance remains unchanged.</p>
+<h4 id="transport-equation-1">Transport Equation</h4>
+<p>$$
+\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega}) = \partial_\mathbf{x}L_o(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
+$$</p>
+<h4 id="scattering-equation-1">Scattering Equation</h4>
+<p>$$
+\partial_\mathbf{x}L_o(\mathbf{p},\mathbf{\omega})
+= \partial_\mathbf{x}L_{e}(\mathbf{p},\mathbf{\omega}) + \int_{S^2}[\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'}) + L_i(\mathbf{p},\mathbf{\omega'})\partial_\mathbf{x}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})]\text{d}\mathbf{\omega'}^{\perp}
+$$</p>
+<p>The right-hand side of the equation contains three terms with \(\partial_{\mathbf{x}}\):</p>
+<ul>
+<li>
+<p>\(\partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega})\)</p>
+<p>If the scene parameter \(\mathbf{x}\) is perturbed and the light source's brightness changes, it "emits" differential radiance.</p>
+</li>
+<li>
+<p>\(\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\)</p>
+<p>Differential radiance is "scattered" like regular radiance.</p>
+</li>
+<li>
+<p>\(L_i(\mathbf{p},\mathbf{\omega'})\partial_\mathbf{x}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\)</p>
+<p>If the scene parameter \(\mathbf{x}\) is perturbed and the material changes, this BSDF also "emits" differential radiance.</p>
+</li>
+</ul>
+<h3 id="optimizing-differential-computation">Optimizing Differential Computation</h3>
+<p>Given an optimization objective, let the loss function be \(g\) and the rendering function be \(f\). We need to compute:
+$$
+\partial_{\mathbf{x}}g(f(\mathbf{x})) = \mathbf{J}_{g \circ f}(\mathbf{x}) = \mathbf{J}_g(f(\mathbf{x}))\mathbf{J}_f(\mathbf{x})
+$$
+We break this into two steps:</p>
+<ol>
+<li>First, compute \(\mathbf{\delta_y} = \mathbf{J}^T_g(\mathbf{y})\). This can be done manually or via auto-differentiation.</li>
+<li>Then, use radiative backpropagation to compute \(\mathbf{\delta_x} = \mathbf{J}^T_f\mathbf{\delta_y}\).</li>
+</ol>
+<h3 id="computing-mathbf-j-t-f-mathbf-delta-y">Computing \(\mathbf{J}^T_f\mathbf{\delta_y}\)</h3>
+<p>Express \(\mathbf{J}<em>f\) as a column vector:
+$$
+\mathbf{J}</em>{f} = [\partial_{\mathbf{x}}I_0, \cdots, \partial_{\mathbf{x}}I_n]
+$$</p>
+<p>Thus:
+$$
+\mathbf{J}^T_f\mathbf{\delta_y} = \sum_{k=1}^n\mathbf{\delta}_{\mathbf{y},k}\partial_{\mathbf{x}}I_k
+= \int_{\mathcal{A}}\int_{S^2}\left[\sum_{k=1}^n\mathbf{\delta}_{\mathbf{y},k}W_k(\mathbf{p},\mathbf{\omega})\right]\partial_\mathbf{x}L_i(\mathbf{p},\mathbf{\omega})\text{d}\mathbf{\omega}^{\perp}\text{d}\mathbf{p}
+$$</p>
+<p>Define the "emitted adjoint radiance":
+$$
+A_e(\mathbf{p},\mathbf{\omega}) := \sum_{k=1}^n\mathbf{\delta}_{\mathbf{y},k}W_k(\mathbf{p},\mathbf{\omega})
+$$
+After computing \(\mathbf{\delta_y}\), \(A_e\) can be trivially computed.</p>
+<p>Referencing the measurement equation, we can write:
+$$
+\mathbf{J}^T_f\mathbf{\delta_y} = \langle A_e, \partial_{\mathbf{x}}L_i \rangle
+$$</p>
+<p>Let:
+$$
+\mathbf{Q}(\mathbf{p},\mathbf{\omega}) := \partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}L_i(\mathbf{p},\mathbf{\omega'})\partial_{\mathbf{x}}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$</p>
+<p>Additionally, define two operators: the scattering operator \(\mathcal{K}\) and the transport operator \(\mathcal{G}\) as:
+$$
+(\mathcal{K}h)(\mathbf{p},\mathbf{\omega}) := \int_{S^2}h(\mathbf{p},\mathbf{\omega'})f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}
+$$
+$$
+(\mathcal{G}h)(\mathbf{p},\mathbf{\omega}) := h(\mathbf{r}(\mathbf{p},\mathbf{\omega}), -\mathbf{\omega})
+$$</p>
+<p>Based on these definitions, we obtain two equations:
+$$
+\partial_{\mathbf{x}}L_i = \mathcal{G}\partial_{\mathbf{x}}L_o
+$$
+$$
+\partial_{\mathbf{x}}L_o = \mathcal{K}\partial_{\mathbf{x}}L_i + \mathbf{Q}
+$$</p>
+<p>These correspond to the transport and scattering equations, respectively. According to a 1997 paper by Veach, we can directly derive some conclusions, such as:
+$$
+\partial_{\mathbf{x}}L_o = \mathcal{KG}\partial_{\mathbf{x}}L_o + \mathbf Q
+= (I - \mathcal{KG})^{-1}\mathbf{Q} = \sum_{i=0}^{\infty}(\mathcal{KG})^i\mathbf Q
+$$</p>
+<p>Let \(\mathcal S := (I - \mathcal{KG})^{-1}\). Then, \(\mathcal {G, K, GS}\) are all <strong>self-adjoint</strong> linear operators.</p>
+<blockquote>
+<p>A linear operator \(\mathcal O\) is self-adjoint if \(\forall v_1, v_2\), \(\langle \mathcal Ov_1, v_2\rangle = \langle v_1,\mathcal{O}v_2\rangle\).</p>
+</blockquote>
+<p>Therefore:
+$$
+\mathbf{J}^T_f\mathbf{\delta_y} = \langle A_e, \partial_{\mathbf{x}}L_i \rangle = \langle A_e, \mathcal{GS}\mathbf{Q} \rangle = \langle \mathcal{GS}A_e, \mathbf{Q} \rangle
+$$</p>
+<p>Applying the \(\mathcal{GS}\) operator to \(A_e\) does not change the result, essentially indicating that we can "start from the other side" to scatter and transport radiance, and the result remains the same. Since \(A_e\) is a scalar function and \(\mathbf Q\) is a vector function with the same dimension as \(\mathbf{x}\) (making it impossible to compute), applying the self-adjoint property makes it much easier to compute.</p>
+<p>After obtaining \(A_e\), we define similar "incident adjoint radiance" and "outgoing adjoint radiance" \(A_i, A_o\) as:
+$$
+A_i = \mathcal{G}A_o
+$$
+$$
+A_o = \mathcal{K}A_i + A_e
+$$</p>
+<p>Thus, we have adjoint radiance \(A_e, A_o, A_i\) that satisfies the fundamental rendering equations, turning backpropagation into "another forward rendering."</p>
+<h2 id="pseudocode">Pseudocode</h2>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">grad</span><span>(</span><span style="color:#bf616a;">x</span><span>):
+</span><span>    </span><span style="color:#65737e;"># Forward rendering
+</span><span>    y = </span><span style="color:#bf616a;">f</span><span>(x)
+</span><span>    </span><span style="color:#65737e;"># Compute the differential of y
+</span><span>    delta_y = </span><span style="color:#bf616a;">J_g</span><span>(y)
+</span><span>    </span><span style="color:#65737e;"># Use radiative backprop to compute the differential of x
+</span><span>    </span><span style="color:#b48ead;">return </span><span style="color:#bf616a;">radiative_backprop</span><span>(x, delta_y)
+</span><span>
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">radiative_backprop</span><span>(</span><span style="color:#bf616a;">x</span><span>, </span><span style="color:#bf616a;">delta_y</span><span>):
+</span><span>    delta_x = </span><span style="color:#d08770;">0
+</span><span>    </span><span style="color:#b48ead;">for </span><span style="color:#bf616a;">_ </span><span style="color:#b48ead;">in </span><span style="color:#96b5b4;">range</span><span>(num_samples):
+</span><span>        </span><span style="color:#65737e;"># Importance sample a ray
+</span><span>        p, omega, weight = sensor.</span><span style="color:#bf616a;">sample_ray</span><span>()
+</span><span>        </span><span style="color:#65737e;"># Compute emitted adjoint radiance
+</span><span>        weight *= </span><span style="color:#bf616a;">A_e</span><span>(delta_y, p, omega) / num_samples
+</span><span>        </span><span style="color:#65737e;"># Propagate adjoint radiance in the scene
+</span><span>        delta_x += </span><span style="color:#bf616a;">radiative_backprop_sample</span><span>(x, p, omega, weight)
+</span><span>    </span><span style="color:#b48ead;">return </span><span>delta_x
+</span><span>
+</span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">radiative_backprop_sample</span><span>(</span><span style="color:#bf616a;">x</span><span>, </span><span style="color:#bf616a;">p</span><span>, </span><span style="color:#bf616a;">omega</span><span>, </span><span style="color:#bf616a;">weight</span><span>):
+</span><span>    </span><span style="color:#65737e;"># Find the intersection point
+</span><span>    p_prime = </span><span style="color:#bf616a;">r</span><span>(p, omega)
+</span><span>    </span><span style="color:#65737e;"># If this point has emitted radiance (light source), add its contribution to the differential
+</span><span>    delta_x = </span><span style="color:#bf616a;">adjoint</span><span>([[ </span><span style="color:#bf616a;">L_e</span><span>(p_prime, -omega) ]], weight)
+</span><span>    </span><span style="color:#65737e;"># Sample a ray from the BSDF
+</span><span>    omega_prime, bsdf_value, bsdf_pdf = </span><span style="color:#bf616a;">sample</span><span>(</span><span style="color:#bf616a;">f_s</span><span>(p_prime, -omega, ·))
+</span><span>    </span><span style="color:#65737e;"># If this BSDF contributes to the differential, add it
+</span><span>    delta_x += </span><span style="color:#bf616a;">adjoint</span><span>([[ </span><span style="color:#bf616a;">f_s</span><span>(p_prime, -omega, omega_prime) ]],
+</span><span>                       weight * </span><span style="color:#bf616a;">L_i</span><span>(p, omega_prime) / bsdf_pdf)
+</span><span>    
+</span><span>    </span><span style="color:#65737e;"># Recursive step
+</span><span>    </span><span style="color:#b48ead;">return </span><span>delta_x + </span><span style="color:#bf616a;">radiative_backprop_sample</span><span>(x, p_prime, omega_prime, 
+</span><span>                                               weight * bsdf_value / bsdf_pdf)
+</span></code></pre>
+<p>The <code>adjoint([[ q(z) ]], delta)</code> function propagates the gradient \(\mathbf{\delta}\) to \(q\) (by computing \(\mathbf{J}_q^T(\mathbf{x},\mathbf{z})\mathbf{\delta}\)) and returns the gradient with respect to \(\mathbf{x}\).</p>
+<h2 id="optimization">Optimization</h2>
+<h3 id="using-biased-gradient-estimation-for-speedup">Using Biased Gradient Estimation for Speedup</h3>
+<p>Change the definition of \(\mathbf{Q}\) from:
+$$
+\mathbf{Q}(\mathbf{p},\mathbf{\omega}) := \partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}L_i(\mathbf{p},\mathbf{\omega'})\partial_{\mathbf{x}}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$
+to:
+$$
+\mathbf{Q}_{\text{approx}}(\mathbf{p},\mathbf{\omega}) := \partial_{\mathbf{x}}L_e(\mathbf{p},\mathbf{\omega}) + \int_{S^2}\partial_{\mathbf{x}}f_s(\mathbf{p},\mathbf{\omega},\mathbf{\omega'})\text{d}\mathbf{\omega'}^{\perp}
+$$
+i.e., directly remove the incident radiance (set it to 1). This avoids recursively computing incident radiance during radiative backprop.</p>
+<p><strong>Surprisingly</strong>, this not only speeds up computation but also improves convergence.</p>
+<h3 id="reusing-intermediate-results-for-speedup">Reusing Intermediate Results for Speedup</h3>
+<p>The authors note that many intermediate results in radiative backpropagation are the same as in forward rendering (e.g., BSDF sampling results, MIS weights). Therefore, we can perform backpropagation and the next forward rendering together, sampling only once.</p>
+<p>This essentially uses the gradient of \(\mathbf{y}\) from the previous iteration to propagate the gradient of \(\mathbf{x}\) in the current iteration, which is valid if the gradient changes smoothly.</p>
+<p>The pseudocode for this optimization is:</p>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">grad_optimized</span><span>(</span><span style="color:#bf616a;">x</span><span>):
+</span><span>    y = </span><span style="color:#bf616a;">f</span><span>(x)
+</span><span>    </span><span style="color:#b48ead;">while </span><span>not converged:
+</span><span>        delta_y = </span><span style="color:#bf616a;">J_g</span><span>(y)
+</span><span>        </span><span style="color:#65737e;"># Radiative backprop also renders the next y
+</span><span>        y, delta_x = </span><span style="color:#bf616a;">radiative_backprop</span><span>(x, delta_y)
+</span><span>        </span><span style="color:#65737e;"># Propagate gradient ...
+</span></code></pre>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

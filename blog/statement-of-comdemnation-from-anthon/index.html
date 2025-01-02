@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 安同开源社区有关 Linux 基金会及其职员不当行为的谴责</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>安同开源社区有关 Linux 基金会及其职员不当行为的谴责</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-10-24 12:00:00 +0000">October 24, 2024</span>&nbsp;·&nbsp;白铭骢
+</div>
+    
+
+    <div class="space"></div>
+    <p>本文转载自 <a href="https://aosc.io/news/detail/2024-10-24-condemnation-of-the-linux-foundation-and-its-employees.zh-cn.md">AOSC 社区</a>。</p>
+<span id="continue-reading"></span>
+<hr />
+<p>过去一天无疑是耻辱和令人绝望的。我们目睹了 Linus Torvalds 对我社贡献者乃至工作的攻击、侮辱和诋毁。</p>
+<p>上周日，一条践踏社区信任的、可耻的提交被无声合并。数十名俄罗斯籍 Linux 内核贡献者、子系统维护者在未被告知的情况下被革除维护者身份。<sup class="footnote-reference"><a href="#1">1</a></sup> 在诸多提出质疑的内核贡献者与关注者中，我社人员也提出了自己的质疑和严厉批评。<sup class="footnote-reference"><a href="#2">2</a></sup> <sup class="footnote-reference"><a href="#3">3</a></sup> 而 Linux 基金会在此事中不仅没有发布任何公告解释行为，Linux 内核项目创始人和核心维护人员 Linus Torvalds 与 <a href="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git">linux-stable</a> 分支维护者 Greg Kroah-Hartman 两位技术人员更是伙同 Linux 基金会一道，开始了极具歧视性的“猎巫行动”。</p>
+<p>在此次新一轮回应之前，昨日我社人员编撰的新闻稿中已有详细的背景介绍，此处全文贴出：</p>
+<blockquote>
+<p>日前，Linux 内核主要维护者之一 Greg Kroah-Hartman (Greg K-H) 提交了一项不寻常的“文档”<a href="https://github.com/torvalds/linux/commit/6e90b675cf942e50c70e8394dfb5862975c3b3b2">更新</a>，将数名具有 &lt;.ru&gt; 顶级域名邮箱的维护者，和一名明确为俄罗斯身份的维护者从 MAINTAINERS（维护者名录）文件除名。</p>
+<p>这一提交已于上周日被 Linus Torvalds 拉取并包含于 6.12-rc4 版本的代码中。</p>
+<p>Greg K-H 并未详述这项更新的具体原因，仅含糊其辞地表示该更改是“由于某些合规性要求”，并指出“（相关人员）提供充足文档后，方可回归（维护者名录）”。</p>
+<p>相关的维护者移除方式相当暴力，其中部分子系统由于唯一维护者使用 &lt;.ru&gt; 顶级域名邮箱，整个子系统都被从 MAINTAINERS 文件中移除，这之中不乏诸如 UFS 文件系统和 PPTP 驱动等重要且被广泛使用的子系统。由于 Linux 内核开发流程完全基于邮件列表进行，当 MAINTAINERS 文件中移除相关维护者后，也就意味着与相关子系统的补丁或沟通将不再被发送至维护者的邮箱，乃至相关的邮件列表。这很可能会造成许多补丁“石沉大海”；而如果某个子系统未得到充分维护，那么其被从内核中移除也只是时间问题了。</p>
+<p>通常而言，Linux 内核补丁除了发送至邮件列表外，还需要抄送与之相关的人士（如子系统维护者和活跃贡献者），并且经过讨论和审阅后才会被拉取合并。然而，Greg K-H 似乎刻意绕过了这部分流程，仅仅将补丁发送至流量最大、几乎不会有人认真阅读每封邮件的 <a href="https://lore.kernel.org/linux-patches/?t=20241018113153">patches@lists.linux.dev</a> 列表，并于仅仅两天后就向 Linus Torvalds 发起拉取请求，而 Torvalds 亦未对相关修改提出质疑和意见便拉取合并这笔更改了。</p>
+<p>考虑到 Linus Torvalds 与 Greg K-H 均受雇于 The Linux Foundation，后者为注册在美国的 501©(6) 组织，“某些合规性要求”为何显而易见。</p>
+<p>截至发稿时，Greg K-H 尚未回应邮件列表上的相关质询。无论结果为何，这都将是 Linux 内核社区历史上最为耻辱的提交之一。</p>
+</blockquote>
+<p>在这一风波伊始，我社贡献者柯晓宇采取了非常勇敢的行动，在提出撤回补丁 (Revert) 的同时，据理力争表达了自己的不满与质疑。<sup class="footnote-reference"><a href="#4">4</a></sup> 与此同时，我们的贡献者密切地关注着这个话题，我们都抱有一丝似有似无的希望：“Greg Kroah-Hartman 和 Linus Torvalds 是否正迫于难以言状的政治压力才做出如此令人意外的事情？”</p>
+<p>很不幸的是，在 Greg Kroah-Hartman 选择违反 <a href="https://people.kernel.org/tglx/notes-about-netiquette-qw89">Linux 邮件列表网络礼仪</a> 与列表中的多人私下交涉后（我社贡献者白铭骢在认定 Greg Kroah-Hartman 的私下沟通全无诚意且具有侮辱性后选择公开邮件对话全文<sup class="footnote-reference"><a href="#5">5</a></sup>，Linus Torvalds 直接选择了最令人不齿的方式回应质疑——攻击、侮辱和诋毁我社贡献者<sup class="footnote-reference"><a href="#6">6</a></sup>：</p>
+<blockquote>
+<p>It's entirely clear why the change was done, it's not getting reverted, and using multiple random anonymous accounts to try to "grass root" it by Russian troll factories isn't going to change anything.</p>
+</blockquote>
+<blockquote>
+<p>为什么要这样改原因很明确，我们也不会撤回这个提交。就算这样用一堆俄罗斯巨魔工厂里整来的匿名账号群起而攻之，结果也不会改变。</p>
+</blockquote>
+<p>Linus Torvalds 还提到，“无辜的路人们”应当理解 Greg Kroah-Hartman 所指的“某些合规性要求”并非美国专利。他还指出，不了解什么是对俄制裁的读者有空应该“多读新闻”。</p>
+<p>而后，Linus Torvalds 话锋一转，攻击由柯晓宇提交的关于撤回变更的补丁：</p>
+<blockquote>
+<p>As to sending me a revert patch - please use whatever mush you call brains. I'm Finnish. Did you think I'd be <em>supporting</em> Russian aggression? Apparently it's not just lack of real news, it's lack of history knowledge too.</p>
+</blockquote>
+<blockquote>
+<p>至于前面发来的撤回补丁，请用一用你们那坨可能叫做脑子的东西。我是芬兰人，你们觉得我可能会<strong>支持</strong>俄国的侵略吗？显然你们不光没读过真实的新闻，还对历史一无所知。</p>
+</blockquote>
+<p>在如今地缘政治极端紧张的今天，Linus Torvalds 选择使用国籍囊括政治观点的行为极端不负责任。更不用说将社区的一切反对意见都归结为“俄罗斯巨魔”和吸取“俄罗斯国家赞助的垃圾信息”的后果。Linus Torvalds 的发言无疑将为 Linux 内核及国际开源社区的协作互信，乃至全人类自由与开源软件运动带来难以弥补的损害。</p>
+<p>因上述事由，我们对 Linux 基金会职员、乃至该组织的不当行为表示强烈抗议和谴责。我们要求 Linux 基金会就 Linus Torvalds 及 Greg Kroah-Hartman 的行为作出解释并对所有相关人员致歉并恢复名誉。</p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a href="https://lore.kernel.org/all/2024101835-tiptop-blip-09ed@gregkh/">https://lore.kernel.org/all/2024101835-tiptop-blip-09ed@gregkh/</a></p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p><a href="https://lore.kernel.org/all/a08dc31ab773604d8f206ba005dc4c7a@aosc.io/">https://lore.kernel.org/all/a08dc31ab773604d8f206ba005dc4c7a@aosc.io/</a></p>
+</div>
+<div class="footnote-definition" id="3"><sup class="footnote-definition-label">3</sup>
+<p><a href="https://lore.kernel.org/all/20241023080935.2945-2-kexybiscuit@aosc.io/">https://lore.kernel.org/all/20241023080935.2945-2-kexybiscuit@aosc.io/</a></p>
+</div>
+<div class="footnote-definition" id="4"><sup class="footnote-definition-label">4</sup>
+<p><a href="https://lore.kernel.org/all/20241023080935.2945-2-kexybiscuit@aosc.io/">https://lore.kernel.org/all/20241023080935.2945-2-kexybiscuit@aosc.io/</a></p>
+</div>
+<div class="footnote-definition" id="5"><sup class="footnote-definition-label">5</sup>
+<p>Mingcong Bai, one of our community's contributors decided to publish Greg Kroah-Hartman's private conversation, having found humiliation and little sincerity in the communication, <a href="https://lore.kernel.org/all/444fa53bdfdee75522a1af41655a99b0@aosc.io/">https://lore.kernel.org/all/444fa53bdfdee75522a1af41655a99b0@aosc.io/</a></p>
+</div>
+<div class="footnote-definition" id="6"><sup class="footnote-definition-label">6</sup>
+<p><a href="https://lore.kernel.org/all/CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com/">https://lore.kernel.org/all/CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com/</a></p>
+</div>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

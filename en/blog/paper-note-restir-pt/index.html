@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>Chris Zhang&#x27;s Blog | Paper Note: Generalized Resampled Importance Sampling - ReSTIR PT</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe/en">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>Paper Note: Generalized Resampled Importance Sampling - ReSTIR PT</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-10-17 15:49:21 +0000">October 17, 2024</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p><a href="https://blog.zcy.moe/blog/paper-note-gris/">Continuing from the previous discussion</a>, ReSTIR PT uses ReSTIR to reuse paths. Since the path spaces of different pixels are not the same, we must find an appropriate way to reuse paths—this corresponds to the shift mapping in GRIS theory.</p>
+<span id="continue-reading"></span><h2 id="formal-definition-of-shift-mapping-in-restir-pt">Formal Definition of Shift Mapping in ReSTIR PT</h2>
+<p>For pixel \(k\) and pixel \(j\), \(T: \Omega_k \to \Omega_j\) is a mapping from the path space of \(k\) to the path space of \(j\):</p>
+<p>
+$$
+T\left(\left[ 
+    \textbf{x}_0, \textbf{x}_1, \textbf{x}_2, \textbf{x}_3, ... \right]\right)
+ = \left[ \textbf{y}_0, \textbf{y}_1, \textbf{y}_2, \textbf{y}_3, ... \right]
+$$
+</p>
+<p>Note that \(\mathbf{y}_0\) is the camera, \(\mathbf{y}_1\) is the primary ray-traced intersection, and what we need to map is \(\mathbf{y}_n, n \geq 2\).</p>
+<ul>
+<li>
+<p>The shift mapping is a bijection from a subset of \(\Omega_k\) to a subset of \(\Omega_j\)—if \(T_{k\to j}(\overline{\mathbf{x}}) = \overline{\mathbf{y}}\), then \(T_{j\to k}(\overline{\mathbf{y}}) = \overline{\mathbf{x}}\).</p>
+</li>
+<li>
+<p>At the same time, we want the mapped path to be as similar as possible to the original path, i.e., \(f_k(T_k(\mathbf{\overline{x}})) \approx f_j(\overline{\mathbf{x}})\) and \(\left| \frac{\partial T_k}{\partial \overline{\mathbf{x}}} \right| \approx 1\).</p>
+</li>
+</ul>
+<h2 id="available-shift-mapping-strategies">Available Shift Mapping Strategies</h2>
+<ul>
+<li>
+<p><strong>Vertex Reuse (Vertex Copy / Reconnection):</strong></p>
+<p>Directly reuse the vertices of the original path, \(y_{i+1} = x_{i+1}\) (reuse the entire path starting from \(i+1\)).</p>
+<ul>
+<li>Only applicable when \(x_i, x_{i+1}, y_{i+1}\) are all on rough surfaces.</li>
+</ul>
+</li>
+<li>
+<p><strong>Half-Vector Reuse (Half-Vector Copy):</strong></p>
+<p>Convert the half-vector of the base path to the local tangent space, reuse it for the offset path, and then trace \(y_{i+1}\).</p>
+<ul>
+<li>Can handle reflections.</li>
+</ul>
+</li>
+<li>
+<p><strong>Direction Reuse (Direction Copy):</strong></p>
+<p>Reuse the outgoing direction of the base path for the offset path.</p>
+<ul>
+<li>Typically used for sampling environment maps.</li>
+</ul>
+</li>
+<li>
+<p><strong>Random Number Reuse (Random Replay):</strong></p>
+<p>Reuse the random numbers of the base path at the current bounce to sample \(y_{i+1}\).</p>
+<ul>
+<li>
+<p>Computationally expensive.</p>
+</li>
+<li>
+<p>Often performs similarly to half-vector or direction reuse.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Manifold Exploration:</strong></p>
+<p>See <a href="https://mediatech.aalto.fi/publications/graphics/GMLT/">Lehtinen et al. 2013</a>, <a href="https://www.cs.cornell.edu/projects/manifolds-sg12/">Jakob and Marschner 2012</a>.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p><strong>ReSTIR GI Strategy:</strong></p>
+<p><del>Although back then humans didn’t have GRIS theory, in hindsight we can say</del> it directly records outgoing radiance on probes to sample single-bounce GI, which essentially corresponds to unconditional \(y_2 = x_2\) reconnection shift.</p>
+</li>
+<li>
+<p><strong>ReSTIR PT Strategy:</strong></p>
+<p>Combines random replay and reconnection <a href="https://profs.etsmtl.ca/agruson/publication/2019_gradientstar/">[Hua et al. 2019]</a>. Reuse vertices when reconnection is suitable; otherwise, reuse random numbers.</p>
+<p>The core contribution of the latter half of the paper is proposing an effective heuristic to determine reuse conditions.</p>
+</li>
+</ul>
+<h2 id="when-to-reuse-vertices">When to Reuse Vertices?</h2>
+<p>The authors propose two new criteria to decide when vertices cannot be reused.</p>
+<h3 id="distance-criterion">Distance Criterion</h3>
+<p>It is observed that in the rendering equation:</p>
+<p>
+$$
+L_o(\mathbf{x}, \omega_o) = L_e(\mathbf{x}, \omega_o) + \int_{\Omega} f_r(\mathbf{x}, \omega_i, \omega_o) L_i(\mathbf{x}, \omega_i) G(\mathbf{x}, \mathbf{x'}) V(\mathbf{x}, \mathbf{x'}) \text{d}\omega_i
+$$
+</p>
+<p>the geometric term:</p>
+<p>
+$$
+G(\mathbf{x}, \mathbf{x'}) = \frac{ \cos \theta_x \cos \theta_{x'} }{ |\mathbf{x} - \mathbf{x'}|^2 }
+$$
+</p>
+<p>contains an inverse-square dependence on the distance between vertices. When two vertices are very close, this results in a large weight, which can lead to high variance. Therefore, the distance criterion is defined such that reuse is allowed only when:</p>
+<p>
+$$
+\|\mathbf{x}_i - \mathbf{x}_{i+1} \| \geq d_{\max}
+$$
+</p>
+<p>In other words, "if the distance between \(\mathbf{x}_{i+1}\) and \(\mathbf{x}_i\) is less than the threshold, the vertex cannot be reused."</p>
+<h3 id="lobe-criterion">Lobe Criterion</h3>
+<p>When inspecting surface roughness, we encounter BSDFs with multiple lobes (e.g., a diffuse surface with a clear coat). During evaluation, only one lobe is selected at a time. Reconnection is allowed only when the roughness of \(x_i, x_{i+1}, y_{i+1}\) is sufficiently high. Since only one lobe is selected at a time, the path must additionally record the lobe ID for each path vertex.</p>
+<blockquote>
+<p>The hybrid mapping ultimately used performs reconnection shift when the above two conditions are met and random replay when they are not.</p>
+</blockquote>
+<h2 id="jacobian-matrix-of-shift-mapping">Jacobian Matrix of Shift Mapping</h2>
+<p>Define the unit vector from \(\mathbf{x}<em>i\) to \(\mathbf{x}</em>{i+1}\) as \(\omega_i^\mathcal{X}\). The random number for light transport at this step is \(\overline{\mathbf{u}}_i^\mathcal{X}\). Then:</p>
+<h3 id="solid-angle-perspective">Solid Angle Perspective</h3>
+<ul>
+<li>Jacobian for Vertex Reuse:</li>
+</ul>
+<p>
+$$
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right| = \left|\frac{\cos \theta_2^y}{\cos \theta_2^x}\right| \cdot \frac{\|\mathbf x_{i+1} - \mathbf x_i\|^2}{\|\mathbf x_{i+1} - \mathbf y_i\|^2}
+$$
+</p>
+<p>where \(\theta_2^\circ\) is the angle between \(\omega_i^\circ\) and its corresponding surface normal.</p>
+<ul>
+<li>Jacobian for Random Number Reuse:</li>
+</ul>
+<p>
+$$
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right| = \left|\frac{\partial \omega_i^y}{\partial \overline{\mathbf u}_i^y}\right| \left|\frac{\partial \overline{\mathbf u}_i^y}{\partial \overline{\mathbf u}_i^x}\right|\left|\frac{\partial \overline{\mathbf u}_i^x}{\partial \omega_i^x}\right| = \frac{p_{\omega_i^x}(\mathbf x_{i+1})}{p_{\omega_i^y}(\mathbf y_{i+1})}
+$$
+</p>
+<p>This corresponds to the ratio of probability densities for solid angle sampling.</p>
+<h3 id="primary-sample-space-perspective">Primary Sample Space Perspective</h3>
+<ul>
+<li>
+<p>Jacobian for Random Number Reuse: Always 1.</p>
+</li>
+<li>
+<p>Jacobian for Vertex Reuse:</p>
+</li>
+</ul>
+<p>
+$$
+\left|\frac{\partial \overline{\mathbf u}_i^y}{\partial \overline{\mathbf u}_i^x}\right| = 
+\left|\frac{\partial \overline{\mathbf u}_i^y}{\partial \omega_i^y}\right|
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right|
+\left|\frac{\partial \omega_i^x}{\partial \overline{\mathbf u}_i^x}\right| =
+\frac{p_{\omega_i^y}(\mathbf y_{i+1})}{p_{\omega_i^x}(\mathbf x_{i+1})} \cdot
+\left|\frac{\partial \omega_i^y}{\partial \omega_i^x}\right|
+$$
+</p>
+<p>Note that, since the reuse decision is made locally for each step, the global Jacobian is the product of all local Jacobians.</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

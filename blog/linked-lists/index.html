@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 双向链表的正确姿势是？</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>双向链表的正确姿势是？</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2022-02-20 22:58:16 +0000">February 20, 2022</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>学完 <a href="https://rust-unofficial.github.io/too-many-lists/">too many linked lists</a> 之后，我跃跃欲试地想要实现一个书中 WIP 的 <code>unsafe</code> 双向链表。</p>
+<span id="continue-reading"></span>
+<p>有了 <code>unsafe</code> 链表的经验，其实双向链表并不算很困难，很快就写出来了。核心的两个结构定义如下：</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub struct </span><span>List&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">head</span><span>: </span><span style="color:#b48ead;">*mut </span><span>Node&lt;T&gt;,
+</span><span>    </span><span style="color:#bf616a;">tail</span><span>: </span><span style="color:#b48ead;">*mut </span><span>Node&lt;T&gt;
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">pub struct </span><span>Node&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">data</span><span>: T,
+</span><span>    </span><span style="color:#bf616a;">prev</span><span>: </span><span style="color:#b48ead;">*mut </span><span>Node&lt;T&gt;,
+</span><span>    </span><span style="color:#bf616a;">next</span><span>: </span><span style="color:#b48ead;">*mut </span><span>Node&lt;T&gt;
+</span><span>}
+</span></code></pre>
+<p>实际上，如果把 <code>*mut Node&lt;T&gt;</code> 和 C++ 中的 <code>Node&lt;T&gt;*</code> 做简单对应，我们很快就会发现它和 C++ 版几乎是等价的：</p>
+<pre data-lang="c++" style="background-color:#2b303b;color:#c0c5ce;" class="language-c++ "><code class="language-c++" data-lang="c++"><span style="color:#b48ead;">template</span><span>&lt;</span><span style="color:#b48ead;">typename</span><span> T&gt;
+</span><span style="color:#b48ead;">struct </span><span>List&lt;T&gt; {
+</span><span>    Node&lt;T&gt; *head;
+</span><span>    Node&lt;T&gt; *tail;
+</span><span>};
+</span><span>
+</span><span style="color:#b48ead;">template</span><span>&lt;</span><span style="color:#b48ead;">typename</span><span> T&gt;
+</span><span style="color:#b48ead;">struct </span><span>Node&lt;T&gt; {
+</span><span>    T data;
+</span><span>    Node&lt;T&gt; *prev;
+</span><span>    Node&lt;T&gt; *next;
+</span><span>}
+</span></code></pre>
+<p>后面的实现多数比较四平八稳，涉及一些 <code>unsafe</code>，但整体逻辑很清晰（反正和写 C 没啥区别）。</p>
+<p>写完之后，感觉这个实现已经很合适了，于是开始看标准库的实现——为什么会是这样？</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub struct </span><span>LinkedList&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">head</span><span>: Option&lt;NonNull&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">tail</span><span>: Option&lt;NonNull&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">len</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#bf616a;">marker</span><span>: PhantomData&lt;Box&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">struct </span><span>Node&lt;T&gt; {
+</span><span>    </span><span style="color:#bf616a;">next</span><span>: Option&lt;NonNull&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">prev</span><span>: Option&lt;NonNull&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">element</span><span>: T,
+</span><span>}
+</span></code></pre>
+<p>首先看 <code>Node</code>。</p>
+<p>查阅标准库的定义，<code>std::ptr::NonNull&lt;T&gt;</code> 的定义是 "<code>*mut T</code> but non-zero and covariant"，即一个非空协变的裸指针。那么在 <code>NonNull</code> 外面再套一层 <code>Option</code>，就会得到一个可空协变的裸指针。</p>
+<p>这样做的好处是显然的：<code>Node&lt;T&gt;</code> 的所有成员都是协变的，那么 <code>Node&lt;T&gt;</code> 就是协变的。有协变的单元对于容器使用是一件很方便的事情。</p>
+<p>然后看 <code>LinkedList</code>。</p>
+<p>我们知道，<code>PhantomData</code> 的作用是留住没有用到的类型参数 / 生命周期参数，但前面的 <code>head</code> 和 <code>tail</code> 里面都有 <code>T</code> 了，这里为什么还要放一个 <code>marker: PhantomData&lt;Box&lt;Node&lt;T&gt;&gt;&gt;</code> 呢？</p>
+<p>这确实非常令人迷惑……直到我看到下面的 <code>Iter</code>:</p>
+<pre data-lang="rust" style="background-color:#2b303b;color:#c0c5ce;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#b48ead;">pub struct </span><span>Iter&lt;</span><span style="color:#b48ead;">&#39;a</span><span>, T: </span><span style="color:#b48ead;">&#39;a</span><span>&gt; {
+</span><span>    </span><span style="color:#bf616a;">head</span><span>: Option&lt;NonNull&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">tail</span><span>: Option&lt;NonNull&lt;Node&lt;T&gt;&gt;&gt;,
+</span><span>    </span><span style="color:#bf616a;">len</span><span>: </span><span style="color:#b48ead;">usize</span><span>,
+</span><span>    </span><span style="color:#bf616a;">marker</span><span>: PhantomData&lt;&amp;</span><span style="color:#b48ead;">&#39;a </span><span>Node&lt;T&gt;&gt;,
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">impl</span><span>&lt;T&gt; LinkedList&lt;T&gt; {
+</span><span>    </span><span style="color:#65737e;">// ...
+</span><span>    </span><span style="color:#b48ead;">pub fn </span><span style="color:#8fa1b3;">iter</span><span>(&amp;</span><span style="color:#bf616a;">self</span><span>) -&gt; Iter&lt;&#39;_, T&gt; {
+</span><span>        Iter { head: </span><span style="color:#bf616a;">self</span><span>.head, tail: </span><span style="color:#bf616a;">self</span><span>.tail, len: </span><span style="color:#bf616a;">self</span><span>.len, marker: PhantomData }
+</span><span>    }
+</span><span>    </span><span style="color:#65737e;">// ...
+</span><span>}
+</span></code></pre>
+<p>作为对比，我实现的 Iter 里面只有两个 <code>Option&lt;&amp;'a Node&lt;T&gt;&gt;</code>。</p>
+<p>虽然链表本身不需要 <code>PhantomData</code> 来记录生命周期，但是 <code>Iter</code> 使用 <code>NonNull&lt;Node&lt;T&gt;&gt;</code> 而非 <code>&amp;'a Node&lt;T&gt;</code> ，需要额外的生命周期标注，因此在这里引入了一个 <code>PhantomData</code>（而且注意，<code>PhantomData</code> 是 ZST，不会引起任何额外运行时开销）。</p>
+<p>这个问题其实说明了一个事实，即 <code>Rust</code> 中并不存在与 <code>C</code> 指针行为完全一致的东西—— <code>*mut T</code> 不协变，<code>NonNull&lt;T&gt;</code> 不可空（硬放空值是 UB），在使用它们的时候还是要小心加小心，而且要根据自己的需求选择最合适的类型。</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

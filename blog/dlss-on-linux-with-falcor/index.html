@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 尝试在 Linux Falcor 上启用 DLSS（并且失败）</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>尝试在 Linux Falcor 上启用 DLSS（并且失败）</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-12-17 18:13:42 +0000">December 17, 2024</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>一个研究生尝试在 Linux 的 Falcor 上强行启用 DLSS，这是他的系统产生的变化……</p>
+<span id="continue-reading"></span><h2 id="qi-yin">起因</h2>
+<p>我在使用 Falcor 提供的一个标准的 Path Tracer render graph，定义如下：</p>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">render_graph_PathTracer</span><span>():
+</span><span>    g = </span><span style="color:#bf616a;">RenderGraph</span><span>(&quot;</span><span style="color:#a3be8c;">PathTracer</span><span>&quot;)
+</span><span>    PathTracer = </span><span style="color:#bf616a;">createPass</span><span>(&quot;</span><span style="color:#a3be8c;">PathTracer</span><span>&quot;, {&#39;</span><span style="color:#a3be8c;">samplesPerPixel</span><span>&#39;: </span><span style="color:#d08770;">1</span><span>})
+</span><span>    g.</span><span style="color:#bf616a;">addPass</span><span>(PathTracer, &quot;</span><span style="color:#a3be8c;">PathTracer</span><span>&quot;)
+</span><span>    VBufferRT = </span><span style="color:#bf616a;">createPass</span><span>(&quot;</span><span style="color:#a3be8c;">VBufferRT</span><span>&quot;, {&#39;</span><span style="color:#a3be8c;">samplePattern</span><span>&#39;: &#39;</span><span style="color:#a3be8c;">Stratified</span><span>&#39;, &#39;</span><span style="color:#a3be8c;">sampleCount</span><span>&#39;: </span><span style="color:#d08770;">16</span><span>, &#39;</span><span style="color:#a3be8c;">useAlphaTest</span><span>&#39;: </span><span style="color:#d08770;">True</span><span>})
+</span><span>    g.</span><span style="color:#bf616a;">addPass</span><span>(VBufferRT, &quot;</span><span style="color:#a3be8c;">VBufferRT</span><span>&quot;)
+</span><span>    AccumulatePass = </span><span style="color:#bf616a;">createPass</span><span>(&quot;</span><span style="color:#a3be8c;">AccumulatePass</span><span>&quot;, {&#39;</span><span style="color:#a3be8c;">enabled</span><span>&#39;: </span><span style="color:#d08770;">True</span><span>, &#39;</span><span style="color:#a3be8c;">precisionMode</span><span>&#39;: &#39;</span><span style="color:#a3be8c;">Single</span><span>&#39;})
+</span><span>    g.</span><span style="color:#bf616a;">addPass</span><span>(AccumulatePass, &quot;</span><span style="color:#a3be8c;">AccumulatePass</span><span>&quot;)
+</span><span>    ToneMapper = </span><span style="color:#bf616a;">createPass</span><span>(&quot;</span><span style="color:#a3be8c;">ToneMapper</span><span>&quot;, {&#39;</span><span style="color:#a3be8c;">autoExposure</span><span>&#39;: </span><span style="color:#d08770;">False</span><span>, &#39;</span><span style="color:#a3be8c;">exposureCompensation</span><span>&#39;: </span><span style="color:#d08770;">0.0</span><span>})
+</span><span>    g.</span><span style="color:#bf616a;">addPass</span><span>(ToneMapper, &quot;</span><span style="color:#a3be8c;">ToneMapper</span><span>&quot;)
+</span><span>    g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">VBufferRT.vbuffer</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">PathTracer.vbuffer</span><span>&quot;)
+</span><span>    g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">VBufferRT.viewW</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">PathTracer.viewW</span><span>&quot;)
+</span><span>    g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">VBufferRT.mvec</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">PathTracer.mvec</span><span>&quot;)
+</span><span>    g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">PathTracer.color</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">AccumulatePass.input</span><span>&quot;)
+</span><span>    g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">AccumulatePass.output</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">ToneMapper.src</span><span>&quot;)
+</span><span>    g.</span><span style="color:#bf616a;">markOutput</span><span>(&quot;</span><span style="color:#a3be8c;">ToneMapper.dst</span><span>&quot;)
+</span><span>    </span><span style="color:#b48ead;">return </span><span>g
+</span></code></pre>
+<p>首先做一次 RT 得到轻量级的 V-Buffer，然后将 V-Buffer 的输出交给 PathTracer 去渲染，经由 Accumulate 积累之后最后用 ToneMapper 输出 LDR 颜色。作为一个完整的 real time path tracer，它的实现完全没有问题，但一个很重要问题是：它太慢了。每帧的时间要大约 60ms，意味着输出中只有 15-20 fps，而查看 profiler 可以得知，几乎所有的时间都花在了 PathTracer 上。</p>
+<p>于是，我们很轻易地得到了任何游戏都会遇到的问题（和自然而然的解决方案）：光追太贵了（，于是让我们打开 DLSS 吧！）</p>
+<p>因为 Falcor 用 Python 作为脚本的设计，改写 render graph 非常简单，只需要添加 DLSSPass 的构建</p>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span>DLSSPass = </span><span style="color:#bf616a;">createPass</span><span>(&quot;</span><span style="color:#a3be8c;">DLSSPass</span><span>&quot;, {&#39;</span><span style="color:#a3be8c;">motionVectorScale</span><span>&#39;: &#39;</span><span style="color:#a3be8c;">Relative</span><span>&#39;})
+</span><span>g.</span><span style="color:#bf616a;">addPass</span><span>(DLSSPass, &quot;</span><span style="color:#a3be8c;">DLSSPass</span><span>&quot;)
+</span></code></pre>
+<p>并且将对应的 buffer 交给 DLSSPass 即可</p>
+<pre data-lang="python" style="background-color:#2b303b;color:#c0c5ce;" class="language-python "><code class="language-python" data-lang="python"><span>g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">VBufferRT.mvec</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">DLSSPass.mvec</span><span>&quot;)
+</span><span>g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">VBufferRT.depth</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">DLSSPass.depth</span><span>&quot;)
+</span><span>g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">PathTracer.color</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">DLSSPass.color</span><span>&quot;)
+</span><span>g.</span><span style="color:#bf616a;">addEdge</span><span>(&quot;</span><span style="color:#a3be8c;">DLSSPass.output</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">AccumulatePass.input</span><span>&quot;)
+</span></code></pre>
+<p>事情本应如此——但我很快发现，在编译好的 bin/Release 里，并没有 <code>DLSSPass.so</code>. 这是怎么回事？</p>
+<h2 id="pai-cha">排查</h2>
+<p>首先检查 CMake 的变量，<code>FALCOR_HAS_DLSS</code> 确实是启用的。再查看 <code>DLSSPass/CMakeLists.txt</code> 很快就能发现问题：</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>if(NOT (FALCOR_HAS_DLSS AND FALCOR_HAS_D3D12))
+</span><span>    return()
+</span><span>endif()
+</span></code></pre>
+<p>只有 D3D12 也启用的情况下，才能启用 DLSS，我在 Linux 环境上，自然没有这个东西——但我在 Linux 上打游戏的经验告诉我，Linux 上的 Vulkan somehow 是能启用 DLSS 的，于是看看能不能删掉这个条件让他强行编译——</p>
+<p>答案是不能，在 <code>DLSSPass/NGXWrapper.cpp::initializeNGX</code> 里出现了 <code>char *</code> 和 <code>wchar_t *</code> 不能隐式转换的问题——NVIDIA 的朋友们在写代码的时候可能是只考虑了 Windows，至少这个在 linux-gcc 上是过不了编译的——先手动转换 <code>wstring</code> 即可解决问题。</p>
+<p>紧接着是 <code>DLSSPass/NGXWrapper.cpp::queryOptimalSettings</code> 里出现了 <code>NGX_DLSS_GET_OPTIMAL_SETTINGS</code> 找不到的问题——翻找 DLSS 3.5 的 API Toolkit 可以发现，这个函数在 <code>nvsdk_ngx_helpers.h</code> 里，而 <code>DLSSPass/NGXWrapper.cpp</code> 只有在有 D3D12 的时候才会 include 这个头文件——手动将它 include 进来也可以解决问题。</p>
+<p>在最后修好一切之后，我们得到了</p>
+<p><img src="/images/dlss_on_linux_with_falcor/error.webp" alt="" /></p>
+<p>好吧。</p>
+<h2 id="wei-sheng">尾声</h2>
+<p>最后查阅 NVIDIA 的公告，他们确实从未有过 DLSS for Vulkan on Linux 的原生支持，唯一一次<a href="https://www.nvidia.com/en-us/geforce/news/june-2021-rtx-dlss-game-update/">与 Linux 有关的公告</a>还是在说通过 Proton 支持了 Linux.</p>
+<p>或许是时候装 Windows 了，welcome to modern graphics :(</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- JS for KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <title>茨月的博客 | 短评 Genesis AI 视频——为什么渲染仍然无可替代</title>
+    
+    <link rel="stylesheet" href="https://blog.zcy.moe/style.css?h=05ce8a9f27c3f6647cbb">
+    
+</head>
+<body>
+    
+<header class="space">
+    
+        <a href="https:&#x2F;&#x2F;blog.zcy.moe">&LeftArrow; Home</a>
+    
+</header>
+
+    
+<main>
+    <h1>短评 Genesis AI 视频——为什么渲染仍然无可替代</h1>
+
+    
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+
+<span title="2024-12-18 22:46:22 +0000">December 18, 2024</span>&nbsp;·&nbsp;茨月
+</div>
+    
+
+    <div class="space"></div>
+    <p>刚刚朋友给我发了一个叫 <a href="https://genesis-embodied-ai.github.io/">Genesis</a> 的集成了 AI 的物理引擎让我点评。借着这个机会在 AI 视频和渲染的话题上稍微发挥两句。</p>
+<span id="continue-reading"></span>
+<p>从他们的 project page 上看，Genesis 是一个非常巨大的框架，包含几个部分：</p>
+<ul>
+<li>一个通用的物理引擎，实现了很多不同的求解器</li>
+<li>一个机器人模拟平台，推测是基于这个物理引擎实现的一套用户友好的抽象</li>
+<li>一个照片级渲染系统，用了 LuisaRender，作为项目的参与者我与有荣焉</li>
+<li>一个生成式数据引擎，通过用户提供的 prompt 生成不同模态的数据</li>
+</ul>
+<p>是一个工程量很大的 rocket science 工作。这样说来可能抽象，但整个工作流配合起来能够实现「用户输入描述，系统输出视频」的效果。给定 Prompt 为「A miniature Wukong holding a stick in his hand sprints across a table surface for 3 seconds, then jumps into the air, and swings his right arm downward during landing. The camera begins with a close-up of his face, then steadily follows the character while gradually zooming out. When the monkey leaps into the air, at the highest point of the jump, the motion pauses for a few seconds. The camera circles around the character for 360 degrees, and slowly ascends, before the action resumes」，这是 <a href="https://bucket.zcy.moe/wukong_genesis.mov">Genesis 输出的视频</a>：</p>
+<p style="text-align: center;">
+<video controls="" muted="" loop="" playsinline="" width="75%">
+    <source src="https://bucket.zcy.moe/wukong_genesis.mov" type="video/mp4">
+</video>
+</p>
+<p>没错，这个功能和 OpenAI 此前大火、最近正式发布的 Sora 是一致的。Sora 的一大特点是想象力丰富，但对现实世界的规则理解不足。就生成一段体操运动视频这个任务而言，这是<a href="https://bucket.zcy.moe/sora_gymnastics.mp4">Sora 生成的结果</a>：</p>
+<p style="text-align: center;">
+<video controls="" muted="" loop="" playsinline="" width="75%">
+    <source src="https://bucket.zcy.moe/sora_gymnastics.mp4" type="video/mp4">
+</video>
+</p>
+<p>充满了胳膊和腿的突变，难以形成一致的动作。这也是生成式大模型，尤其是文生图和文生视频大模型的一个问题：Hallucination，它并没有充分理解现实世界中的规则（如人体的肌肉和组织如何工作，能够做到什么、不能够做到什么），进而生成出带有幻觉的内容。而 Genesis 则输出了清晰锐利的视频，里面含有非常合理的动作以及合适的运镜。</p>
+<p>诚然，把一个精挑细选出的好结果和一个最难的任务下表现出的坏结果作对比是不公平的，但我还是想说，Genesis 的视频在一致性、合理性的表现上远超 Sora——而且这是有原因的。Genesis 用生成式 AI 生成不同模态的数据，尽管具体是什么我无从得知，但我推测应该是场景（模型、贴图）以及动作，将它交由物理求解器求解出骨骼动画或其他的动作序列，然后交由渲染器去生成最终的视频。在这个工作流中，求解器和渲染器都是基于物理规律运作的，因此可以保证输出可靠的动作/图像/视频，而且可以轻松地在时间和分辨率两个维度上 scale。</p>
+<p>前段时间与一位 CV 领域的学者交流时，对方对 Monte Carlo rendering 提出了这样的评价:「I would not be able to work on monte-carlo ray tracing for image generation. This topic has some disadvantages that I would like to avoid.」因为缺乏进一步的交流，我无从得知这个缺陷是什么，但这个评价反映了很长一段时间内人们对于渲染的意见：它太老了/已经被解决了/会被AI替代，或者说，<strong>渲染死了</strong>。但借由 Genesis 和 Sora 的质量对比，我可以更自信地讲出我的这个判断：</p>
+<div class="collapsible">
+    <div class="inner">
+        生成式 AI 很强，但缺乏对规则的显式理解。希望将渲染（或者说图像/视频生成）这整个问题交给一个生成式 AI 模型，寄希望于毕其功于一役，是做不到的。物理模拟与渲染带来的精确控制和真实感是它们不被生成式 AI 替代的理由。
+    </div>
+</div>
+<p>站在 2024 年末这个时间点上，我认为由生成式 AI 来生成数据（站在 AI 人的视角上，可以视为某种 latent code），交由基于物理规律的求解器和渲染器（视为某种 decoder）进行处理，最终得到视频，是文本生成视频这个任务的一个非常聪明也非常正确的途径。希望在 GPU 算力增长逐渐陷入瓶颈的 2025 年，图形学能有更多新鲜血液，学术界和工业界也能逐渐褪去对 AI 能力的盲信，静下来认真审视它的<strong>能</strong>与<strong>不能</strong>，用聪明的方式创造出<strong>适合行业工作者使用、真正提高生产力</strong>的 AI 工具。</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://blog.zcy.moe/dark_mode.svg" width="24" height="24" alt=""></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://blog.zcy.moe/light_mode.svg" width="24" height="24" alt=""></button>
+    </div>
+    <div class="language-switch-buttons">
+        <button class="language-switch-button" id="language-switch-dark-on"><img src="https://blog.zcy.moe/translation_dark.svg" width="24" height="24" alt=""></button>
+        <button class="language-switch-button" id="language-switch-dark-off"><img src="https://blog.zcy.moe/translation_light.svg" width="24" height="24" alt=""></button>
+        <ul class="language-dropdown">
+            <li class="language-option" id="switch-to-en">English</li>
+            <li class="language-option" id="switch-to-zh-cn">中文</li>
+        </ul>
+    </div>
+    <div id="action-botton">
+        <div class="action-wrapper">
+            <div class="action meter">
+                <span id="progress_meter">JS</span>
+            </div>
+            <a href="#top" class="action up no-dot">
+                <svg xmlns='http://www.w3.org/2000/svg' class='icon' viewBox='0 0 512 512'><title>Arrow Up</title><path fill='none' stroke='currentColor' stroke-linecap='square' stroke-miterlimit='10' stroke-width='48' d='M112 244l144-144 144 144M256 120v292'/></svg>
+            </a>
+        </div>
+    </div>
+    <!-- JS for light/dark switch, minified -->
+    <script>const cls=document.body.classList;const getSessionTheme=sessionStorage.getItem("theme");if(getSessionTheme==="dark"){cls.toggle("dark-mode",true)}else if(getSessionTheme==="light"){cls.toggle("dark-mode",false)}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){cls.toggle("dark-mode",true)}document.getElementById("dark-mode-on").addEventListener("click",function(e){cls.toggle("dark-mode",true);sessionStorage.setItem("theme","dark")});document.getElementById("dark-mode-off").addEventListener("click",function(e){cls.toggle("dark-mode",false);sessionStorage.setItem("theme","light")});</script>
+    <!-- JS for progress meter, minified -->
+    <script type="text/javascript">let progress_meter=document.getElementById("progress_meter"),height=document.body.scrollHeight-screen.height,last_position=window.scrollY;function update_progress_meter(){height=document.body.clientHeight-window.innerHeight,current_position=window.scrollY,progress=Math.ceil(current_position/height*100),height==0?progress=100:progress<0?progress=0:progress>100&&(progress=100),progress_meter.innerText=(progress==100?"End":(progress+"%"))}let ticking=!1;window.addEventListener('scroll',function(a){ticking||(window.requestAnimationFrame(function(){update_progress_meter(),ticking=!1}),ticking=!0)}),progress_meter.style.textDecoration='none',update_progress_meter()</script>
+    <!-- JS for language toggle, minified -->
+    <script type="text/javascript">let toggle_language=function(lang_code){return function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;if(!path.startsWith(`/${ lang_code }`)){const newPath=`/${ lang_code }${ path }`;const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}}};let toggle_default_language=function(){const currentUrl=window.location.href;const url=new URL(currentUrl);const path=url.pathname;const possible_lang_codes=['en'];const lang_code=path.split("/")[1];if(possible_lang_codes.includes(lang_code)){const newPath=path.replace(`/${ lang_code }`,'');const newUrl=`${url.origin }${ newPath }${url.search }${url.hash }`;window.location.href=newUrl}};document.getElementById('switch-to-en').addEventListener('click',toggle_language('en'));document.getElementById('switch-to-zh-cn').addEventListener('click',toggle_default_language);</script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>
